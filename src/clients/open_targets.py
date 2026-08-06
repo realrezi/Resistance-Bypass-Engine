@@ -6,21 +6,27 @@ class OpenTargetsClient(BaseHTTPClient):
     BASE_URL = "https://api.platform.opentargets.org/api/v4/graphql"
 
     KNOWN_DRUGS_QUERY = """
-    query knownDrugsQuery($ensemblId: String!, $size: Int = 100) {
+    query knownDrugsQuery($ensemblId: String!) {
       target(ensemblId: $ensemblId) {
         id
         approvedSymbol
-        knownDrugs(size: $size) {
+        drugAndClinicalCandidates {
           count
           rows {
-            drugId
-            prefName
-            drugType
-            mechanismOfAction
-            targetId
-            targetSymbol
-            phase
-            status
+            id
+            maxClinicalStage
+            drug {
+              id
+              name
+              drugType
+              maximumClinicalStage
+              mechanismsOfAction {
+                rows {
+                  mechanismOfAction
+                  targetName
+                }
+              }
+            }
           }
         }
       }
@@ -34,7 +40,6 @@ class OpenTargetsClient(BaseHTTPClient):
             "query": self.KNOWN_DRUGS_QUERY,
             "variables": {
                 "ensemblId": clean_ensembl,
-                "size": size,
             },
         }
         data = await self.post_json(self.BASE_URL, json_data=json_payload)
@@ -46,5 +51,36 @@ class OpenTargetsClient(BaseHTTPClient):
         if not target_data:
             return []
 
-        known_drugs = target_data.get("knownDrugs", {})
-        return known_drugs.get("rows", [])
+        candidates = target_data.get("drugAndClinicalCandidates", {})
+        rows = candidates.get("rows", [])
+
+        parsed_drugs: List[Dict[str, Any]] = []
+        for row in rows[:size]:
+            drug_obj = row.get("drug", {}) or {}
+            drug_id = drug_obj.get("id", "")
+            pref_name = drug_obj.get("name") or drug_id
+            drug_type = drug_obj.get("drugType", "")
+            moa_rows = drug_obj.get("mechanismsOfAction", {}).get("rows", [])
+            moa = moa_rows[0].get("mechanismOfAction") if moa_rows else "Bypass Pathway Inhibitor"
+            stage_str = row.get("maxClinicalStage") or drug_obj.get("maximumClinicalStage") or "PHASE_2"
+            phase = 2
+            if "PHASE_" in str(stage_str):
+                try:
+                    phase = int(str(stage_str).replace("PHASE_", ""))
+                except ValueError:
+                    phase = 2
+
+            parsed_drugs.append(
+                {
+                    "drugId": drug_id,
+                    "prefName": pref_name,
+                    "drugType": drug_type,
+                    "mechanismOfAction": moa,
+                    "targetSymbol": target_data.get("approvedSymbol", ""),
+                    "phase": phase,
+                    "status": "active",
+                }
+            )
+
+        return parsed_drugs
+
