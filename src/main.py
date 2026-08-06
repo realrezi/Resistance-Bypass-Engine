@@ -70,7 +70,7 @@ INDEX_HTML = """<!DOCTYPE html>
         }
 
         .container {
-            max-width: 1100px;
+            max-width: 1150px;
             margin: 0 auto;
         }
 
@@ -108,7 +108,7 @@ INDEX_HTML = """<!DOCTYPE html>
         p.subtitle {
             color: var(--text-muted);
             font-size: 1.1rem;
-            max-width: 680px;
+            max-width: 720px;
             margin: 0 auto 1.5rem auto;
         }
 
@@ -128,6 +128,7 @@ INDEX_HTML = """<!DOCTYPE html>
             border-radius: 6px;
             border: 1px solid var(--card-border);
             transition: all 0.2s ease;
+            cursor: pointer;
         }
 
         .nav-link:hover {
@@ -136,13 +137,19 @@ INDEX_HTML = """<!DOCTYPE html>
             background: rgba(255,255,255,0.05);
         }
 
+        .nav-link.highlight {
+            background: rgba(168, 85, 247, 0.15);
+            border-color: rgba(168, 85, 247, 0.3);
+            color: #c084fc;
+        }
+
         .grid-layout {
             display: grid;
-            grid-template-columns: 360px 1fr;
+            grid-template-columns: 380px 1fr;
             gap: 1.5rem;
         }
 
-        @media (max-width: 850px) {
+        @media (max-width: 900px) {
             .grid-layout { grid-template-columns: 1fr; }
         }
 
@@ -170,11 +177,58 @@ INDEX_HTML = """<!DOCTYPE html>
         }
 
         label {
-            display: block;
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
             font-size: 0.85rem;
             font-weight: 600;
             color: #cbd5e1;
             margin-bottom: 0.4rem;
+        }
+
+        .info-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            color: #94a3b8;
+            font-size: 0.7rem;
+            cursor: help;
+            position: relative;
+        }
+
+        .tooltip-box {
+            position: relative;
+        }
+
+        .tooltip-box .tooltip-text {
+            visibility: hidden;
+            width: 220px;
+            background-color: #0f172a;
+            color: #e2e8f0;
+            text-align: left;
+            border-radius: 8px;
+            padding: 0.6rem 0.8rem;
+            position: absolute;
+            z-index: 10;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.2s;
+            font-size: 0.78rem;
+            border: 1px solid rgba(255,255,255,0.15);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            font-weight: 400;
+            line-height: 1.35;
+        }
+
+        .tooltip-box:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
         }
 
         input {
@@ -195,20 +249,29 @@ INDEX_HTML = """<!DOCTYPE html>
             box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15);
         }
 
+        .preset-section-title {
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin: 0.8rem 0 0.4rem 0;
+        }
+
         .preset-buttons {
             display: flex;
             flex-wrap: wrap;
             gap: 0.4rem;
-            margin-bottom: 1.25rem;
+            margin-bottom: 0.5rem;
         }
 
         .btn-preset {
             background: rgba(255, 255, 255, 0.04);
             border: 1px solid rgba(255, 255, 255, 0.08);
             color: #94a3b8;
-            padding: 0.35rem 0.65rem;
+            padding: 0.35rem 0.6rem;
             border-radius: 6px;
-            font-size: 0.78rem;
+            font-size: 0.76rem;
             font-weight: 500;
             cursor: pointer;
             transition: all 0.2s ease;
@@ -231,6 +294,7 @@ INDEX_HTML = """<!DOCTYPE html>
             font-weight: 700;
             cursor: pointer;
             transition: transform 0.2s ease, opacity 0.2s ease;
+            margin-top: 0.5rem;
         }
 
         .btn-submit:hover {
@@ -285,6 +349,10 @@ INDEX_HTML = """<!DOCTYPE html>
             text-transform: uppercase;
             letter-spacing: 0.05em;
             margin-top: 0.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.25rem;
         }
 
         .canonical-tags {
@@ -302,6 +370,38 @@ INDEX_HTML = """<!DOCTYPE html>
             border-radius: 6px;
             font-size: 0.78rem;
             font-family: var(--font-mono);
+        }
+
+        .filter-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .filter-tabs {
+            display: flex;
+            gap: 0.3rem;
+        }
+
+        .btn-tab {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            color: #94a3b8;
+            padding: 0.35rem 0.65rem;
+            border-radius: 6px;
+            font-size: 0.78rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-tab.active {
+            background: rgba(56, 189, 248, 0.15);
+            border-color: rgba(56, 189, 248, 0.4);
+            color: #38bdf8;
+            font-weight: 600;
         }
 
         .therapy-card {
@@ -404,17 +504,87 @@ INDEX_HTML = """<!DOCTYPE html>
             padding: 4rem 1rem;
             color: #64748b;
         }
+
+        /* Clinician Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(7, 10, 18, 0.85);
+            backdrop-filter: blur(12px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .modal-content {
+            background: #0f172a;
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 16px;
+            max-width: 720px;
+            width: 100%;
+            max-height: 85vh;
+            overflow-y: auto;
+            padding: 2rem;
+            color: #e2e8f0;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .modal-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #38bdf8;
+        }
+
+        .modal-close {
+            background: transparent;
+            border: none;
+            color: #94a3b8;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .glossary-item {
+            margin-bottom: 1.25rem;
+        }
+
+        .glossary-term {
+            font-weight: 700;
+            color: #f8fafc;
+            font-size: 0.95rem;
+            margin-bottom: 0.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .glossary-desc {
+            font-size: 0.88rem;
+            color: #94a3b8;
+            line-height: 1.5;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <div class="badge">🧬 Targeted Oncology Microservice</div>
+            <div class="badge">🧬 Targeted Oncology Precision Engine</div>
             <h1>Resistance Bypass Engine</h1>
-            <p class="subtitle">Predict acquired drug resistance mechanisms, resolve canonical biological IDs, expand PPI signaling networks, and rank clinical combination therapies.</p>
+            <p class="subtitle">Models acquired drug resistance pathways in cancer, resolves canonical biological IDs, constructs NetworkX PPI graphs, and ranks active clinical dual-drug combination therapies.</p>
             <div class="nav-links">
+                <a onclick="toggleModal(true)" class="nav-link highlight">📖 Clinician & Researcher Guide</a>
                 <a href="/docs" target="_blank" class="nav-link">⚡ OpenAPI Docs (/docs)</a>
-                <a href="/health" target="_blank" class="nav-link">💚 Health Diagnostics</a>
+                <a href="/health" target="_blank" class="nav-link">💚 Diagnostics</a>
                 <a href="https://github.com/realrezi/Resistance-Bypass-Engine" target="_blank" class="nav-link">📦 GitHub Repository</a>
             </div>
         </header>
@@ -422,36 +592,71 @@ INDEX_HTML = """<!DOCTYPE html>
         <div class="grid-layout">
             <!-- Sidebar Form -->
             <div class="glass-panel">
-                <div class="panel-title">🎯 Analysis Inputs</div>
-                
-                <div class="form-group">
-                    <label>Quick Demo Presets</label>
-                    <div class="preset-buttons">
-                        <button class="btn-preset" onclick="setPreset('EGFR', 'Osimertinib', 'MET')">EGFR + MET (Bypass)</button>
-                        <button class="btn-preset" onclick="setPreset('EGFR', 'Osimertinib', 'EGFR')">EGFR + EGFR (On-Target)</button>
-                        <button class="btn-preset" onclick="setPreset('HER2', 'Trastuzumab', 'MET')">HER2 + MET (Alias)</button>
-                    </div>
+                <div class="panel-title">
+                    <span>🎯 Analysis Inputs</span>
                 </div>
-
+                
                 <form id="analyzeForm" onsubmit="runAnalysis(event)">
                     <div class="form-group">
-                        <label for="primary_target">Primary Target Symbol</label>
+                        <label for="primary_target">
+                            Primary Target Symbol
+                            <span class="tooltip-box info-icon">i
+                                <span class="tooltip-text">Oncogenic driver gene targeted by frontline therapy (e.g. EGFR, ERBB2, ALK, BRAF).</span>
+                            </span>
+                        </label>
                         <input type="text" id="primary_target" value="EGFR" required placeholder="e.g. EGFR, ERBB2">
                     </div>
+
                     <div class="form-group">
-                        <label for="primary_drug">Primary Drug Name</label>
+                        <label for="primary_drug">
+                            Primary Drug Name
+                            <span class="tooltip-box info-icon">i
+                                <span class="tooltip-text">Frontline targeted agent administered (e.g. Osimertinib, Trastuzumab, Sotorasib).</span>
+                            </span>
+                        </label>
                         <input type="text" id="primary_drug" value="Osimertinib" required placeholder="e.g. Osimertinib">
                     </div>
+
                     <div class="form-group">
-                        <label for="resistance_marker">Secondary Resistance Marker</label>
+                        <label for="resistance_marker">
+                            Secondary Resistance Marker
+                            <span class="tooltip-box info-icon">i
+                                <span class="tooltip-text">Bypass marker or secondary mutation driving acquired resistance (e.g. MET, KRAS, BRAF).</span>
+                            </span>
+                        </label>
                         <input type="text" id="resistance_marker" value="MET" required placeholder="e.g. MET, KRAS">
                     </div>
+
                     <div class="form-group">
                         <label for="cancer_type">Cancer Indication</label>
                         <input type="text" id="cancer_type" value="Non-Small Cell Lung Cancer">
                     </div>
+
                     <button type="submit" id="submitBtn" class="btn-submit">🚀 Run Resistance Pipeline</button>
                 </form>
+
+                <div style="margin-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 1rem;">
+                    <div class="preset-section-title">Lung Cancer (NSCLC) Presets</div>
+                    <div class="preset-buttons">
+                        <button class="btn-preset" onclick="setPreset('EGFR', 'Osimertinib', 'MET', 'NSCLC')">EGFR + MET (Bypass)</button>
+                        <button class="btn-preset" onclick="setPreset('EGFR', 'Osimertinib', 'EGFR', 'NSCLC')">EGFR + EGFR (C797S)</button>
+                        <button class="btn-preset" onclick="setPreset('ALK', 'Alectinib', 'MET', 'NSCLC')">ALK + MET (Bypass)</button>
+                        <button class="btn-preset" onclick="setPreset('MET', 'Capmatinib', 'EGFR', 'NSCLC')">MET + EGFR (Reciprocal)</button>
+                    </div>
+
+                    <div class="preset-section-title">Breast & Gynecologic Presets</div>
+                    <div class="preset-buttons">
+                        <button class="btn-preset" onclick="setPreset('HER2', 'Trastuzumab', 'MET', 'Breast Cancer')">HER2 + MET (Bypass)</button>
+                        <button class="btn-preset" onclick="setPreset('ESR1', 'Fulvestrant', 'CDK4', 'Breast Cancer')">ESR1 + CDK4 (Cyclin)</button>
+                    </div>
+
+                    <div class="preset-section-title">Melanoma & GI Presets</div>
+                    <div class="preset-buttons">
+                        <button class="btn-preset" onclick="setPreset('BRAF', 'Dabrafenib', 'RAF1', 'Melanoma')">BRAF + RAF1 (MAPK)</button>
+                        <button class="btn-preset" onclick="setPreset('KRAS', 'Sotorasib', 'EGFR', 'Colorectal Cancer')">KRAS + EGFR (RTK)</button>
+                        <button class="btn-preset" onclick="setPreset('AR', 'Enzalutamide', 'PIK3CA', 'Prostate Cancer')">AR + PIK3CA (PI3K)</button>
+                    </div>
+                </div>
             </div>
 
             <!-- Results Panel -->
@@ -469,7 +674,7 @@ INDEX_HTML = """<!DOCTYPE html>
                 </div>
 
                 <div id="placeholder" class="placeholder-state">
-                    <p>Enter biological targets on the left or select a preset to analyze signaling graph topologies.</p>
+                    <p>Select a clinical preset or enter custom targets to model signaling graph topologies.</p>
                 </div>
 
                 <div id="resultsContent" style="display: none;">
@@ -481,32 +686,100 @@ INDEX_HTML = """<!DOCTYPE html>
                     <div class="metrics-summary">
                         <div class="metric-card">
                             <div class="metric-val" id="resTypeVal">-</div>
-                            <div class="metric-lbl">Resistance Type</div>
+                            <div class="metric-lbl">
+                                Resistance Type
+                                <span class="tooltip-box info-icon">i
+                                    <span class="tooltip-text">Off-Target Bypass (parallel activation) vs On-Target Mutation (binding pocket alteration).</span>
+                                </span>
+                            </div>
                         </div>
                         <div class="metric-card">
                             <div class="metric-val" id="nodesCountVal">0</div>
-                            <div class="metric-lbl">Network Nodes</div>
+                            <div class="metric-lbl">
+                                Network Nodes
+                                <span class="tooltip-box info-icon">i
+                                    <span class="tooltip-text">Number of interacting proteins in the STRING-DB signaling subnet.</span>
+                                </span>
+                            </div>
                         </div>
                         <div class="metric-card">
                             <div class="metric-val" id="distVal">0.0</div>
-                            <div class="metric-lbl">Shortest Distance</div>
+                            <div class="metric-lbl">
+                                Shortest Distance
+                                <span class="tooltip-box info-icon">i
+                                    <span class="tooltip-text">Topological distance in network between target and resistance marker.</span>
+                                </span>
+                            </div>
                         </div>
                     </div>
 
-                    <h3 style="font-size: 1rem; margin-bottom: 1rem; color: #e2e8f0;">Ranked Dual-Drug Combinations</h3>
+                    <div class="filter-controls">
+                        <h3 style="font-size: 1rem; color: #e2e8f0;">Ranked Dual-Drug Combination Therapies</h3>
+                        <div class="filter-tabs">
+                            <button class="btn-tab active" onclick="filterPhase('ALL')">All Phases</button>
+                            <button class="btn-tab" onclick="filterPhase(4)">Phase 4 (Approved)</button>
+                            <button class="btn-tab" onclick="filterPhase(3)">Phase 3</button>
+                            <button class="btn-tab" onclick="filterPhase(2)">Phase 2</button>
+                        </div>
+                    </div>
+
                     <div id="therapiesList"></div>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- Clinician Guide Modal -->
+    <div id="clinicianModal" class="modal-overlay" onclick="if(event.target===this) toggleModal(false)">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">📖 Clinical & Methodological Guide</div>
+                <button class="modal-close" onclick="toggleModal(false)">&times;</button>
+            </div>
+            
+            <div class="glossary-item">
+                <div class="glossary-term">🎯 Primary Target & Primary Drug</div>
+                <div class="glossary-desc">The frontline oncogenic driver protein (e.g. EGFR in lung cancer) and the primary targeted inhibitor administered to the patient (e.g. Osimertinib).</div>
+            </div>
+
+            <div class="glossary-item">
+                <div class="glossary-term">⚡ Secondary Resistance Marker</div>
+                <div class="glossary-desc">The acquired gene or protein driving therapeutic resistance. Resistance occurs via two primary biological mechanisms:</div>
+                <ul style="margin: 0.4rem 0 0 1.2rem; font-size: 0.85rem; color: #94a3b8;">
+                    <li><strong>Off-Target Bypass:</strong> Activation of a parallel signaling pathway (e.g., MET amplification) that bypasses the blocked primary target to sustain downstream cell survival.</li>
+                    <li><strong>On-Target Mutation:</strong> Secondary mutations directly inside the primary target gene (e.g., EGFR C797S) preventing drug binding.</li>
+                </ul>
+            </div>
+
+            <div class="glossary-item">
+                <div class="glossary-term">🧮 Hub-Penalized Bottleneck Centrality</div>
+                <div class="glossary-desc">NetworkX centrality algorithm computed as: <code>Betweenness / log2(Degree + 2)</code>. This penalizes generic, highly-connected hub proteins (e.g., Ubiquitin) while isolating true bottleneck signaling nodes driving resistance.</div>
+            </div>
+
+            <div class="glossary-item">
+                <div class="glossary-term">🧪 Synergy Score & Dual-Drug Ranking</div>
+                <div class="glossary-desc">Calculated score (0.0 to 1.0) combining network shortest path distance, bottleneck centrality, and ChEMBL binding affinity (pChEMBL). Recommends active, non-withdrawn clinical combination therapies to override resistance.</div>
+            </div>
+
+            <div style="text-align: right; margin-top: 1.5rem;">
+                <button class="btn-submit" style="width: auto; padding: 0.6rem 1.2rem;" onclick="toggleModal(false)">Got It</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         let latestAnalysisData = null;
+        let currentFilterPhase = 'ALL';
 
-        function setPreset(target, drug, marker) {
+        function toggleModal(show) {
+            document.getElementById('clinicianModal').style.display = show ? 'flex' : 'none';
+        }
+
+        function setPreset(target, drug, marker, indication) {
             document.getElementById('primary_target').value = target;
             document.getElementById('primary_drug').value = drug;
             document.getElementById('resistance_marker').value = marker;
+            if (indication) document.getElementById('cancer_type').value = indication;
             executePipeline();
         }
 
@@ -515,12 +788,18 @@ INDEX_HTML = """<!DOCTYPE html>
             executePipeline();
         }
 
+        function filterPhase(phase) {
+            currentFilterPhase = phase;
+            document.querySelectorAll('.btn-tab').forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active');
+            renderTherapies();
+        }
+
         async function executePipeline() {
             const submitBtn = document.getElementById('submitBtn');
             const loader = document.getElementById('loader');
             const placeholder = document.getElementById('placeholder');
             const resultsContent = document.getElementById('resultsContent');
-            const therapiesList = document.getElementById('therapiesList');
             const errorBanner = document.getElementById('errorBanner');
             const copyJsonBtn = document.getElementById('copyJsonBtn');
 
@@ -559,30 +838,7 @@ INDEX_HTML = """<!DOCTYPE html>
                     : Number(data.shortest_path_distance) || 0;
                 document.getElementById('distVal').innerText = distNum.toFixed(3);
 
-                therapiesList.innerHTML = '';
-                if (!data.ranked_combinations || data.ranked_combinations.length === 0) {
-                    therapiesList.innerHTML = '<div style="color: #94a3b8; font-size: 0.9rem; text-align: center; padding: 2rem;">No clinical combination therapies found for this pair.</div>';
-                } else {
-                    data.ranked_combinations.forEach((c, idx) => {
-                        const pct = Math.round((c.synergy_score || 0) * 100);
-                        const card = document.createElement('div');
-                        card.className = 'therapy-card';
-                        card.innerHTML = `
-                            <div class="therapy-header">
-                                <span class="drug-title">#${idx+1} ${c.secondary_drug} + ${payload.primary_drug}</span>
-                                <span class="phase-badge">Phase ${c.clinical_phase}</span>
-                            </div>
-                            <div style="font-size: 0.8rem; color: #38bdf8; margin-bottom: 0.2rem;">
-                                Target: <strong>${c.secondary_target}</strong> | Synergy Score: <strong>${c.synergy_score}</strong> | Hub Penalty Centrality: ${c.hub_penalized_centrality}
-                            </div>
-                            <div class="synergy-bar-bg">
-                                <div class="synergy-bar-fill" style="width: ${pct}%"></div>
-                            </div>
-                            <div class="rationale">${c.biological_rationale}</div>
-                        `;
-                        therapiesList.appendChild(card);
-                    });
-                }
+                renderTherapies();
 
                 resultsContent.style.display = 'block';
                 copyJsonBtn.style.display = 'inline-block';
@@ -596,6 +852,43 @@ INDEX_HTML = """<!DOCTYPE html>
             }
         }
 
+        function renderTherapies() {
+            if (!latestAnalysisData) return;
+            const therapiesList = document.getElementById('therapiesList');
+            therapiesList.innerHTML = '';
+
+            let candidates = latestAnalysisData.ranked_combinations || [];
+            if (currentFilterPhase !== 'ALL') {
+                candidates = candidates.filter(c => c.clinical_phase === Number(currentFilterPhase));
+            }
+
+            if (candidates.length === 0) {
+                therapiesList.innerHTML = '<div style="color: #94a3b8; font-size: 0.9rem; text-align: center; padding: 2rem;">No clinical combination therapies found for the selected filter.</div>';
+                return;
+            }
+
+            const primaryDrug = document.getElementById('primary_drug').value.trim();
+            candidates.forEach((c, idx) => {
+                const pct = Math.round((c.synergy_score || 0) * 100);
+                const card = document.createElement('div');
+                card.className = 'therapy-card';
+                card.innerHTML = `
+                    <div class="therapy-header">
+                        <span class="drug-title">#${idx+1} ${c.secondary_drug} + ${primaryDrug}</span>
+                        <span class="phase-badge">Phase ${c.clinical_phase}</span>
+                    </div>
+                    <div style="font-size: 0.8rem; color: #38bdf8; margin-bottom: 0.2rem;">
+                        Target: <strong>${c.secondary_target}</strong> | Synergy Score: <strong>${c.synergy_score}</strong> | Hub Penalty Centrality: ${c.hub_penalized_centrality}
+                    </div>
+                    <div class="synergy-bar-bg">
+                        <div class="synergy-bar-fill" style="width: ${pct}%"></div>
+                    </div>
+                    <div class="rationale">${c.biological_rationale}</div>
+                `;
+                therapiesList.appendChild(card);
+            });
+        }
+
         function copyResultJson() {
             if (!latestAnalysisData) return;
             navigator.clipboard.writeText(JSON.stringify(latestAnalysisData, null, 2))
@@ -606,6 +899,7 @@ INDEX_HTML = """<!DOCTYPE html>
 </body>
 </html>
 """
+
 
 
 def _sync_build_and_score(
