@@ -12,13 +12,20 @@ class IDMapper(BaseHTTPClient):
         url = f"https://rest.genenames.org/fetch/symbol/{symbol}"
         headers = {"Accept": "application/json"}
         data = await self.get_json(url, headers=headers)
-        
+
         docs = data.get("response", {}).get("docs", [])
         if not docs:
-            # Fallback search
-            search_url = f"https://rest.genenames.org/search/symbol/{symbol}"
-            data = await self.get_json(search_url, headers=headers)
-            docs = data.get("response", {}).get("docs", [])
+            # Fallback search across symbols, aliases, and previous symbols (e.g., HER2 -> ERBB2)
+            search_url = f"https://rest.genenames.org/search/{symbol}"
+            search_data = await self.get_json(search_url, headers=headers)
+            search_docs = search_data.get("response", {}).get("docs", [])
+            if search_docs:
+                canonical = search_docs[0].get("symbol", "").upper()
+                if canonical:
+                    # Fetch official canonical document for the resolved symbol
+                    fetch_url = f"https://rest.genenames.org/fetch/symbol/{canonical}"
+                    fetch_data = await self.get_json(fetch_url, headers=headers)
+                    docs = fetch_data.get("response", {}).get("docs", [])
 
         if not docs:
             raise ValueError(f"Gene symbol '{symbol}' not found in HGNC.")
@@ -30,6 +37,7 @@ class IDMapper(BaseHTTPClient):
         ensembl_id = raw_ensembl.split(".")[0] if raw_ensembl else ""
 
         return canonical_symbol, ensembl_id
+
 
     async def resolve_uniprot(self, canonical_symbol: str) -> str:
         """Resolve UniProt primary accession for human gene symbol."""
