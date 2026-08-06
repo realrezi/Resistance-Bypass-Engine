@@ -31,3 +31,4 @@ bypass_engine_cache/
 # OS
 .DS_Store
 Thumbs.db
+.vercel

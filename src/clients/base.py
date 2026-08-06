@@ -48,9 +48,12 @@ class BaseHTTPClient:
         headers: Optional[Dict[str, str]] = None,
     ) -> Union[Dict[str, Any], List[Any]]:
         cache_key = _stable_cache_key("GET", url, params)
-        cached_val = cache.get(cache_key)
-        if cached_val is not None:
-            return cached_val
+        try:
+            cached_val = cache.get(cache_key)
+            if cached_val is not None:
+                return cached_val
+        except Exception:
+            pass
 
         merged_headers = self.headers.copy()
         if headers:
@@ -64,7 +67,10 @@ class BaseHTTPClient:
                 data = response.json()
 
         # Cache only primitive JSON types (dict/list) with 7-day TTL
-        cache.set(cache_key, data, expire=604800)
+        try:
+            cache.set(cache_key, data, expire=604800)
+        except Exception:
+            pass
         return data
 
     @retry(
@@ -80,9 +86,12 @@ class BaseHTTPClient:
         headers: Optional[Dict[str, str]] = None,
     ) -> Union[Dict[str, Any], List[Any]]:
         cache_key = _stable_cache_key("POST", url, json_data)
-        cached_val = cache.get(cache_key)
-        if cached_val is not None:
-            return cached_val
+        try:
+            cached_val = cache.get(cache_key)
+            if cached_val is not None:
+                return cached_val
+        except Exception:
+            pass
 
         merged_headers = self.headers.copy()
         if headers:
@@ -95,5 +104,9 @@ class BaseHTTPClient:
                 response.raise_for_status()
                 data = response.json()
 
-        cache.set(cache_key, data, expire=604800)
+        try:
+            cache.set(cache_key, data, expire=604800)
+        except Exception:
+            pass
         return data
+

@@ -570,8 +570,10 @@ async def analyze_resistance(req: ResistanceRequest) -> ResistanceBypassReport:
     id_mapper = IDMapper()
 
     try:
-        mapped_primary = await id_mapper.map_identifier(req.primary_target)
-        mapped_resistance = await id_mapper.map_identifier(req.resistance_marker)
+        mapped_primary, mapped_resistance = await asyncio.gather(
+            id_mapper.map_identifier(req.primary_target),
+            id_mapper.map_identifier(req.resistance_marker),
+        )
     except Exception as e:
         raise HTTPException(status_code=422, detail=f"ID Resolution failed: {str(e)}")
 
@@ -644,23 +646,25 @@ async def analyze_resistance(req: ResistanceRequest) -> ResistanceBypassReport:
         string_client = StringDBClient()
         ot_client = OpenTargetsClient()
 
-        # Fetch STRING-DB network
-        interactions = await string_client.get_network(
-            primary_target_canonical, resistance_marker_canonical
-        )
+        async def _fetch_activities() -> Dict[str, float]:
+            if mapped_resistance.chembl_target_id:
+                return await chembl_client.get_target_activities(
+                    mapped_resistance.chembl_target_id
+                )
+            return {}
 
-        # Fetch Open Targets known drugs for resistance marker
-        ot_drugs = await ot_client.get_known_drugs(mapped_resistance.ensembl_id)
+        # Fetch external APIs concurrently via asyncio.gather
+        interactions, ot_drugs, activity_map = await asyncio.gather(
+            string_client.get_network(
+                primary_target_canonical, resistance_marker_canonical
+            ),
+            ot_client.get_known_drugs(mapped_resistance.ensembl_id),
+            _fetch_activities(),
+        )
 
         # Filter out withdrawn drugs — AGENTS.md: "ranks active, non-withdrawn clinical dual-drug combination therapies"
         ot_drugs = [d for d in ot_drugs if not _is_drug_withdrawn(d)]
 
-        # Fetch ChEMBL activities for resistance target if available
-        activity_map: Dict[str, float] = {}
-        if mapped_resistance.chembl_target_id:
-            activity_map = await chembl_client.get_target_activities(
-                mapped_resistance.chembl_target_id
-            )
 
         raw_candidates: List[Dict[str, Any]] = []
 
