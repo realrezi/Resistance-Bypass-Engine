@@ -722,7 +722,35 @@ INDEX_HTML = """<!DOCTYPE html>
                                 <span class="tooltip-body">Oncogenic driver gene targeted by frontline therapy (e.g. EGFR, ERBB2/HER2, ALK, BRAF).</span>
                             </span>
                         </label>
-                        <input class="input-field" type="text" id="primary_target" value="EGFR" required placeholder="e.g. EGFR, ERBB2">
+                        <input class="input-field" type="text" id="primary_target" value="EGFR" required placeholder="Type gene symbol (e.g. EGFR, ERBB2)..." list="targets_list" autocomplete="off">
+                        <datalist id="targets_list">
+                            <option value="EGFR">Epidermal Growth Factor Receptor</option>
+                            <option value="ERBB2">ERBB2 / HER2 Receptor Tyrosine Kinase</option>
+                            <option value="MET">MET Hepatocyte Growth Factor Receptor</option>
+                            <option value="ALK">ALK Receptor Tyrosine Kinase</option>
+                            <option value="KRAS">KRAS Proto-Oncogene GTPase</option>
+                            <option value="BRAF">BRAF Serine/Threonine Kinase</option>
+                            <option value="PIK3CA">PI3K Catalytic Subunit Alpha</option>
+                            <option value="ROS1">ROS1 Receptor Tyrosine Kinase</option>
+                            <option value="RET">RET Proto-Oncogene Kinase</option>
+                            <option value="ESR1">Estrogen Receptor 1</option>
+                            <option value="ABL1">ABL1 Non-Receptor Tyrosine Kinase</option>
+                            <option value="CDK4">Cyclin Dependent Kinase 4</option>
+                            <option value="CDK6">Cyclin Dependent Kinase 6</option>
+                            <option value="AR">Androgen Receptor</option>
+                            <option value="BRCA1">BRCA1 DNA Repair Associated</option>
+                            <option value="BRCA2">BRCA2 DNA Repair Associated</option>
+                            <option value="TP53">Tumor Protein P53</option>
+                            <option value="PTEN">Phosphatase And Tensin Homolog</option>
+                            <option value="AKT1">AKT Serine/Threonine Kinase 1</option>
+                            <option value="MAP2K1">MAP2K1 / MEK1 Kinase</option>
+                            <option value="NRAS">NRAS Proto-Oncogene GTPase</option>
+                            <option value="FGFR1">FGFR1 Receptor Tyrosine Kinase</option>
+                            <option value="FGFR2">FGFR2 Receptor Tyrosine Kinase</option>
+                            <option value="FGFR3">FGFR3 Receptor Tyrosine Kinase</option>
+                            <option value="KIT">KIT Receptor Tyrosine Kinase</option>
+                            <option value="PDGFRA">PDGFRA Tyrosine Kinase</option>
+                        </datalist>
                     </div>
 
                     <div class="form-group">
@@ -732,7 +760,41 @@ INDEX_HTML = """<!DOCTYPE html>
                                 <span class="tooltip-body">Frontline targeted agent administered to patient (e.g. Osimertinib, Trastuzumab, Sotorasib).</span>
                             </span>
                         </label>
-                        <input class="input-field" type="text" id="primary_drug" value="Osimertinib" required placeholder="e.g. Osimertinib">
+                        <input class="input-field" type="text" id="primary_drug" value="Osimertinib" required placeholder="Type drug name (e.g. Osimertinib)..." list="drugs_list" autocomplete="off">
+                        <datalist id="drugs_list">
+                            <option value="Osimertinib">Osimertinib (EGFR TKI)</option>
+                            <option value="Trastuzumab">Trastuzumab (Anti-HER2 mAb)</option>
+                            <option value="Gefitinib">Gefitinib (EGFR TKI)</option>
+                            <option value="Erlotinib">Erlotinib (EGFR TKI)</option>
+                            <option value="Afatinib">Afatinib (EGFR TKI)</option>
+                            <option value="Lapatinib">Lapatinib (EGFR/HER2 TKI)</option>
+                            <option value="Tucatinib">Tucatinib (HER2 TKI)</option>
+                            <option value="Capmatinib">Capmatinib (MET TKI)</option>
+                            <option value="Tepotinib">Tepotinib (MET TKI)</option>
+                            <option value="Alectinib">Alectinib (ALK TKI)</option>
+                            <option value="Brigatinib">Brigatinib (ALK TKI)</option>
+                            <option value="Lorlatinib">Lorlatinib (ALK TKI)</option>
+                            <option value="Sotorasib">Sotorasib (KRAS G12C Inhibitor)</option>
+                            <option value="Adagrasib">Adagrasib (KRAS G12C Inhibitor)</option>
+                            <option value="Dabrafenib">Dabrafenib (BRAF Inhibitor)</option>
+                            <option value="Vemurafenib">Vemurafenib (BRAF Inhibitor)</option>
+                            <option value="Encorafenib">Encorafenib (BRAF Inhibitor)</option>
+                            <option value="Trametinib">Trametinib (MEK Inhibitor)</option>
+                            <option value="Fulvestrant">Fulvestrant (SERD)</option>
+                            <option value="Palbociclib">Palbociclib (CDK4/6 Inhibitor)</option>
+                            <option value="Ribociclib">Ribociclib (CDK4/6 Inhibitor)</option>
+                            <option value="Abemaciclib">Abemaciclib (CDK4/6 Inhibitor)</option>
+                            <option value="Imatinib">Imatinib (BCR-ABL TKI)</option>
+                            <option value="Nilotinib">Nilotinib (BCR-ABL TKI)</option>
+                            <option value="Dasatinib">Dasatinib (BCR-ABL TKI)</option>
+                            <option value="Ponatinib">Ponatinib (BCR-ABL TKI)</option>
+                            <option value="Selpercatinib">Selpercatinib (RET Inhibitor)</option>
+                            <option value="Pralsetinib">Pralsetinib (RET Inhibitor)</option>
+                            <option value="Entrectinib">Entrectinib (ROS1/NTRK TKI)</option>
+                            <option value="Enzalutamide">Enzalutamide (AR Inhibitor)</option>
+                            <option value="Alpelisib">Alpelisib (PI3Kalpha Inhibitor)</option>
+                            <option value="Olaparib">Olaparib (PARP Inhibitor)</option>
+                        </datalist>
                     </div>
 
                     <div class="form-group">
@@ -742,12 +804,51 @@ INDEX_HTML = """<!DOCTYPE html>
                                 <span class="tooltip-body">Bypass marker or secondary mutation driving acquired resistance (e.g. MET, KRAS, BRAF).</span>
                             </span>
                         </label>
-                        <input class="input-field" type="text" id="resistance_marker" value="MET" required placeholder="e.g. MET, KRAS">
+                        <input class="input-field" type="text" id="resistance_marker" value="MET" required placeholder="Type resistance marker (e.g. MET, KRAS)..." list="markers_list" autocomplete="off">
+                        <datalist id="markers_list">
+                            <option value="MET">MET Amplification / Bypass</option>
+                            <option value="EGFR">EGFR Secondary Mutation (C797S)</option>
+                            <option value="KRAS">KRAS Activation</option>
+                            <option value="BRAF">BRAF V600 Activation</option>
+                            <option value="ERBB2">ERBB2 / HER2 Amplification</option>
+                            <option value="PIK3CA">PIK3CA Hyperactivation</option>
+                            <option value="CDK4">CDK4 Cyclin Axis</option>
+                            <option value="CDK6">CDK6 Cyclin Axis</option>
+                            <option value="ABL1">ABL1 Gatekeeper (T315I)</option>
+                            <option value="MAP2K1">MAP2K1 / MEK1 Reactivation</option>
+                            <option value="RAF1">RAF1 Bypass</option>
+                            <option value="MYC">MYC Amplification</option>
+                            <option value="PTEN">PTEN Loss of Function</option>
+                            <option value="AKT1">AKT1 Activation</option>
+                            <option value="RB1">RB1 Loss of Function</option>
+                            <option value="TP53">TP53 Mutation</option>
+                            <option value="NRAS">NRAS Bypass</option>
+                            <option value="MAPK1">ERK1 / MAPK1 Reactivation</option>
+                        </datalist>
                     </div>
 
                     <div class="form-group">
                         <label class="field-label" for="cancer_type">Cancer Indication</label>
-                        <input class="input-field" type="text" id="cancer_type" value="Non-Small Cell Lung Cancer">
+                        <input class="input-field" type="text" id="cancer_type" value="Non-Small Cell Lung Cancer" placeholder="Type indication (e.g. NSCLC, Breast Cancer)..." list="indications_list" autocomplete="off">
+                        <datalist id="indications_list">
+                            <option value="Non-Small Cell Lung Cancer">Non-Small Cell Lung Cancer (NSCLC)</option>
+                            <option value="Small Cell Lung Cancer">Small Cell Lung Cancer (SCLC)</option>
+                            <option value="HER2+ Breast Cancer">HER2+ Breast Cancer</option>
+                            <option value="HR+/HER2- Breast Cancer">HR+/HER2- Breast Cancer</option>
+                            <option value="Triple-Negative Breast Cancer">Triple-Negative Breast Cancer (TNBC)</option>
+                            <option value="Colorectal Cancer">Colorectal Cancer (CRC)</option>
+                            <option value="Cutaneous Melanoma">Cutaneous Melanoma</option>
+                            <option value="Chronic Myeloid Leukemia">Chronic Myeloid Leukemia (CML)</option>
+                            <option value="Prostate Cancer">Metastatic Castration-Resistant Prostate Cancer</option>
+                            <option value="Pancreatic Ductal Adenocarcinoma">Pancreatic Ductal Adenocarcinoma (PDAC)</option>
+                            <option value="Ovarian Cancer">High-Grade Serous Ovarian Cancer</option>
+                            <option value="Glioblastoma Multiforme">Glioblastoma Multiforme (GBM)</option>
+                            <option value="Head and Neck Squamous Cell Carcinoma">Head and Neck Cancer (HNSCC)</option>
+                            <option value="Renal Cell Carcinoma">Clear Cell Renal Cell Carcinoma (ccRCC)</option>
+                            <option value="Thyroid Cancer">Thyroid Cancer</option>
+                            <option value="Gastric Cancer">Gastric & Gastroesophageal Junction Cancer</option>
+                            <option value="Bladder Carcinoma">Bladder / Urothelial Carcinoma</option>
+                        </datalist>
                     </div>
 
                     <button type="submit" id="submitBtn" class="btn-run">
