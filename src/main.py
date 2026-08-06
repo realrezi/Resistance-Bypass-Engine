@@ -44,7 +44,7 @@ INDEX_HTML = """<!DOCTYPE html>
     <style>
         :root {
             --bg-dark: #070a12;
-            --card-bg: rgba(15, 23, 42, 0.7);
+            --card-bg: rgba(15, 23, 42, 0.75);
             --card-border: rgba(255, 255, 255, 0.08);
             --primary-gradient: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%);
             --accent-purple: linear-gradient(135deg, #a855f7 0%, #6366f1 100%);
@@ -115,13 +115,14 @@ INDEX_HTML = """<!DOCTYPE html>
         .nav-links {
             display: flex;
             justify-content: center;
-            gap: 1rem;
+            flex-wrap: wrap;
+            gap: 0.75rem;
         }
 
         .nav-link {
             color: #94a3b8;
             text-decoration: none;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             font-weight: 500;
             padding: 0.4rem 0.8rem;
             border-radius: 6px;
@@ -161,7 +162,7 @@ INDEX_HTML = """<!DOCTYPE html>
             margin-bottom: 1.25rem;
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            justify-content: space-between;
         }
 
         .form-group {
@@ -242,9 +243,20 @@ INDEX_HTML = """<!DOCTYPE html>
             cursor: not-allowed;
         }
 
+        .error-banner {
+            display: none;
+            background: rgba(239, 68, 68, 0.12);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 10px;
+            padding: 1rem;
+            color: #fca5a5;
+            font-size: 0.88rem;
+            margin-bottom: 1.25rem;
+        }
+
         .metrics-summary {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
             gap: 1rem;
             margin-bottom: 1.5rem;
         }
@@ -258,10 +270,13 @@ INDEX_HTML = """<!DOCTYPE html>
         }
 
         .metric-val {
-            font-size: 1.5rem;
+            font-size: clamp(1rem, 2vw, 1.4rem);
             font-weight: 800;
             color: #38bdf8;
             font-family: var(--font-mono);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .metric-lbl {
@@ -270,6 +285,23 @@ INDEX_HTML = """<!DOCTYPE html>
             text-transform: uppercase;
             letter-spacing: 0.05em;
             margin-top: 0.2rem;
+        }
+
+        .canonical-tags {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .tag-pill {
+            background: rgba(56, 189, 248, 0.1);
+            border: 1px solid rgba(56, 189, 248, 0.2);
+            color: #7dd3fc;
+            padding: 0.25rem 0.6rem;
+            border-radius: 6px;
+            font-size: 0.78rem;
+            font-family: var(--font-mono);
         }
 
         .therapy-card {
@@ -293,7 +325,7 @@ INDEX_HTML = """<!DOCTYPE html>
         }
 
         .drug-title {
-            font-size: 1.1rem;
+            font-size: 1.05rem;
             font-weight: 700;
             color: #f1f5f9;
         }
@@ -328,6 +360,22 @@ INDEX_HTML = """<!DOCTYPE html>
             font-size: 0.85rem;
             color: #94a3b8;
             line-height: 1.4;
+        }
+
+        .btn-action {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #94a3b8;
+            padding: 0.3rem 0.6rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-action:hover {
+            color: #fff;
+            border-color: #38bdf8;
         }
 
         .loader {
@@ -408,7 +456,12 @@ INDEX_HTML = """<!DOCTYPE html>
 
             <!-- Results Panel -->
             <div class="glass-panel">
-                <div class="panel-title">📊 Resistance Analysis & Synergy Ranking</div>
+                <div class="panel-title">
+                    <span>📊 Resistance Analysis & Synergy Ranking</span>
+                    <button id="copyJsonBtn" class="btn-action" style="display: none;" onclick="copyResultJson()">📋 Copy JSON</button>
+                </div>
+
+                <div id="errorBanner" class="error-banner"></div>
 
                 <div id="loader" class="loader">
                     <div class="spinner"></div>
@@ -420,6 +473,11 @@ INDEX_HTML = """<!DOCTYPE html>
                 </div>
 
                 <div id="resultsContent" style="display: none;">
+                    <div class="canonical-tags">
+                        <span class="tag-pill" id="primaryTag">Target: -</span>
+                        <span class="tag-pill" id="resistanceTag">Marker: -</span>
+                    </div>
+
                     <div class="metrics-summary">
                         <div class="metric-card">
                             <div class="metric-val" id="resTypeVal">-</div>
@@ -443,31 +501,41 @@ INDEX_HTML = """<!DOCTYPE html>
     </div>
 
     <script>
+        let latestAnalysisData = null;
+
         function setPreset(target, drug, marker) {
             document.getElementById('primary_target').value = target;
             document.getElementById('primary_drug').value = drug;
             document.getElementById('resistance_marker').value = marker;
-            runAnalysis(new Event('submit'));
+            executePipeline();
         }
 
-        async function runAnalysis(e) {
-            e.preventDefault();
+        function runAnalysis(e) {
+            if (e && e.preventDefault) e.preventDefault();
+            executePipeline();
+        }
+
+        async function executePipeline() {
             const submitBtn = document.getElementById('submitBtn');
             const loader = document.getElementById('loader');
             const placeholder = document.getElementById('placeholder');
             const resultsContent = document.getElementById('resultsContent');
             const therapiesList = document.getElementById('therapiesList');
+            const errorBanner = document.getElementById('errorBanner');
+            const copyJsonBtn = document.getElementById('copyJsonBtn');
 
             submitBtn.disabled = true;
+            errorBanner.style.display = 'none';
             placeholder.style.display = 'none';
             resultsContent.style.display = 'none';
+            copyJsonBtn.style.display = 'none';
             loader.style.display = 'block';
 
             const payload = {
-                primary_target: document.getElementById('primary_target').value,
-                primary_drug: document.getElementById('primary_drug').value,
-                resistance_marker: document.getElementById('resistance_marker').value,
-                cancer_type: document.getElementById('cancer_type').value
+                primary_target: document.getElementById('primary_target').value.trim(),
+                primary_drug: document.getElementById('primary_drug').value.trim(),
+                resistance_marker: document.getElementById('resistance_marker').value.trim(),
+                cancer_type: document.getElementById('cancer_type').value.trim()
             };
 
             try {
@@ -478,46 +546,67 @@ INDEX_HTML = """<!DOCTYPE html>
                 });
 
                 const data = await response.json();
-                if (!response.ok) throw new Error(data.detail || 'Analysis failed');
+                if (!response.ok) throw new Error(data.detail || 'Analysis pipeline failed');
 
+                latestAnalysisData = data;
+                document.getElementById('primaryTag').innerText = 'Target: ' + data.primary_target_canonical;
+                document.getElementById('resistanceTag').innerText = 'Marker: ' + data.resistance_marker_canonical;
                 document.getElementById('resTypeVal').innerText = data.resistance_type;
                 document.getElementById('nodesCountVal').innerText = data.pathway_nodes_count;
-                document.getElementById('distVal').innerText = data.shortest_path_distance.toFixed(2);
+                
+                const distNum = typeof data.shortest_path_distance === 'number' 
+                    ? data.shortest_path_distance 
+                    : Number(data.shortest_path_distance) || 0;
+                document.getElementById('distVal').innerText = distNum.toFixed(3);
 
                 therapiesList.innerHTML = '';
-                data.ranked_combinations.forEach((c, idx) => {
-                    const pct = Math.round(c.synergy_score * 100);
-                    const card = document.createElement('div');
-                    card.className = 'therapy-card';
-                    card.innerHTML = `
-                        <div class="therapy-header">
-                            <span class="drug-title">#${idx+1} ${c.secondary_drug} + ${payload.primary_drug}</span>
-                            <span class="phase-badge">Phase ${c.clinical_phase}</span>
-                        </div>
-                        <div style="font-size: 0.8rem; color: #38bdf8; margin-bottom: 0.2rem;">
-                            Target: <strong>${c.secondary_target}</strong> | Synergy Score: <strong>${c.synergy_score}</strong> | Hub Penalty Centrality: ${c.hub_penalized_centrality}
-                        </div>
-                        <div class="synergy-bar-bg">
-                            <div class="synergy-bar-fill" style="width: ${pct}%"></div>
-                        </div>
-                        <div class="rationale">${c.biological_rationale}</div>
-                    `;
-                    therapiesList.appendChild(card);
-                });
+                if (!data.ranked_combinations || data.ranked_combinations.length === 0) {
+                    therapiesList.innerHTML = '<div style="color: #94a3b8; font-size: 0.9rem; text-align: center; padding: 2rem;">No clinical combination therapies found for this pair.</div>';
+                } else {
+                    data.ranked_combinations.forEach((c, idx) => {
+                        const pct = Math.round((c.synergy_score || 0) * 100);
+                        const card = document.createElement('div');
+                        card.className = 'therapy-card';
+                        card.innerHTML = `
+                            <div class="therapy-header">
+                                <span class="drug-title">#${idx+1} ${c.secondary_drug} + ${payload.primary_drug}</span>
+                                <span class="phase-badge">Phase ${c.clinical_phase}</span>
+                            </div>
+                            <div style="font-size: 0.8rem; color: #38bdf8; margin-bottom: 0.2rem;">
+                                Target: <strong>${c.secondary_target}</strong> | Synergy Score: <strong>${c.synergy_score}</strong> | Hub Penalty Centrality: ${c.hub_penalized_centrality}
+                            </div>
+                            <div class="synergy-bar-bg">
+                                <div class="synergy-bar-fill" style="width: ${pct}%"></div>
+                            </div>
+                            <div class="rationale">${c.biological_rationale}</div>
+                        `;
+                        therapiesList.appendChild(card);
+                    });
+                }
 
                 resultsContent.style.display = 'block';
+                copyJsonBtn.style.display = 'inline-block';
             } catch (err) {
-                alert('Error: ' + err.message);
+                errorBanner.innerText = '❌ ' + err.message;
+                errorBanner.style.display = 'block';
                 placeholder.style.display = 'block';
             } finally {
                 loader.style.display = 'none';
                 submitBtn.disabled = false;
             }
         }
+
+        function copyResultJson() {
+            if (!latestAnalysisData) return;
+            navigator.clipboard.writeText(JSON.stringify(latestAnalysisData, null, 2))
+                .then(() => alert('JSON response copied to clipboard!'))
+                .catch(() => alert('Failed to copy to clipboard'));
+        }
     </script>
 </body>
 </html>
 """
+
 
 def _sync_build_and_score(
     interactions: List[Dict[str, Any]],
