@@ -52,6 +52,8 @@ async def get_network_image():
 @app.get("/static/lab_mutation.png")
 async def get_lab_mutation_image():
     """Serve the Clinical Genomic Lab & Mutation Diagram image."""
+    if LAB_MUTATION_B64:
+        return Response(content=base64.b64decode(LAB_MUTATION_B64), media_type="image/png")
     possible_paths = [
         os.path.join(os.path.dirname(__file__), "static", "lab_mutation.png"),
         os.path.join(os.getcwd(), "src", "static", "lab_mutation.png"),
