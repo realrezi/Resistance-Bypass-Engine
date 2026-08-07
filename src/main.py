@@ -78,6 +78,8 @@ INDEX_HTML = """<!DOCTYPE html>
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.28.1/cytoscape.min.js"></script>
+    <script src="https://3dmol.org/build/3Dmol-min.js"></script>
+
     <style>
         :root {
             --bg-lab: #090d16;
@@ -1270,6 +1272,15 @@ INDEX_HTML = """<!DOCTYPE html>
                 <div id="nodeModalHotspots" style="display: flex; flex-direction: column; gap: 0.4rem;"></div>
             </div>
 
+            <div style="background: #1e293b; border: 1px solid #334155; border-radius: 10px; padding: 0.9rem; margin-bottom: 1rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                    <div style="font-weight: 700; color: #94a3b8; text-transform: uppercase; font-size: 0.72rem;">Interactive 3D Macromolecular Structure (PDB: <span id="nodeModalPdbTag" style="color:#34d399;">1M17</span>)</div>
+                    <div style="font-size: 0.72rem; color: #38bdf8; font-weight: 600;">Rotate 360° • Zoom • Pan</div>
+                </div>
+                <div id="pdb3dViewer" style="height: 280px; width: 100%; position: relative; background: #090d16; border-radius: 8px; border: 1px solid #334155; overflow: hidden;"></div>
+            </div>
+
+
             <div style="background: #1e293b; border: 1px solid #334155; border-radius: 10px; padding: 0.9rem; margin-bottom: 1.25rem; display: flex; justify-content: space-around; text-align: center;">
                 <div>
                     <div id="nodeModalEnsembl" style="font-size: 0.85rem; font-family: monospace; font-weight: 700; color: #38bdf8;">ENSG00000146648</div>
@@ -1580,16 +1591,36 @@ INDEX_HTML = """<!DOCTYPE html>
                 hotspotsContainer.appendChild(item);
             });
 
+            const pdbId = ann.pdb_id || '1M17';
+            document.getElementById('nodeModalPdbTag').innerText = pdbId;
+            const viewerContainer = document.getElementById('pdb3dViewer');
+            viewerContainer.innerHTML = '';
+
             const uniProtUrl = 'https://www.uniprot.org/uniprotkb/' + (ann.uniprot_id || '');
             const ensemblUrl = 'https://www.ensembl.org/Homo_sapiens/Gene/Summary?g=' + (ann.ensembl_id || '');
-            const pdbUrl = 'https://www.rcsb.org/structure/' + (ann.pdb_id || '1M17');
+            const pdbUrl = 'https://www.rcsb.org/structure/' + pdbId;
 
             document.getElementById('linkUniProt').href = uniProtUrl;
             document.getElementById('linkEnsembl').href = ensemblUrl;
             document.getElementById('linkPDB').href = pdbUrl;
 
             toggleModal('nodeModal', true);
+
+            setTimeout(() => {
+                if (window.$3Dmol) {
+                    const viewer = $3Dmol.createViewer(viewerContainer, { backgroundColor: '0x090d16' });
+                    $3Dmol.download('pdb:' + pdbId, viewer, { multichannel: true }, function() {
+                        viewer.setStyle({}, { cartoon: { color: 'spectrum' } });
+                        viewer.addSurface($3Dmol.SurfaceType.VDW, { opacity: 0.25, color: 'white' });
+                        viewer.zoomTo();
+                        viewer.render();
+                    });
+                } else {
+                    viewerContainer.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#94a3b8;font-size:0.85rem;">3D Model Structure (PDB: ${pdbId})</div>`;
+                }
+            }, 100);
         }
+
 
 
 
