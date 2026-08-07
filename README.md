@@ -93,17 +93,22 @@ $$\text{Synergy Score } (S) = \alpha \cdot C_{\text{norm}}(v) + \beta \cdot (1.0
 
 ## 📊 Prevalent Clinical Resistance Matrix
 
-| Tumor Indication | Primary Driver | Frontline Agent | Secondary Bypass Marker | Mechanism of Action |
-| :--- | :--- | :--- | :--- | :--- |
-| **NSCLC (Lung)** | `EGFR L858R` | Osimertinib | `MET Amplification` | Off-Target RTK Bypass via ERBB3/PI3K |
-| **NSCLC (Lung)** | `EGFR L858R` | Osimertinib | `EGFR C797S` | On-Target Covalent Binding Disruption |
-| **NSCLC (Lung)** | `EML4-ALK` | Alectinib | `MET Bypass` | Parallel RTK Activation |
-| **HER2+ Breast** | `ERBB2 / HER2` | Trastuzumab | `MET Amplification` | Monoclonal Antibody Bypass Evasion |
-| **HR+ Breast** | `ESR1` | Fulvestrant | `CDK4 / Cyclin D1` | Endocrine Escape via Cell Cycle Activation |
-| **Colorectal (CRC)** | `KRAS G12C` | Sotorasib | `EGFR Feedback` | Rapid RTK Feedback Reactivation |
-| **Colorectal (CRC)** | `BRAF V600E` | Encorafenib | `EGFR Feedback` | Monotherapy BRAF Escape Loop |
-| **Melanoma** | `BRAF V600E` | Dabrafenib | `MAP2K1 / MEK1` | MAPK Cascade Re-activation |
-| **CML / AML** | `BCR-ABL1` | Imatinib | `ABL1 T315I` | Gatekeeper Steric Binding Loss |
+| Tumor Indication | Primary Driver | Frontline Agent | Secondary Bypass Marker | Literature Prevalence | Mechanism of Action |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **NSCLC (Lung)** | `EGFR L858R` | Osimertinib | `MET Amplification` | **15–20% Acquired** | Off-Target RTK Bypass via ERBB3/PI3K |
+| **NSCLC (Lung)** | `EGFR L858R` | Osimertinib | `EGFR C797S` | **7–10% Gatekeeper** | On-Target Covalent Binding Disruption |
+| **NSCLC (Lung)** | `EML4-ALK` | Alectinib | `MET Bypass` | **8–12% Bypass** | Parallel RTK Activation in ALK+ NSCLC |
+| **HER2+ Breast** | `ERBB2 / HER2` | Trastuzumab | `MET Amplification` | **10–15% RTK Bypass** | Monoclonal Antibody Bypass Evasion |
+| **HR+ Breast** | `ESR1` | Fulvestrant | `CDK4 / Cyclin D1` | **25–40% Post-AI** | Endocrine Escape via Cell Cycle Activation |
+| **Colorectal (CRC)** | `KRAS G12C` | Sotorasib | `EGFR Feedback` | **70–85% Feedback** | Rapid RTK Feedback Reactivation |
+| **Colorectal (CRC)** | `BRAF V600E` | Encorafenib | `EGFR Feedback` | **75–85% Feedback** | Monotherapy BRAF Escape Loop |
+| **Melanoma** | `BRAF V600E` | Dabrafenib | `MAP2K1 / MEK1` | **35–45% Acquired** | MAPK Cascade Re-activation |
+| **CML / AML** | `BCR-ABL1` | Imatinib | `ABL1 T315I` | **15–20% Gatekeeper** | Gatekeeper Steric Binding Loss |
+| **Prostate (mCRPC)** | `AR` | Enzalutamide | `PIK3CA / PTEN` | **40–50% PTEN/PI3K** | Reciprocal AR-PI3K Feedback Crosstalk |
+| **Ovarian / GYN** | `PIK3CA` | Alpelisib | `KRAS` | **15–25% Co-mutation** | Parallel RAS/MAPK Activation |
+| **Glioma (GBM)** | `EGFRvIII` | Gefitinib | `MET` | **10–15% Redundancy** | Co-activation of Multiple RTKs |
+| **Thyroid** | `RET Fusion` | Selpercatinib | `MET` | **10–15% Acquired** | MET Bypass emerging after RET TKI |
+
 
 ---
 

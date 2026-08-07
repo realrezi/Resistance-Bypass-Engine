@@ -800,25 +800,25 @@ INDEX_HTML = """<!DOCTYPE html>
                 <div class="prevalence-card high-prev" onclick="setPreset('EGFR', 'Osimertinib', 'MET', 'Non-Small Cell Lung Cancer')">
                     <div class="prevalence-header">
                         <span class="scenario-pair-title">EGFR + MET Amplification</span>
-                        <span class="badge-prevalence">15–20% Global Prev.</span>
+                        <span class="badge-prevalence">15–20% Acquired Prev.</span>
                     </div>
                     <div class="locus-tag">Chr 7p11.2 (EGFR) ➔ Chr 7q31.2 (MET)</div>
-                    <div class="scenario-mechanism"><strong>Mechanism:</strong> Off-Target RTK Bypass. MET amplification reactivates ERBB3/PI3K signaling despite Osimertinib blockade.</div>
+                    <div class="scenario-mechanism"><strong>Mechanism:</strong> Off-Target RTK Bypass. MET amplification reactivates ERBB3/PI3K signaling despite 3rd-gen Osimertinib blockade.</div>
                 </div>
 
                 <div class="prevalence-card" onclick="setPreset('EGFR', 'Osimertinib', 'EGFR', 'Non-Small Cell Lung Cancer')">
                     <div class="prevalence-header">
                         <span class="scenario-pair-title">EGFR + C797S Secondary Mutation</span>
-                        <span class="badge-prevalence high">7–10% Global Prev.</span>
+                        <span class="badge-prevalence high">7–10% Gatekeeper Prev.</span>
                     </div>
                     <div class="locus-tag">Chr 7p11.2 (Exon 20 C797S)</div>
-                    <div class="scenario-mechanism"><strong>Mechanism:</strong> On-Target ATP Pocket Mutation. C797S mutation disrupts covalent binding of 3rd-gen TKI Osimertinib.</div>
+                    <div class="scenario-mechanism"><strong>Mechanism:</strong> On-Target ATP Pocket Mutation. C797S mutation disrupts covalent binding of Osimertinib.</div>
                 </div>
 
                 <div class="prevalence-card approved-prev" onclick="setPreset('ALK', 'Alectinib', 'MET', 'Non-Small Cell Lung Cancer')">
                     <div class="prevalence-header">
                         <span class="scenario-pair-title">ALK + MET Bypass</span>
-                        <span class="badge-prevalence high">8–12% Global Prev.</span>
+                        <span class="badge-prevalence high">8–12% Bypass Prev.</span>
                     </div>
                     <div class="locus-tag">Chr 2p23.2 (ALK) ➔ Chr 7q31.2 (MET)</div>
                     <div class="scenario-mechanism"><strong>Mechanism:</strong> Parallel RTK activation bypassing 2nd-gen ALK inhibitor (Alectinib) blockade in ALK+ NSCLC.</div>
@@ -830,7 +830,7 @@ INDEX_HTML = """<!DOCTYPE html>
                 <div class="prevalence-card high-prev" onclick="setPreset('HER2', 'Trastuzumab', 'MET', 'HER2+ Breast Cancer')">
                     <div class="prevalence-header">
                         <span class="scenario-pair-title">HER2 + MET Amplification</span>
-                        <span class="badge-prevalence">10–15% Global Prev.</span>
+                        <span class="badge-prevalence">10–15% RTK Bypass</span>
                     </div>
                     <div class="locus-tag">Chr 17q12 (ERBB2) ➔ Chr 7q31.2 (MET)</div>
                     <div class="scenario-mechanism"><strong>Mechanism:</strong> Off-target RTK bypass hyperactivation overriding anti-HER2 monoclonal antibody (Trastuzumab) therapy.</div>
@@ -839,7 +839,7 @@ INDEX_HTML = """<!DOCTYPE html>
                 <div class="prevalence-card approved-prev" onclick="setPreset('ESR1', 'Fulvestrant', 'CDK4', 'HR+/HER2- Breast Cancer')">
                     <div class="prevalence-header">
                         <span class="scenario-pair-title">ESR1 + CDK4/6 Cyclin Axis</span>
-                        <span class="badge-prevalence high">12–18% Global Prev.</span>
+                        <span class="badge-prevalence high">25–40% Post-AI Prev.</span>
                     </div>
                     <div class="locus-tag">Chr 6q25.1 (ESR1) ➔ Chr 12q14.1 (CDK4)</div>
                     <div class="scenario-mechanism"><strong>Mechanism:</strong> Endocrine therapy escape driven by ligand-independent ESR1 mutations & Cyclin D1/CDK4 pathway reactivation.</div>
@@ -851,7 +851,7 @@ INDEX_HTML = """<!DOCTYPE html>
                 <div class="prevalence-card high-prev" onclick="setPreset('KRAS', 'Sotorasib', 'EGFR', 'Colorectal Cancer')">
                     <div class="prevalence-header">
                         <span class="scenario-pair-title">KRAS G12C + EGFR Feedback</span>
-                        <span class="badge-prevalence">20–25% Global Prev.</span>
+                        <span class="badge-prevalence">70–85% Feedback Prev.</span>
                     </div>
                     <div class="locus-tag">Chr 12p12.1 (KRAS) ➔ Chr 7p11.2 (EGFR)</div>
                     <div class="scenario-mechanism"><strong>Mechanism:</strong> Rapid RTK feedback loop reactivating MAPK signaling; requires dual KRAS G12C + EGFR blockade.</div>
@@ -860,7 +860,7 @@ INDEX_HTML = """<!DOCTYPE html>
                 <div class="prevalence-card approved-prev" onclick="setPreset('BRAF', 'Encorafenib', 'EGFR', 'Colorectal Cancer')">
                     <div class="prevalence-header">
                         <span class="scenario-pair-title">BRAF V600E + EGFR Feedback</span>
-                        <span class="badge-prevalence high">10–12% Global Prev.</span>
+                        <span class="badge-prevalence high">75–85% Feedback Prev.</span>
                     </div>
                     <div class="locus-tag">Chr 7q34 (BRAF) ➔ Chr 7p11.2 (EGFR)</div>
                     <div class="scenario-mechanism"><strong>Mechanism:</strong> Monotherapy BRAF inhibition induces strong EGFR feedback; FDA-approved Encorafenib + Cetuximab dual therapy.</div>
@@ -872,7 +872,7 @@ INDEX_HTML = """<!DOCTYPE html>
                 <div class="prevalence-card approved-prev" onclick="setPreset('BRAF', 'Dabrafenib', 'MAP2K1', 'Cutaneous Melanoma')">
                     <div class="prevalence-header">
                         <span class="scenario-pair-title">BRAF V600 + MAP2K1/MEK1</span>
-                        <span class="badge-prevalence">35–45% Global Prev.</span>
+                        <span class="badge-prevalence">35–45% Acquired Prev.</span>
                     </div>
                     <div class="locus-tag">Chr 7q34 (BRAF) ➔ Chr 15q22.31 (MAP2K1)</div>
                     <div class="scenario-mechanism"><strong>Mechanism:</strong> Re-activation of MAPK signaling cascade overcome by FDA-approved dual BRAF + MEK inhibition (Dabrafenib + Trametinib).</div>
@@ -884,7 +884,7 @@ INDEX_HTML = """<!DOCTYPE html>
                 <div class="prevalence-card high-prev" onclick="setPreset('ABL1', 'Imatinib', 'ABL1', 'Chronic Myeloid Leukemia')">
                     <div class="prevalence-header">
                         <span class="scenario-pair-title">BCR-ABL + T315I Gatekeeper</span>
-                        <span class="badge-prevalence">15–20% Global Prev.</span>
+                        <span class="badge-prevalence">15–20% TKI Resistance</span>
                     </div>
                     <div class="locus-tag">Chr 9q34.12 (ABL1 T315I Gatekeeper)</div>
                     <div class="scenario-mechanism"><strong>Mechanism:</strong> Threonine to Isoleucine mutation causes steric clash with 1st/2nd-gen TKIs; managed via Ponatinib or Asciminib combination.</div>
@@ -896,7 +896,7 @@ INDEX_HTML = """<!DOCTYPE html>
                 <div class="prevalence-card" onclick="setPreset('AR', 'Enzalutamide', 'PIK3CA', 'Metastatic Castration-Resistant Prostate Cancer')">
                     <div class="prevalence-header">
                         <span class="scenario-pair-title">AR + PIK3CA Crosstalk</span>
-                        <span class="badge-prevalence">12–16% Global Prev.</span>
+                        <span class="badge-prevalence">40–50% PTEN/PI3K Loss</span>
                     </div>
                     <div class="locus-tag">Chr Xq12 (AR) ➔ Chr 3q26.32 (PIK3CA)</div>
                     <div class="scenario-mechanism"><strong>Mechanism:</strong> Reciprocal feedback crosstalk between Androgen Receptor and PI3K/AKT signaling pathways in mCRPC.</div>
@@ -908,7 +908,7 @@ INDEX_HTML = """<!DOCTYPE html>
                 <div class="prevalence-card" onclick="setPreset('PIK3CA', 'Alpelisib', 'KRAS', 'Ovarian Cancer')">
                     <div class="prevalence-header">
                         <span class="scenario-pair-title">PIK3CA + KRAS Bypass</span>
-                        <span class="badge-prevalence">8–12% Global Prev.</span>
+                        <span class="badge-prevalence">15–25% Co-mutation Prev.</span>
                     </div>
                     <div class="locus-tag">Chr 3q26.32 (PIK3CA) ➔ Chr 12p12.1 (KRAS)</div>
                     <div class="scenario-mechanism"><strong>Mechanism:</strong> Parallel activation of RAS/MAPK axis circumventing selective PI3Kalpha inhibitor blockade in gynecologic malignancies.</div>
@@ -920,7 +920,7 @@ INDEX_HTML = """<!DOCTYPE html>
                 <div class="prevalence-card" onclick="setPreset('EGFR', 'Gefitinib', 'MET', 'Glioblastoma')">
                     <div class="prevalence-header">
                         <span class="scenario-pair-title">EGFRvIII + MET Amplification</span>
-                        <span class="badge-prevalence">10–14% Global Prev.</span>
+                        <span class="badge-prevalence">10–15% RTK Redundancy</span>
                     </div>
                     <div class="locus-tag">Chr 7p11.2 (EGFRvIII) ➔ Chr 7q31.2 (MET)</div>
                     <div class="scenario-mechanism"><strong>Mechanism:</strong> Co-activation of multiple RTKs (EGFRvIII and MET) driving redundant oncogenic signaling in high-grade glioma.</div>
@@ -932,12 +932,13 @@ INDEX_HTML = """<!DOCTYPE html>
                 <div class="prevalence-card" onclick="setPreset('RET', 'Selpercatinib', 'MET', 'Thyroid Cancer')">
                     <div class="prevalence-header">
                         <span class="scenario-pair-title">RET Fusion + MET Bypass</span>
-                        <span class="badge-prevalence">&lt;5% Global Prev.</span>
+                        <span class="badge-prevalence">10–15% Acquired Bypass</span>
                     </div>
                     <div class="locus-tag">Chr 10q11.21 (RET) ➔ Chr 7q31.2 (MET)</div>
                     <div class="scenario-mechanism"><strong>Mechanism:</strong> Acquired MET amplification emerging after selective RET inhibitor (Selpercatinib) treatment.</div>
                 </div>
             </div>
+
         </section>
 
         <!-- Workstation Grid -->
