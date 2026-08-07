@@ -1626,8 +1626,9 @@ INDEX_HTML = """<!DOCTYPE html>
                         <span class="badge-phase ${isApproved ? 'approved' : ''}">${isApproved ? 'FDA Approved' : 'Phase ' + c.clinical_phase}</span>
                     </div>
                     <div style="font-size: 0.82rem; color: #cbd5e1; margin-bottom: 0.35rem;">
-                        Secondary Target: <strong style="color:#f8fafc;">${c.secondary_target}</strong> | Synergy Score: <strong style="color:#38bdf8;">${c.synergy_score}</strong> | Hub Centrality: <strong style="color:#c084fc;">${c.hub_penalized_centrality > 0 ? c.hub_penalized_centrality.toFixed(3) : 'Target Endpoint (0.000)'}</strong>
+                        Secondary Target: <strong style="color:#f8fafc;">${c.secondary_target}</strong> | Synergy Score: <strong style="color:#38bdf8;">${c.synergy_score}</strong> | Hub Centrality: <strong style="color:#c084fc;">${(c.hub_penalized_centrality || 0).toFixed(3)}</strong>
                     </div>
+
 
 
 

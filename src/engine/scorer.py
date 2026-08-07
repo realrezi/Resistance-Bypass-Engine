@@ -191,8 +191,11 @@ class PathwayScorer:
 
             candidate_res = dict(item["candidate"])
             candidate_res["synergy_score"] = round(synergy, 4)
-            candidate_res["hub_penalized_centrality"] = round(cb_n, 4)
+            # Retain absolute hub centrality score if min-max normalization zeroes out lowest candidate
+            centrality_disp = cb_n if (cb_n > 0.0 or len(raw_scores) == 1) else round(item["cb_adj"], 4)
+            candidate_res["hub_penalized_centrality"] = round(centrality_disp, 4)
             candidate_res["shortest_path_distance"] = round(item["distance"], 4)
+
 
 
 
