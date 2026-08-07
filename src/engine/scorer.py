@@ -38,6 +38,7 @@ def normalize_series(
     return [normalize_value(v, min_v, max_v, zero_var_default) for v in values]
 
 
+
 class PathwayScorer:
     @staticmethod
     def extract_lcc(G: nx.Graph) -> nx.Graph:
@@ -71,6 +72,7 @@ class PathwayScorer:
             adjusted_centrality[node] = cb_val / deg_penalty
 
         return adjusted_centrality
+
 
     @staticmethod
     def calculate_shortest_distance(
@@ -113,12 +115,23 @@ class PathwayScorer:
 
         raw_scores: List[Dict[str, Any]] = []
 
-        # 3. Calculate raw distance, centrality, and affinity for each candidate
+        # 3. Calculate raw distance, composite centrality, and affinity for each candidate
         for cand in candidates:
             sec_target = cand.get("secondary_target", "").strip().upper()
 
-            # Adjusted Centrality
+            # Adjusted Betweenness Centrality
             cb_adj = adjusted_centralities.get(sec_target, 0.0)
+
+            # Degree Centrality in G_lcc with Hub Penalty
+            deg_centrality = 0.0
+            if sec_target in G_lcc:
+                node_deg = G_lcc.degree(sec_target)
+                max_deg = max([G_lcc.degree(n) for n in G_lcc.nodes()], default=1)
+                deg_penalty = math.log2(node_deg + 2)
+                deg_centrality = (node_deg / max(max_deg, 1)) / deg_penalty
+
+            # Composite Hub-Penalized Centrality
+            composite_centrality = cb_adj + 0.5 * deg_centrality
 
             # Shortest Distance
             dist = cls.calculate_shortest_distance(G_lcc, primary_target, sec_target)
@@ -138,11 +151,12 @@ class PathwayScorer:
                 {
                     "candidate": cand,
                     "target": sec_target,
-                    "cb_adj": cb_adj,
+                    "cb_adj": composite_centrality,
                     "distance": dist,
                     "affinity": pchembl,
                 }
             )
+
 
         # 4. Batch Normalization across candidate pool
         # Centrality: zero-variance → 0.0 (no signal detected)
@@ -177,8 +191,13 @@ class PathwayScorer:
 
             candidate_res = dict(item["candidate"])
             candidate_res["synergy_score"] = round(synergy, 4)
-            candidate_res["hub_penalized_centrality"] = round(cb_n, 4)
+            # Retain absolute hub centrality score if min-max normalization zeroes out lowest candidate
+            centrality_disp = cb_n if (cb_n > 0.0 or len(raw_scores) == 1) else round(item["cb_adj"], 4)
+            candidate_res["hub_penalized_centrality"] = round(centrality_disp, 4)
             candidate_res["shortest_path_distance"] = round(item["distance"], 4)
+
+
+
 
             scored_results.append(candidate_res)
 
