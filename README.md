@@ -1,9 +1,6 @@
-# 🔬 Targeted Oncology Resistance Bypass Engine
+# Targeted Oncology Resistance Bypass Engine
 
-<div align="center">
-
-# **Targeted Oncology Resistance Bypass Engine**
-### **A Computational Graph Engine for Modeling Acquired Drug Resistance & Resolving Dual-Target Combination Therapies in Human Malignancies**
+**A Computational Graph Engine for Modeling Acquired Drug Resistance & Resolving Dual-Target Combination Therapies in Human Malignancies**
 
 [![Live Demo](https://img.shields.io/badge/🌐_Live_Workstation-resistance--bypass--engine.vercel.app-0080FF?style=for-the-badge)](https://resistance-bypass-engine.vercel.app/)
 [![GitHub Repo](https://img.shields.io/badge/GitHub-realrezi%2FResistance--Bypass--Engine-181717?style=for-the-badge&logo=github)](https://github.com/realrezi/Resistance-Bypass-Engine)
@@ -12,8 +9,6 @@
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.110-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
 
 **Author:** [Ahmadreza Shirdel](https://github.com/realrezi)
-
-</div>
 
 ---
 
@@ -100,7 +95,6 @@ $$\text{Synergy Score } (S) = \alpha \cdot C_{\text{norm}}(v) + \beta \cdot (1.0
 | **NSCLC (Lung)** | `EML4-ALK` | Alectinib | `MET Bypass` | **8–12% Bypass** | Parallel RTK Activation in ALK+ NSCLC |
 | **HER2+ Breast** | `ERBB2 / HER2` | Trastuzumab | `MET Amplification` | **10–15% RTK Bypass** | Monoclonal Antibody Bypass Evasion |
 | **HR+ Breast** | `ESR1` | Fulvestrant | `CDK4 / Cyclin D1` | **25–40% Post-Aromatase Inhibitors (AI)** | Endocrine Escape post-Aromatase Inhibitor failure via Cell Cycle Activation |
-
 | **Colorectal (CRC)** | `KRAS G12C` | Sotorasib | `EGFR Feedback` | **70–85% Feedback** | Rapid RTK Feedback Reactivation |
 | **Colorectal (CRC)** | `BRAF V600E` | Encorafenib | `EGFR Feedback` | **75–85% Feedback** | Monotherapy BRAF Escape Loop |
 | **Melanoma** | `BRAF V600E` | Dabrafenib | `MAP2K1 / MEK1` | **35–45% Acquired** | MAPK Cascade Re-activation |
@@ -109,7 +103,6 @@ $$\text{Synergy Score } (S) = \alpha \cdot C_{\text{norm}}(v) + \beta \cdot (1.0
 | **Ovarian / GYN** | `PIK3CA` | Alpelisib | `KRAS` | **15–25% Co-mutation** | Parallel RAS/MAPK Activation |
 | **Glioma (GBM)** | `EGFRvIII` | Gefitinib | `MET` | **10–15% Redundancy** | Co-activation of Multiple RTKs |
 | **Thyroid** | `RET Fusion` | Selpercatinib | `MET` | **10–15% Acquired** | MET Bypass emerging after RET TKI |
-
 
 ---
 
