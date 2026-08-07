@@ -1,9 +1,6 @@
 # Rule: Pydantic Data Models & Validation Schemas
-
-- Validate non-empty, bounded primary drug, target, resistance marker, and cancer type.
-- Normalize canonical target inputs but preserve human-readable drug/cancer text.
-- Accept optional primary/resistance alteration text and a structured alteration type.
-- Candidate responses must contain a heuristic combination-priority score, decomposed score components, clinical status, indication/pair-evidence flags, provenance references, and candidate limitations.
-- Keep the legacy `synergy_score` only as a compatibility mirror; documentation and UI must not describe it as experimental synergy.
-- Reports must include request context, methodology version, research-safety warnings, source provenance, relevant component nodes/edges, and evidence-linked candidates.
-- Unknown scientific values must be `None` or empty collections, never synthetic placeholders.
+Write Python code in `src/schemas/models.py` for:
+- `IDMappingResult`: `original_input: str`, `canonical_symbol: str`, `ensembl_id: str`, `uniprot_id: str`, `chembl_target_id: Optional[str] = None`.
+- `ResistanceRequest`: `primary_drug: str`, `primary_target: str`, `resistance_marker: str`, `cancer_type: Optional[str] = "Non-Small Cell Lung Cancer"`. Use `@field_validator` on targets to run `.strip().upper()`.
+- `CombinationCandidate`: `secondary_drug: str`, `secondary_target: str`, `mechanism_of_action: str`, `clinical_phase: int`, `is_withdrawn: bool = False`, `synergy_score: float`, `hub_penalized_centrality: float`, `chembl_ic50_nm: Optional[float] = None`, `biological_rationale: str`.
+- `ResistanceBypassReport`: `primary_target_canonical: str`, `resistance_marker_canonical: str`, `resistance_type: str`, `pathway_nodes_count: int`, `shortest_path_distance: float`, `ranked_combinations: List[CombinationCandidate]`.

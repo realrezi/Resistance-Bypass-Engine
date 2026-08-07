@@ -1,207 +1,206 @@
-from __future__ import annotations
-
 import math
-from typing import Any
-
+from typing import Any, Dict, List, Optional
 import networkx as nx
 
 
-def clamp01(value: float) -> float:
-    return min(max(float(value), 0.0), 1.0)
+def normalize_value(
+    x: float, min_val: float, max_val: float, zero_var_default: float = 0.0
+) -> float:
+    """Normalize value x to [0.0, 1.0] with configurable zero-variance guard.
+
+    Args:
+        x: The value to normalize.
+        min_val: Minimum value in the series.
+        max_val: Maximum value in the series.
+        zero_var_default: Value to return when min_val == max_val (zero variance).
+            Use 0.0 for metrics where zero-variance means "no signal" (e.g. centrality).
+            Use 1.0 for metrics where equal values should be treated as "maximum" (legacy).
+    """
+    if abs(max_val - min_val) < 1e-9:
+        return zero_var_default
+    val = (x - min_val) / (max_val - min_val)
+    return min(max(val, 0.0), 1.0)
 
 
-def _bounded_positive(value: float, scale: float = 4.0) -> float:
-    """Map a non-negative value to a stable [0, 1) range."""
-    return clamp01(1.0 - math.exp(-scale * max(value, 0.0)))
+def normalize_series(
+    values: List[float], zero_var_default: float = 0.0
+) -> List[float]:
+    """Normalize a list of float values to [0.0, 1.0].
+
+    Args:
+        values: List of raw values.
+        zero_var_default: Default when all values are identical (zero variance).
+    """
+    if not values:
+        return []
+    min_v = min(values)
+    max_v = max(values)
+    return [normalize_value(v, min_v, max_v, zero_var_default) for v in values]
+
 
 
 class PathwayScorer:
     @staticmethod
-    def extract_relevant_component(
-        graph: nx.Graph, required_nodes: set[str] | None = None
-    ) -> nx.Graph:
-        if graph.number_of_nodes() < 2:
-            raise ValueError("NoPathwayFound: insufficient physical interactions.")
+    def extract_lcc(G: nx.Graph) -> nx.Graph:
+        """Guard topology and extract Largest Connected Component (LCC)."""
+        if len(G.nodes) < 2:
+            raise ValueError("NoPathwayFound: Insufficient biological interactions.")
 
-        required = {node.upper() for node in (required_nodes or set())}
-        missing = required - set(graph.nodes)
-        if missing:
-            raise ValueError(
-                "NoPathwayFound: requested targets absent from the physical network: "
-                + ", ".join(sorted(missing))
-            )
+        connected_comps = list(nx.connected_components(G))
+        if not connected_comps:
+            raise ValueError("NoPathwayFound: Insufficient biological interactions.")
 
-        components = list(nx.connected_components(graph))
-        if required:
-            matching = [component for component in components if required <= component]
-            if not matching:
-                raise ValueError(
-                    "NoPathwayFound: primary and resistance targets are not connected."
-                )
-            nodes = max(
-                matching, key=lambda component: (len(component), sorted(component))
-            )
-        else:
-            nodes = max(
-                components, key=lambda component: (len(component), sorted(component))
-            )
+        lcc_nodes = max(connected_comps, key=len)
+        if len(lcc_nodes) < 2:
+            raise ValueError("NoPathwayFound: Insufficient biological interactions.")
 
-        if len(nodes) < 2:
-            raise ValueError("NoPathwayFound: insufficient physical interactions.")
-        return graph.subgraph(nodes).copy()
+        return G.subgraph(lcc_nodes).copy()
 
     @staticmethod
-    def calculate_bottleneck_centralities(graph: nx.Graph) -> dict[str, float]:
-        """Calculate the documented hub-penalized composite centrality."""
-        betweenness = nx.betweenness_centrality(graph, weight="weight")
-        max_degree = max((graph.degree(node) for node in graph), default=1)
-        result: dict[str, float] = {}
-        for node in graph:
-            degree = graph.degree(node)
-            penalty = math.log2(degree + 2)
-            composite = (
-                betweenness.get(node, 0.0) + 0.5 * (degree / max(max_degree, 1))
-            ) / penalty
-            result[str(node)] = float(composite)
-        return result
+    def calculate_bottleneck_centralities(G_lcc: nx.Graph) -> Dict[str, float]:
+        """Calculate betweenness centrality with degree penalization:
+
+        C_B,adjusted(v) = C_B(v) / log2(degree(v) + 2)
+        """
+        C_B = nx.betweenness_centrality(G_lcc, weight="weight")
+        adjusted_centrality: Dict[str, float] = {}
+
+        for node in G_lcc.nodes():
+            cb_val = C_B.get(node, 0.0)
+            deg = G_lcc.degree(node)
+            deg_penalty = math.log2(deg + 2)
+            adjusted_centrality[node] = cb_val / deg_penalty
+
+        return adjusted_centrality
+
 
     @staticmethod
     def calculate_shortest_distance(
-        graph: nx.Graph, source_node: str, target_node: str
-    ) -> float | None:
-        if source_node not in graph or target_node not in graph:
-            return None
-        if not nx.has_path(graph, source_node, target_node):
-            return None
-        return float(
-            nx.dijkstra_path_length(graph, source_node, target_node, weight="weight")
-        )
-
-    @classmethod
-    def rank_target_nodes(
-        cls,
-        graph: nx.Graph,
-        primary_target: str,
-        resistance_target: str,
-        limit: int = 5,
-    ) -> list[str]:
-        centralities = cls.calculate_bottleneck_centralities(graph)
-        ranked: list[tuple[float, str]] = []
-        for node in graph:
-            if node == primary_target:
-                continue
-            distance = cls.calculate_shortest_distance(graph, primary_target, str(node))
-            if distance is None:
-                continue
-            topology = _bounded_positive(centralities.get(str(node), 0.0))
-            proximity = math.exp(-distance)
-            discovery_score = 0.65 * topology + 0.35 * proximity
-            if node == resistance_target:
-                discovery_score += 1.0
-            ranked.append((discovery_score, str(node)))
-        ranked.sort(key=lambda item: (-item[0], item[1]))
-        return [node for _, node in ranked[:limit]]
+        G_lcc: nx.Graph, source_node: str, target_node: str
+    ) -> float:
+        """Calculate Dijkstra shortest path distance d between source_node and target_node."""
+        if (
+            source_node in G_lcc
+            and target_node in G_lcc
+            and nx.has_path(G_lcc, source_node, target_node)
+        ):
+            return float(
+                nx.dijkstra_path_length(
+                    G_lcc, source_node, target_node, weight="weight"
+                )
+            )
+        return 2.0
 
     @classmethod
     def score_candidates(
         cls,
-        graph: nx.Graph,
+        G: nx.Graph,
         primary_target: str,
-        candidates: list[dict[str, Any]],
-    ) -> list[dict[str, Any]]:
+        candidates: List[Dict[str, Any]],
+    ) -> List[Dict[str, Any]]:
+        """Score candidate target combinations on the network graph.
+
+        Each candidate dict should have keys:
+        - secondary_target: str
+        - chembl_ic50_nm: Optional[float] or pchembl_value: Optional[float]
+        """
         if not candidates:
             return []
 
-        centralities = cls.calculate_bottleneck_centralities(graph)
-        scored: list[dict[str, Any]] = []
+        # 1. Topology Guard & LCC extraction
+        G_lcc = cls.extract_lcc(G)
 
-        for candidate in candidates:
-            target = str(candidate.get("secondary_target") or "").strip().upper()
-            distance = cls.calculate_shortest_distance(graph, primary_target, target)
-            if distance is None:
-                continue
+        # 2. Centrality calculation
+        adjusted_centralities = cls.calculate_bottleneck_centralities(G_lcc)
 
-            topology = _bounded_positive(centralities.get(target, 0.0))
-            proximity = clamp01(math.exp(-distance))
-            phase = min(max(int(candidate.get("clinical_phase") or 0), 0), 4)
-            indication_match = bool(candidate.get("indication_match"))
-            combination_evidence = bool(candidate.get("combination_evidence"))
-            status = str(candidate.get("clinical_status") or "unknown")
-            status_signal = 1.0 if status == "active_or_completed" else 0.5
-            if status == "stopped":
-                status_signal = 0.0
-            clinical = clamp01(
-                0.45 * (phase / 4.0)
-                + 0.25 * float(indication_match)
-                + 0.20 * float(combination_evidence)
-                + 0.10 * status_signal
-            )
+        raw_scores: List[Dict[str, Any]] = []
 
-            median_pchembl = candidate.get("median_pchembl")
-            pharmacology: float | None = None
-            if median_pchembl is not None:
+        # 3. Calculate raw distance, composite centrality, and affinity for each candidate
+        for cand in candidates:
+            sec_target = cand.get("secondary_target", "").strip().upper()
+
+            # Adjusted Betweenness Centrality
+            cb_adj = adjusted_centralities.get(sec_target, 0.0)
+
+            # Degree Centrality in G_lcc with Hub Penalty
+            deg_centrality = 0.0
+            if sec_target in G_lcc:
+                node_deg = G_lcc.degree(sec_target)
+                max_deg = max([G_lcc.degree(n) for n in G_lcc.nodes()], default=1)
+                deg_penalty = math.log2(node_deg + 2)
+                deg_centrality = (node_deg / max(max_deg, 1)) / deg_penalty
+
+            # Composite Hub-Penalized Centrality
+            composite_centrality = cb_adj + 0.5 * deg_centrality
+
+            # Shortest Distance
+            dist = cls.calculate_shortest_distance(G_lcc, primary_target, sec_target)
+
+            # Affinity (pChEMBL value if available)
+            pchembl = cand.get("pchembl_value")
+            if pchembl is None and cand.get("chembl_ic50_nm") is not None:
+                # Convert IC50 in nM to pChEMBL = -log10(IC50 * 1e-9)
                 try:
-                    pharmacology = clamp01(
-                        1.0 / (1.0 + math.exp(-(float(median_pchembl) - 7.0)))
-                    )
-                except (TypeError, ValueError, OverflowError):
-                    pharmacology = None
+                    ic50_nm = float(cand["chembl_ic50_nm"])
+                    if ic50_nm > 0:
+                        pchembl = -math.log10(ic50_nm * 1e-9)
+                except (ValueError, TypeError):
+                    pchembl = None
 
-            weighted = {
-                "topology": (topology, 0.30),
-                "proximity": (proximity, 0.25),
-                "clinical_evidence": (clinical, 0.25),
-            }
-            if pharmacology is not None:
-                weighted["pharmacology"] = (pharmacology, 0.20)
-            weight_total = sum(weight for _, weight in weighted.values())
-            priority = (
-                sum(value * weight for value, weight in weighted.values())
-                / weight_total
-            )
-
-            limitations: list[str] = []
-            if not indication_match:
-                limitations.append(
-                    "No indication-specific clinical report matched the requested cancer type."
-                )
-            if not combination_evidence:
-                limitations.append(
-                    "No pair-level clinical report mentioning the primary drug was found."
-                )
-            if pharmacology is None:
-                limitations.append(
-                    "No quality-filtered human binding pChEMBL measurement was available."
-                )
-            limitations.append(
-                "Priority score is heuristic and is not an experimental synergy measurement."
-            )
-
-            result = dict(candidate)
-            result.update(
+            raw_scores.append(
                 {
-                    "combination_priority_score": round(priority, 4),
-                    "synergy_score": round(priority, 4),
-                    "score_components": {
-                        "topology": round(topology, 4),
-                        "proximity": round(proximity, 4),
-                        "pharmacology": (
-                            round(pharmacology, 4) if pharmacology is not None else None
-                        ),
-                        "clinical_evidence": round(clinical, 4),
-                    },
-                    "hub_penalized_centrality": round(topology, 4),
-                    "shortest_path_distance": round(distance, 4),
-                    "limitations": limitations,
+                    "candidate": cand,
+                    "target": sec_target,
+                    "cb_adj": composite_centrality,
+                    "distance": dist,
+                    "affinity": pchembl,
                 }
             )
-            scored.append(result)
 
-        scored.sort(
-            key=lambda item: (
-                -item["combination_priority_score"],
-                str(item.get("secondary_drug") or ""),
-                str(item.get("secondary_target") or ""),
-            )
-        )
-        return scored
+
+        # 4. Batch Normalization across candidate pool
+        # Centrality: zero-variance → 0.0 (no signal detected)
+        cb_raw = [item["cb_adj"] for item in raw_scores]
+        cb_normed = normalize_series(cb_raw, zero_var_default=0.0)
+
+        # Distance: zero-variance → 0.0 so (1.0 - d_norm) = 1.0 (no penalty)
+        dist_raw = [item["distance"] for item in raw_scores]
+        dist_normed = normalize_series(dist_raw, zero_var_default=0.0)
+
+        # Affinity: per-candidate branching
+        # Collect non-None affinities for normalization range
+        non_none_affinities = [
+            item["affinity"] for item in raw_scores if item["affinity"] is not None
+        ]
+        aff_min = min(non_none_affinities) if non_none_affinities else 0.0
+        aff_max = max(non_none_affinities) if non_none_affinities else 0.0
+
+        scored_results: List[Dict[str, Any]] = []
+
+        for i, item in enumerate(raw_scores):
+            cb_n = cb_normed[i]
+            d_n = dist_normed[i]
+
+            if item["affinity"] is not None:
+                # Case A (has affinity): Synergy = 0.40 * C_B + 0.30 * (1 - d) + 0.30 * Aff
+                aff_n = normalize_value(item["affinity"], aff_min, aff_max, zero_var_default=1.0)
+                synergy = 0.40 * cb_n + 0.30 * (1.0 - d_n) + 0.30 * aff_n
+            else:
+                # Case B (missing affinity): Synergy = 0.55 * C_B + 0.45 * (1 - d)
+                synergy = 0.55 * cb_n + 0.45 * (1.0 - d_n)
+
+            candidate_res = dict(item["candidate"])
+            candidate_res["synergy_score"] = round(synergy, 4)
+            # Retain absolute hub centrality score if min-max normalization zeroes out lowest candidate
+            centrality_disp = cb_n if (cb_n > 0.0 or len(raw_scores) == 1) else round(item["cb_adj"], 4)
+            candidate_res["hub_penalized_centrality"] = round(centrality_disp, 4)
+            candidate_res["shortest_path_distance"] = round(item["distance"], 4)
+
+
+
+
+            scored_results.append(candidate_res)
+
+        # Sort candidates descending by synergy_score
+        scored_results.sort(key=lambda x: x["synergy_score"], reverse=True)
+        return scored_results

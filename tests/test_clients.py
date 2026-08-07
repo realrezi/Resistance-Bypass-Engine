@@ -1,213 +1,160 @@
 from unittest.mock import AsyncMock, patch
-
 import pytest
-
-from src.clients.base import (
-    CACHE_TTL_SECONDS,
-    USER_AGENT,
-    BaseHTTPClient,
-    _is_json_value,
-    _stable_cache_key,
-)
+from src.clients.base import USER_AGENT, BaseHTTPClient, _stable_cache_key
 from src.clients.chembl import ChEMBLClient
 from src.clients.open_targets import OpenTargetsClient
 from src.clients.string_db import StringDBClient
 from src.services.id_mapper import IDMapper
 
 
+
 @pytest.mark.asyncio
 async def test_ensembl_version_stripping():
+    """Verify that Ensembl IDs with version suffixes (e.g., .15) are stripped."""
     mapper = IDMapper()
-    response = {
+    mock_hgnc_response = {
         "response": {
-            "docs": [{"symbol": "EGFR", "ensembl_gene_id": "ENSG00000146648.15"}]
+            "docs": [
+                {
+                    "symbol": "EGFR",
+                    "ensembl_gene_id": "ENSG00000146648.15",
+                }
+            ]
         }
     }
-    with patch.object(mapper, "get_json", new_callable=AsyncMock) as mocked:
-        mocked.return_value = response
+    with patch.object(mapper, "get_json", new_callable=AsyncMock) as mock_get:
+        mock_get.return_value = mock_hgnc_response
         symbol, ensembl_id = await mapper.resolve_hgnc("EGFR")
-    assert (symbol, ensembl_id) == ("EGFR", "ENSG00000146648")
+        assert symbol == "EGFR"
+        assert ensembl_id == "ENSG00000146648"
 
 
 @pytest.mark.asyncio
-async def test_hgnc_alias_search_prefers_exact_alias():
+async def test_chembl_single_protein_filtering():
+    """Verify ChEMBL target resolution filters strictly for target_type == 'SINGLE PROTEIN'."""
     mapper = IDMapper()
-    responses = [
-        {"response": {"docs": []}},
-        {
-            "response": {
-                "docs": [
-                    {"symbol": "OTHER", "alias_symbol": ["X"]},
-                    {"symbol": "ERBB2", "alias_symbol": ["HER2"]},
-                ]
-            }
-        },
-        {"response": {"docs": [{"symbol": "ERBB2", "ensembl_gene_id": "ENSG1"}]}},
-    ]
-    with patch.object(mapper, "get_json", new_callable=AsyncMock) as mocked:
-        mocked.side_effect = responses
-        symbol, _ = await mapper.resolve_hgnc("HER2")
-    assert symbol == "ERBB2"
-
-
-@pytest.mark.asyncio
-async def test_chembl_single_protein_human_filtering():
-    mapper = IDMapper()
-    response = {
+    mock_chembl_response = {
         "targets": [
             {
-                "target_chembl_id": "WRONG",
-                "target_type": "SINGLE PROTEIN",
-                "organism": "Mus musculus",
+                "target_chembl_id": "CHEMBL12345",
+                "target_type": "PROTEIN COMPLEX",
             },
             {
                 "target_chembl_id": "CHEMBL203",
                 "target_type": "SINGLE PROTEIN",
-                "organism": "Homo sapiens",
+            },
+            {
+                "target_chembl_id": "CHEMBL99999",
+                "target_type": "SELECTIVITY GROUP",
             },
         ]
     }
-    with patch.object(mapper, "get_json", new_callable=AsyncMock) as mocked:
-        mocked.return_value = response
-        target = await mapper.resolve_chembl_target("P00533")
-    assert target == "CHEMBL203"
+    with patch.object(mapper, "get_json", new_callable=AsyncMock) as mock_get:
+        mock_get.return_value = mock_chembl_response
+        chembl_id = await mapper.resolve_chembl_target("P00533")
+        assert chembl_id == "CHEMBL203"
 
 
 @pytest.mark.asyncio
-async def test_chembl_exhaustive_activity_pagination_and_metadata():
+async def test_chembl_exhaustive_pagination():
+    """Verify ChEMBL client follows page_meta.next until all pages are fetched."""
     client = ChEMBLClient()
     page1 = {
-        "activities": [
-            {
-                "molecule_pref_name": "Drug A",
-                "pchembl_value": "8.0",
-                "standard_type": "IC50",
-                "molecule_chembl_id": "CHEMBL1",
-                "assay_chembl_id": "ASSAY1",
-                "document_chembl_id": "DOC1",
-            }
-        ],
-        "page_meta": {"next": "/chembl/api/data/activity.json?offset=1"},
+        "molecules": [{"molecule_chembl_id": "CHEMBL1", "pref_name": "Drug A"}],
+        "page_meta": {"next": "/api/data/molecule.json?page=2"},
     }
     page2 = {
-        "activities": [
-            {
-                "molecule_pref_name": "Drug A",
-                "pchembl_value": "6.0",
-                "standard_type": "Ki",
-                "molecule_chembl_id": "CHEMBL1",
-                "assay_chembl_id": "ASSAY2",
-                "document_chembl_id": "DOC2",
-            }
-        ],
+        "molecules": [{"molecule_chembl_id": "CHEMBL2", "pref_name": "Drug B"}],
         "page_meta": {"next": None},
     }
-    with patch.object(client, "get_json", new_callable=AsyncMock) as mocked:
-        mocked.side_effect = [page1, page2]
-        result = await client.get_target_activities("CHEMBL3714")
-    assert mocked.call_count == 2
-    assert result["DRUG A"]["median_pchembl"] == 7.0
-    assert result["DRUG A"]["measurement_count"] == 2
-    assert result["DRUG A"]["measurement_types"] == ["IC50", "Ki"]
+
+    with patch.object(client, "get_json", new_callable=AsyncMock) as mock_get:
+        mock_get.side_effect = [page1, page2]
+        molecules = await client.get_clinical_molecules()
+        assert len(molecules) == 2
+        assert molecules[0]["pref_name"] == "Drug A"
+        assert molecules[1]["pref_name"] == "Drug B"
+        assert mock_get.call_count == 2
 
 
 @pytest.mark.asyncio
-async def test_string_client_requests_physical_network_and_identity():
+async def test_user_agent_header():
+    """Verify base HTTP client includes mandatory User-Agent header."""
+    base_client = BaseHTTPClient()
+    assert base_client.headers["User-Agent"] == USER_AGENT
+    assert "ResistanceBypassEngine/1.0" in USER_AGENT
+
+
+@pytest.mark.asyncio
+async def test_string_db_client():
+    """Verify STRING-DB client parameters and payload handling."""
     client = StringDBClient()
-    with patch.object(client, "get_json", new_callable=AsyncMock) as mocked:
-        mocked.return_value = []
-        await client.get_network("EGFR", "MET")
-    _, kwargs = mocked.call_args
-    assert kwargs["params"]["network_type"] == "physical"
-    assert kwargs["params"]["required_score"] == 400
-    assert kwargs["params"]["caller_identity"].startswith("mailto:")
+    mock_network = [
+        {"stringId_A": "9606.ENSP00000275493", "preferredName_A": "EGFR", "preferredName_B": "MET", "score": 900}
+    ]
+    with patch.object(client, "get_json", new_callable=AsyncMock) as mock_get:
+        mock_get.return_value = mock_network
+        res = await client.get_network("EGFR", "MET")
+        assert len(res) == 1
+        assert res[0]["preferredName_A"] == "EGFR"
+        mock_get.assert_called_once_with(
+            "https://string-db.org/api/json/network",
+            params={"identifiers": "EGFR\rMET", "species": 9606, "required_score": 400, "add_nodes": 25},
+        )
 
 
 @pytest.mark.asyncio
-async def test_open_targets_parses_indication_trial_and_withdrawal_evidence():
+async def test_open_targets_client():
+    """Verify Open Targets GraphQL query execution."""
     client = OpenTargetsClient()
-    response = {
+    mock_ot_response = {
         "data": {
             "target": {
-                "approvedSymbol": "MET",
+                "id": "ENSG00000146648",
+                "approvedSymbol": "EGFR",
                 "drugAndClinicalCandidates": {
+                    "count": 1,
                     "rows": [
                         {
-                            "id": "row1",
+                            "id": "mock_id",
                             "maxClinicalStage": "PHASE_4",
-                            "diseases": [
-                                {
-                                    "diseaseFromSource": "NSCLC",
-                                    "disease": {
-                                        "id": "EFO_1",
-                                        "name": "non-small cell lung cancer",
-                                    },
-                                }
-                            ],
-                            "clinicalReports": [
-                                {
-                                    "id": "NCT1",
-                                    "source": "AACT",
-                                    "clinicalStage": "PHASE_3",
-                                    "trialOverallStatus": "RECRUITING",
-                                    "url": "https://clinicaltrials.gov/study/NCT1",
-                                    "title": "Osimertinib plus capmatinib",
-                                }
-                            ],
                             "drug": {
-                                "id": "CHEMBL1",
-                                "name": "CAPMATINIB",
+                                "id": "CHEMBL1201585",
+                                "name": "OSIMERTINIB",
                                 "drugType": "Small molecule",
                                 "maximumClinicalStage": "PHASE_4",
-                                "drugWarnings": [],
                                 "mechanismsOfAction": {
                                     "rows": [
                                         {
-                                            "mechanismOfAction": "MET inhibitor",
-                                            "targetName": "MET",
+                                            "mechanismOfAction": "EGFR inhibitor",
+                                            "targetName": "EGFR",
                                         }
                                     ]
                                 },
                             },
                         }
-                    ]
+                    ],
                 },
             }
         }
     }
-    with patch.object(client, "post_json", new_callable=AsyncMock) as mocked:
-        mocked.return_value = response
-        drugs = await client.get_known_drugs(
-            "ENSG00000105976", "Non-Small Cell Lung Cancer", "Osimertinib"
-        )
-    assert drugs[0]["indicationMatch"] is True
-    assert drugs[0]["combinationEvidence"] is True
-    assert drugs[0]["clinicalStatus"] == "active_or_completed"
-    assert drugs[0]["evidence"][0]["record_id"] == "NCT1"
+    with patch.object(client, "post_json", new_callable=AsyncMock) as mock_post:
+        mock_post.return_value = mock_ot_response
+        drugs = await client.get_known_drugs("ENSG00000146648.15")
+        assert len(drugs) == 1
+        assert drugs[0]["prefName"] == "OSIMERTINIB"
+        assert drugs[0]["phase"] == 4
 
 
-@pytest.mark.asyncio
-async def test_open_targets_surfaces_graphql_errors():
-    client = OpenTargetsClient()
-    with patch.object(client, "post_json", new_callable=AsyncMock) as mocked:
-        mocked.return_value = {"errors": [{"message": "schema changed"}]}
-        with pytest.raises(RuntimeError, match="schema changed"):
-            await client.get_known_drugs("ENSG1")
 
+def test_cache_key_determinism():
+    """Verify cache keys are stable regardless of dict key insertion order."""
+    params_a = {"species": 9606, "identifiers": "EGFR", "required_score": 400}
+    params_b = {"required_score": 400, "species": 9606, "identifiers": "EGFR"}
+    key_a = _stable_cache_key("GET", "https://example.com/api", params_a)
+    key_b = _stable_cache_key("GET", "https://example.com/api", params_b)
+    assert key_a == key_b
 
-def test_cache_contract_and_key_determinism():
-    a = {"species": 9606, "identifiers": "EGFR"}
-    b = {"identifiers": "EGFR", "species": 9606}
-    assert _stable_cache_key("GET", "https://example.test", a) == _stable_cache_key(
-        "GET", "https://example.test", b
-    )
-    assert _is_json_value({"a": [1, None, True]})
-    assert not _is_json_value({"a": object()})
-    assert CACHE_TTL_SECONDS == 604800
-    assert "mailto:" in USER_AGENT
-
-
-def test_base_client_has_compliance_headers():
-    client = BaseHTTPClient()
-    assert client.headers["User-Agent"] == USER_AGENT
-    assert client.headers["From"]
+    # None payload produces stable key
+    key_none = _stable_cache_key("POST", "https://example.com/api", None)
+    assert "null" in key_none

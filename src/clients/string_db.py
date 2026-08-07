@@ -1,6 +1,5 @@
-from typing import Any
-
-from src.clients.base import CONTACT_EMAIL, BaseHTTPClient
+from typing import Any, Dict, List
+from src.clients.base import BaseHTTPClient
 
 
 class StringDBClient(BaseHTTPClient):
@@ -13,16 +12,13 @@ class StringDBClient(BaseHTTPClient):
         add_nodes: int = 25,
         required_score: int = 400,
         species: int = 9606,
-        network_type: str = "physical",
-    ) -> list[dict[str, Any]]:
+    ) -> List[Dict[str, Any]]:
         """Fetch protein interaction network from STRING-DB."""
         params = {
             "identifiers": f"{t_primary}\r{t_resistance}",
             "species": species,
             "required_score": required_score,
             "add_nodes": add_nodes,
-            "network_type": network_type,
-            "caller_identity": f"mailto:{CONTACT_EMAIL}",
         }
         data = await self.get_json(self.BASE_URL, params=params)
         if isinstance(data, list):
