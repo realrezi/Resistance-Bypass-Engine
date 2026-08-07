@@ -201,6 +201,88 @@ GENE_ANNOTATIONS: Dict[str, Dict[str, Any]] = {
         ],
         "pathways": ["mTORC1 / S6K Protein Synthesis", "FOXO Transcription Factor Inhibition", "BAD Antiapoptotic Inactivation"]
     },
+    "ROS1": {
+        "symbol": "ROS1",
+        "name": "ROS Proto-Oncogene 1 Receptor Tyrosine Kinase",
+        "locus": "Chr 6q22.1",
+        "ensembl_id": "ENSG00000047936",
+        "uniprot_id": "P08922",
+        "pdb_id": "3ZBF",
+        "druggability": "Tier 1: FDA Approved TKI Target",
+        "role": "Oncogenic Rearrangement Kinase (CD74-ROS1)",
+        "hotspots": [
+            "G2032R (Solvent Front Master Resistance)",
+            "D2033N (Kinase Binding Pocket Resistance)",
+            "S1986Y/F (Gatekeeper Region Mutation)"
+        ],
+        "pathways": ["SHP2 / RAS Activation", "PI3K/AKT Pathway", "STAT3 Survival Cascade"]
+    },
+    "RET": {
+        "symbol": "RET",
+        "name": "RET Proto-Oncogene Kinase",
+        "locus": "Chr 10q11.21",
+        "ensembl_id": "ENSG00000165731",
+        "uniprot_id": "P07949",
+        "pdb_id": "2IVT",
+        "druggability": "Tier 1: FDA Approved TKI Target",
+        "role": "RTK Fusion & Activating Mutation Target",
+        "hotspots": [
+            "G810R/S (Solvent Front Resistance Variant)",
+            "V804M / V804L (Gatekeeper Mutation)",
+            "K703E (ATP Binding Pocket Mutation)",
+            "KCC6-RET / CCDC6-RET Translocations"
+        ],
+        "pathways": ["RAS/MAPK Axis", "PI3K/AKT Axis", "PLCgamma Pathway"]
+    },
+    "NTRK1": {
+        "symbol": "NTRK1",
+        "name": "Neurotrophic Receptor Tyrosine Kinase 1 (TRKA)",
+        "locus": "Chr 1q23.1",
+        "ensembl_id": "ENSG00000198400",
+        "uniprot_id": "P04629",
+        "pdb_id": "4AOJ",
+        "druggability": "Tier 1: FDA Approved Agnostic TKI Target",
+        "role": "Agnostic Oncogenic Fusion Kinase",
+        "hotspots": [
+            "G595R (Solvent Front Larotrectinib Resistance)",
+            "G667C (xDFG Motif Resistance)",
+            "F589L (Gatekeeper Mutation)"
+        ],
+        "pathways": ["TRK Kinase Fusion Signaling", "PLCgamma Pathway", "PI3K Survival Cascade"]
+    },
+    "TP53": {
+        "symbol": "TP53",
+        "name": "Tumor Protein P53",
+        "locus": "Chr 17p13.1",
+        "ensembl_id": "ENSG00000141510",
+        "uniprot_id": "P04637",
+        "pdb_id": "1TUP",
+        "druggability": "Tier 2: Master Tumor Suppressor",
+        "role": "Guardian of the Genome & Apoptosis Regulator",
+        "hotspots": [
+            "R273H / R273C (DNA Binding Hotspot)",
+            "R175H (Conformational Structural Loss)",
+            "R248Q / R248W (Contact Hotspot Variant)",
+            "Y220C (Small Molecule Reactivation Pocket)"
+        ],
+        "pathways": ["Cell Cycle Arrest (p21/CDKN1A)", "BAX/PUMA Pro-Apoptotic Axis", "DNA Repair Surveillance"]
+    },
+    "PTEN": {
+        "symbol": "PTEN",
+        "name": "Phosphatase and Tensin Homolog",
+        "locus": "Chr 10q23.31",
+        "ensembl_id": "ENSG00000171862",
+        "uniprot_id": "P60484",
+        "pdb_id": "1D5R",
+        "druggability": "Tier 2: Master Lipid Phosphatase Suppressor",
+        "role": "PI3K/AKT De-phosphorylation Brake",
+        "hotspots": [
+            "Homozygous Genomic Deletion",
+            "R130G / R130Q (Phosphatase Catalytic Domain)",
+            "C124S (Enzymatic Active Site Inactivation)"
+        ],
+        "pathways": ["PIP3 Dephosphorylation to PIP2", "Negative Regulation of AKT Signaling", "Cell Migration Control"]
+    },
     "GRB2": {
         "symbol": "GRB2",
         "name": "Growth Factor Receptor Bound Protein 2",

@@ -781,15 +781,16 @@ INDEX_HTML = """<!DOCTYPE html>
             </div>
 
             <div class="matrix-tabs-container">
-                <button class="btn-matrix-tab active" onclick="switchMatrixCategory('nsclc')">🫁 NSCLC Loci</button>
-                <button class="btn-matrix-tab" onclick="switchMatrixCategory('breast')">🎗️ Breast Carcinoma</button>
-                <button class="btn-matrix-tab" onclick="switchMatrixCategory('crc')">🧬 Colorectal Loci</button>
-                <button class="btn-matrix-tab" onclick="switchMatrixCategory('melanoma')">☀️ Melanoma Axis</button>
-                <button class="btn-matrix-tab" onclick="switchMatrixCategory('cml')">🩸 Hematologic Myeloma</button>
-                <button class="btn-matrix-tab" onclick="switchMatrixCategory('prostate')">🩺 Prostate Axis</button>
-                <button class="btn-matrix-tab" onclick="switchMatrixCategory('ovarian')">🎗️ Ovarian Signatures</button>
-                <button class="btn-matrix-tab" onclick="switchMatrixCategory('glioma')">🧠 Glioma & CNS</button>
-                <button class="btn-matrix-tab" onclick="switchMatrixCategory('thyroid')">🫀 Thyroid & Rare Fusions</button>
+                <button class="btn-matrix-tab active" onclick="switchMatrixCategory('nsclc', this)">🫁 NSCLC Loci</button>
+                <button class="btn-matrix-tab" onclick="switchMatrixCategory('breast', this)">🎗️ Breast Carcinoma</button>
+                <button class="btn-matrix-tab" onclick="switchMatrixCategory('crc', this)">🧬 Colorectal Loci</button>
+                <button class="btn-matrix-tab" onclick="switchMatrixCategory('melanoma', this)">☀️ Melanoma Axis</button>
+                <button class="btn-matrix-tab" onclick="switchMatrixCategory('cml', this)">🩸 Hematologic Myeloma</button>
+                <button class="btn-matrix-tab" onclick="switchMatrixCategory('prostate', this)">🩺 Prostate Axis</button>
+                <button class="btn-matrix-tab" onclick="switchMatrixCategory('ovarian', this)">🎗️ Ovarian Signatures</button>
+                <button class="btn-matrix-tab" onclick="switchMatrixCategory('glioma', this)">🧠 Glioma & CNS</button>
+                <button class="btn-matrix-tab" onclick="switchMatrixCategory('thyroid', this)">🫀 Thyroid & Rare Fusions</button>
+
             </div>
 
             <!-- Tab 1: NSCLC Scenarios -->
@@ -1319,14 +1320,16 @@ INDEX_HTML = """<!DOCTYPE html>
             executePipeline();
         }
 
-        function switchMatrixCategory(cat) {
+        function switchMatrixCategory(cat, btn) {
             document.querySelectorAll('.btn-matrix-tab').forEach(b => b.classList.remove('active'));
-            event.target.classList.add('active');
+            if (btn) btn.classList.add('active');
+            else if (window.event && window.event.target) window.event.target.classList.add('active');
             ['nsclc', 'breast', 'crc', 'melanoma', 'cml', 'prostate', 'ovarian', 'glioma', 'thyroid'].forEach(c => {
                 const el = document.getElementById('matrix-' + c);
                 if (el) el.style.display = (c === cat) ? 'grid' : 'none';
             });
         }
+
 
         function runAnalysis(e) {
             if (e && e.preventDefault) e.preventDefault();

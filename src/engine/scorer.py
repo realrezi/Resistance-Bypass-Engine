@@ -115,12 +115,23 @@ class PathwayScorer:
 
         raw_scores: List[Dict[str, Any]] = []
 
-        # 3. Calculate raw distance, centrality, and affinity for each candidate
+        # 3. Calculate raw distance, composite centrality, and affinity for each candidate
         for cand in candidates:
             sec_target = cand.get("secondary_target", "").strip().upper()
 
-            # Adjusted Centrality
+            # Adjusted Betweenness Centrality
             cb_adj = adjusted_centralities.get(sec_target, 0.0)
+
+            # Degree Centrality in G_lcc with Hub Penalty
+            deg_centrality = 0.0
+            if sec_target in G_lcc:
+                node_deg = G_lcc.degree(sec_target)
+                max_deg = max([G_lcc.degree(n) for n in G_lcc.nodes()], default=1)
+                deg_penalty = math.log2(node_deg + 2)
+                deg_centrality = (node_deg / max(max_deg, 1)) / deg_penalty
+
+            # Composite Hub-Penalized Centrality
+            composite_centrality = cb_adj + 0.5 * deg_centrality
 
             # Shortest Distance
             dist = cls.calculate_shortest_distance(G_lcc, primary_target, sec_target)
@@ -140,11 +151,12 @@ class PathwayScorer:
                 {
                     "candidate": cand,
                     "target": sec_target,
-                    "cb_adj": cb_adj,
+                    "cb_adj": composite_centrality,
                     "distance": dist,
                     "affinity": pchembl,
                 }
             )
+
 
         # 4. Batch Normalization across candidate pool
         # Centrality: zero-variance → 0.0 (no signal detected)
