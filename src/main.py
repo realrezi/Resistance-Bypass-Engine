@@ -36,9 +36,16 @@ app.add_middleware(
 @app.get("/static/network.png")
 async def get_network_image():
     """Serve the 3D biological network visualization image."""
-    img_path = os.path.join(os.path.dirname(__file__), "static", "network.png")
-    if os.path.exists(img_path):
-        return FileResponse(img_path, media_type="image/png")
+    possible_paths = [
+        os.path.join(os.path.dirname(__file__), "static", "network.png"),
+        os.path.join(os.getcwd(), "src", "static", "network.png"),
+        os.path.join(os.getcwd(), "api", "static", "network.png"),
+        "src/static/network.png",
+        "api/static/network.png",
+    ]
+    for p in possible_paths:
+        if os.path.exists(p):
+            return FileResponse(p, media_type="image/png")
     raise HTTPException(status_code=404, detail="Image not found")
 
 
