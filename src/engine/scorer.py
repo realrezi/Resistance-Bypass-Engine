@@ -182,6 +182,8 @@ class PathwayScorer:
             candidate_res["hub_penalized_centrality"] = round(cb_n, 4)
             candidate_res["shortest_path_distance"] = round(item["distance"], 4)
 
+
+
             scored_results.append(candidate_res)
 
         # Sort candidates descending by synergy_score

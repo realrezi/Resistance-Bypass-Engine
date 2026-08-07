@@ -1517,7 +1517,27 @@ INDEX_HTML = """<!DOCTYPE html>
                 const node = evt.target;
                 openNodeInspector(node.id());
             });
+
+            cyInstance.on('tap', 'edge', function(evt){
+                const edge = evt.target;
+                const score = edge.data('score') || 0.5;
+                alert(`Biological PPI Interaction Edge: ${edge.data('source')} ⟷ ${edge.data('target')}\nSTRING-DB Confidence Score: ${score.toFixed(3)}`);
+            });
+
+            cyInstance.on('mouseover', 'node', function(evt){
+                const node = evt.target;
+                node.style('border-width', '6px');
+                node.style('shadow-blur', '25px');
+            });
+
+            cyInstance.on('mouseout', 'node', function(evt){
+                const node = evt.target;
+                const isKey = node.data('role') === 'primary' || node.data('role') === 'resistance';
+                node.style('border-width', isKey ? '4px' : '2.5px');
+                node.style('shadow-blur', isKey ? '20px' : '12px');
+            });
         }
+
 
         function openNodeInspector(nodeId) {
             const nodeClean = (nodeId || '').toUpperCase();
@@ -1603,8 +1623,10 @@ INDEX_HTML = """<!DOCTYPE html>
                         <span class="badge-phase ${isApproved ? 'approved' : ''}">${isApproved ? 'FDA Approved' : 'Phase ' + c.clinical_phase}</span>
                     </div>
                     <div style="font-size: 0.82rem; color: #cbd5e1; margin-bottom: 0.35rem;">
-                        Secondary Target: <strong style="color:#f8fafc;">${c.secondary_target}</strong> | Synergy Score: <strong style="color:#38bdf8;">${c.synergy_score}</strong> | Hub Bottleneck Centrality: <strong style="color:#c084fc;">${(c.hub_penalized_centrality && c.hub_penalized_centrality > 0) ? c.hub_penalized_centrality.toFixed(3) : '0.000 (Direct Target Node)'}</strong>
+                        Secondary Target: <strong style="color:#f8fafc;">${c.secondary_target}</strong> | Synergy Score: <strong style="color:#38bdf8;">${c.synergy_score}</strong> | Hub Centrality: <strong style="color:#c084fc;">${c.hub_penalized_centrality > 0 ? c.hub_penalized_centrality.toFixed(3) : 'Target Endpoint (0.000)'}</strong>
                     </div>
+
+
 
                     <div class="progress-track">
                         <div class="progress-fill" style="width: ${pct}%"></div>
