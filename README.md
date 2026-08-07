@@ -99,7 +99,8 @@ $$\text{Synergy Score } (S) = \alpha \cdot C_{\text{norm}}(v) + \beta \cdot (1.0
 | **NSCLC (Lung)** | `EGFR L858R` | Osimertinib | `EGFR C797S` | **7–10% Gatekeeper** | On-Target Covalent Binding Disruption |
 | **NSCLC (Lung)** | `EML4-ALK` | Alectinib | `MET Bypass` | **8–12% Bypass** | Parallel RTK Activation in ALK+ NSCLC |
 | **HER2+ Breast** | `ERBB2 / HER2` | Trastuzumab | `MET Amplification` | **10–15% RTK Bypass** | Monoclonal Antibody Bypass Evasion |
-| **HR+ Breast** | `ESR1` | Fulvestrant | `CDK4 / Cyclin D1` | **25–40% Post-AI** | Endocrine Escape via Cell Cycle Activation |
+| **HR+ Breast** | `ESR1` | Fulvestrant | `CDK4 / Cyclin D1` | **25–40% Post-Aromatase Inhibitors (AI)** | Endocrine Escape post-Aromatase Inhibitor failure via Cell Cycle Activation |
+
 | **Colorectal (CRC)** | `KRAS G12C` | Sotorasib | `EGFR Feedback` | **70–85% Feedback** | Rapid RTK Feedback Reactivation |
 | **Colorectal (CRC)** | `BRAF V600E` | Encorafenib | `EGFR Feedback` | **75–85% Feedback** | Monotherapy BRAF Escape Loop |
 | **Melanoma** | `BRAF V600E` | Dabrafenib | `MAP2K1 / MEK1` | **35–45% Acquired** | MAPK Cascade Re-activation |

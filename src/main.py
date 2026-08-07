@@ -839,11 +839,12 @@ INDEX_HTML = """<!DOCTYPE html>
                 <div class="prevalence-card approved-prev" onclick="setPreset('ESR1', 'Fulvestrant', 'CDK4', 'HR+/HER2- Breast Cancer')">
                     <div class="prevalence-header">
                         <span class="scenario-pair-title">ESR1 + CDK4/6 Cyclin Axis</span>
-                        <span class="badge-prevalence high">25–40% Post-AI Prev.</span>
+                        <span class="badge-prevalence high">25–40% Post-Aromatase Inhibitor (AI)</span>
                     </div>
                     <div class="locus-tag">Chr 6q25.1 (ESR1) ➔ Chr 12q14.1 (CDK4)</div>
-                    <div class="scenario-mechanism"><strong>Mechanism:</strong> Endocrine therapy escape driven by ligand-independent ESR1 mutations & Cyclin D1/CDK4 pathway reactivation.</div>
+                    <div class="scenario-mechanism"><strong>Mechanism:</strong> Endocrine therapy escape post-Aromatase Inhibitor (AI) failure driven by ligand-independent ESR1 mutations & Cyclin D1/CDK4 pathway reactivation.</div>
                 </div>
+
             </div>
 
             <!-- Tab 3: Colorectal Cancer Scenarios -->
