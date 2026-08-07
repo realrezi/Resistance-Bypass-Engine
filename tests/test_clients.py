@@ -112,14 +112,26 @@ async def test_open_targets_client():
             "target": {
                 "id": "ENSG00000146648",
                 "approvedSymbol": "EGFR",
-                "knownDrugs": {
+                "drugAndClinicalCandidates": {
                     "count": 1,
                     "rows": [
                         {
-                            "drugId": "CHEMBL1201585",
-                            "prefName": "OSIMERTINIB",
-                            "drugType": "Small molecule",
-                            "phase": 4,
+                            "id": "mock_id",
+                            "maxClinicalStage": "PHASE_4",
+                            "drug": {
+                                "id": "CHEMBL1201585",
+                                "name": "OSIMERTINIB",
+                                "drugType": "Small molecule",
+                                "maximumClinicalStage": "PHASE_4",
+                                "mechanismsOfAction": {
+                                    "rows": [
+                                        {
+                                            "mechanismOfAction": "EGFR inhibitor",
+                                            "targetName": "EGFR",
+                                        }
+                                    ]
+                                },
+                            },
                         }
                     ],
                 },
@@ -131,6 +143,8 @@ async def test_open_targets_client():
         drugs = await client.get_known_drugs("ENSG00000146648.15")
         assert len(drugs) == 1
         assert drugs[0]["prefName"] == "OSIMERTINIB"
+        assert drugs[0]["phase"] == 4
+
 
 
 def test_cache_key_determinism():

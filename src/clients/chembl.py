@@ -25,8 +25,11 @@ class ChEMBLClient(BaseHTTPClient):
 
         all_molecules: List[Dict[str, Any]] = []
         next_url: Optional[str] = url
+        page_count = 0
+        max_pages = 5
 
-        while next_url:
+        while next_url and page_count < max_pages:
+            page_count += 1
             if next_url == url:
                 data = await self.get_json(next_url, params=params)
             else:
@@ -52,7 +55,8 @@ class ChEMBLClient(BaseHTTPClient):
     async def get_target_activities(
         self,
         target_chembl_id: str,
-        limit: int = 100,
+        limit: int = 1000,
+        max_pages: int = 5,
     ) -> Dict[str, float]:
         """Fetch bioactivity values for target and group by pref_name using median pchembl_value."""
         url = f"{self.BASE_URL}/activity.json"
@@ -64,8 +68,10 @@ class ChEMBLClient(BaseHTTPClient):
 
         all_activities: List[Dict[str, Any]] = []
         next_url: Optional[str] = url
+        page_count = 0
 
-        while next_url:
+        while next_url and page_count < max_pages:
+            page_count += 1
             if next_url == url:
                 data = await self.get_json(next_url, params=params)
             else:
