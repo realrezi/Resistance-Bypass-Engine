@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import Any, Dict, List, Optional
 from pydantic import BaseModel, field_validator
 
 
@@ -43,3 +43,6 @@ class ResistanceBypassReport(BaseModel):
     pathway_nodes_count: int
     shortest_path_distance: float
     ranked_combinations: List[CombinationCandidate]
+    network_nodes: Optional[List[Dict[str, Any]]] = None
+    network_edges: Optional[List[Dict[str, Any]]] = None
+

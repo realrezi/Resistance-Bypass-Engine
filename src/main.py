@@ -76,6 +76,7 @@ INDEX_HTML = """<!DOCTYPE html>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.28.1/cytoscape.min.js"></script>
     <style>
         :root {
             --bg-lab: #f1f5f9;
@@ -1138,6 +1139,28 @@ INDEX_HTML = """<!DOCTYPE html>
                         </div>
                     </div>
 
+                    <!-- Interactive Cytoscape Network Visualizer -->
+                    <div class="network-viz-card" style="background: #090d16; border: 1px solid #1e293b; border-radius: 12px; padding: 1rem; margin-bottom: 1.5rem;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+                            <div style="display:flex; align-items:center; gap:0.5rem;">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0284c7" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 0 0-7.07 17.07"/></svg>
+                                <span style="font-weight: 800; font-size: 0.95rem; color: #f8fafc;">Interactive Biological Signaling Network Graph</span>
+                            </div>
+                            <div style="display: flex; gap: 0.4rem;">
+                                <button type="button" class="btn-header" style="font-size: 0.75rem; padding: 0.25rem 0.6rem; color: #fff;" onclick="resetGraphZoom()">Fit View</button>
+                                <button type="button" class="btn-header" style="font-size: 0.75rem; padding: 0.25rem 0.6rem; color: #fff;" onclick="relayoutGraph('cose')">Physics</button>
+                                <button type="button" class="btn-header" style="font-size: 0.75rem; padding: 0.25rem 0.6rem; color: #fff;" onclick="relayoutGraph('circle')">Circle</button>
+                            </div>
+                        </div>
+                        <div id="cyNetwork" style="width: 100%; height: 350px; background: #0b1120; border-radius: 8px; border: 1px solid #1e293b; position: relative;"></div>
+                        <div style="display:flex; justify-content:center; flex-wrap:wrap; gap:1.25rem; margin-top:0.75rem; font-size:0.78rem; color:#94a3b8;">
+                            <span style="display:inline-flex; align-items:center; gap:0.35rem;"><span style="width:10px; height:10px; border-radius:50%; background:#0284c7; border: 2px solid #38bdf8;"></span> Primary Target</span>
+                            <span style="display:inline-flex; align-items:center; gap:0.35rem;"><span style="width:10px; height:10px; border-radius:50%; background:#e11d48; border: 2px solid #f43f5e;"></span> Resistance Marker</span>
+                            <span style="display:inline-flex; align-items:center; gap:0.35rem;"><span style="width:10px; height:10px; border-radius:50%; background:#059669; border: 2px solid #34d399;"></span> Combination Target</span>
+                            <span style="display:inline-flex; align-items:center; gap:0.35rem;"><span style="width:10px; height:10px; border-radius:50%; background:#7c3aed; border: 2px solid #a855f7;"></span> Intermediary Bottleneck</span>
+                        </div>
+                    </div>
+
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem;">
                         <h3 style="font-size:1rem; font-weight:800; color:var(--text-main);">Ranked Dual-Drug Combination Therapies</h3>
                     </div>
@@ -1202,6 +1225,7 @@ INDEX_HTML = """<!DOCTYPE html>
 
     <script>
         let latestAnalysisData = null;
+        let cyInstance = null;
 
         function toggleModal(id, show) {
             document.getElementById(id).style.display = show ? 'flex' : 'none';
@@ -1284,9 +1308,10 @@ INDEX_HTML = """<!DOCTYPE html>
                 document.getElementById('distVal').innerText = distNum.toFixed(3);
 
                 renderTherapies();
-
                 resultsContent.style.display = 'block';
                 copyJsonBtn.style.display = 'inline-flex';
+
+                setTimeout(renderNetworkGraph, 50);
             } catch (err) {
                 errorBanner.innerText = '❌ ' + err.message;
                 errorBanner.style.display = 'block';
@@ -1294,6 +1319,132 @@ INDEX_HTML = """<!DOCTYPE html>
             } finally {
                 loader.style.display = 'none';
                 submitBtn.disabled = false;
+            }
+        }
+
+        function renderNetworkGraph() {
+            if (!latestAnalysisData) return;
+            const container = document.getElementById('cyNetwork');
+            if (!container || typeof cytoscape === 'undefined') return;
+
+            const primaryTarget = (latestAnalysisData.primary_target_canonical || '').toUpperCase();
+            const resistanceMarker = (latestAnalysisData.resistance_marker_canonical || '').toUpperCase();
+            const nodes = latestAnalysisData.network_nodes || [];
+            const edges = latestAnalysisData.network_edges || [];
+
+            const elements = [];
+
+            if (nodes.length === 0) {
+                elements.push({ data: { id: primaryTarget, label: primaryTarget, role: 'primary', degree: 4 } });
+                elements.push({ data: { id: resistanceMarker, label: resistanceMarker, role: 'resistance', degree: 4 } });
+                elements.push({ data: { id: 'edge_fallback', source: primaryTarget, target: resistanceMarker, score: 0.9 } });
+            } else {
+                const secondaryTargets = (latestAnalysisData.ranked_combinations || []).map(c => (c.secondary_target || '').toUpperCase());
+
+                nodes.forEach(n => {
+                    let role = 'intermediary';
+                    if (n.id === primaryTarget) role = 'primary';
+                    else if (n.id === resistanceMarker) role = 'resistance';
+                    else if (secondaryTargets.includes(n.id)) role = 'secondary';
+
+                    elements.push({
+                        data: { id: n.id, label: n.id, degree: n.degree || 1, role: role }
+                    });
+                });
+
+                edges.forEach((e, idx) => {
+                    elements.push({
+                        data: { id: 'edge_' + idx, source: e.source, target: e.target, score: e.score || 0.5 }
+                    });
+                });
+            }
+
+            if (cyInstance) cyInstance.destroy();
+
+            cyInstance = cytoscape({
+                container: container,
+                elements: elements,
+                style: [
+                    {
+                        selector: 'node',
+                        style: {
+                            'background-color': '#7c3aed',
+                            'label': 'data(label)',
+                            'color': '#ffffff',
+                            'font-size': '11px',
+                            'font-weight': 'bold',
+                            'text-valign': 'center',
+                            'text-halign': 'center',
+                            'width': 'mapData(degree, 1, 20, 32, 60)',
+                            'height': 'mapData(degree, 1, 20, 32, 60)',
+                            'border-width': '2px',
+                            'border-color': '#a855f7'
+                        }
+                    },
+                    {
+                        selector: 'node[role = "primary"]',
+                        style: {
+                            'background-color': '#0284c7',
+                            'border-color': '#38bdf8',
+                            'border-width': '3.5px',
+                            'width': '58px',
+                            'height': '58px',
+                            'font-size': '12px'
+                        }
+                    },
+                    {
+                        selector: 'node[role = "resistance"]',
+                        style: {
+                            'background-color': '#e11d48',
+                            'border-color': '#f43f5e',
+                            'border-width': '3.5px',
+                            'width': '58px',
+                            'height': '58px',
+                            'font-size': '12px'
+                        }
+                    },
+                    {
+                        selector: 'node[role = "secondary"]',
+                        style: {
+                            'background-color': '#059669',
+                            'border-color': '#34d399',
+                            'border-width': '3px',
+                            'width': '50px',
+                            'height': '50px',
+                            'font-size': '11px'
+                        }
+                    },
+                    {
+                        selector: 'edge',
+                        style: {
+                            'width': 'mapData(score, 0.4, 1, 1.5, 4.5)',
+                            'line-color': '#334155',
+                            'curve-style': 'bezier',
+                            'opacity': 0.75
+                        }
+                    }
+                ],
+                layout: {
+                    name: 'cose',
+                    animate: true,
+                    animationDuration: 600,
+                    padding: 30
+                }
+            });
+
+            cyInstance.on('tap', 'node', function(evt){
+                const node = evt.target;
+                alert(`Biological Node: ${node.id()}\nConnections: ${node.data('degree')}\nNetwork Role: ${node.data('role').toUpperCase()}`);
+            });
+        }
+
+        function resetGraphZoom() {
+            if (cyInstance) cyInstance.fit(30);
+        }
+
+        function relayoutGraph(layoutName) {
+            if (cyInstance) {
+                cyInstance.layout({ name: layoutName, animate: true, padding: 30 }).run();
             }
         }
 
@@ -1347,7 +1498,7 @@ def _sync_build_and_score(
     interactions: List[Dict[str, Any]],
     primary_target: str,
     raw_candidates: List[Dict[str, Any]],
-) -> Tuple[int, float, List[Dict[str, Any]]]:
+) -> Tuple[int, float, List[Dict[str, Any]], List[Dict[str, Any]], List[Dict[str, Any]]]:
     """CPU-bound worker function offloaded via asyncio.to_thread."""
     G = build_signaling_graph(interactions)
     if len(G.nodes) < 2:
@@ -1361,7 +1512,17 @@ def _sync_build_and_score(
     else:
         shortest_path_distance = 2.0
 
-    return pathway_nodes_count, shortest_path_distance, scored
+    network_nodes = [{"id": str(n), "degree": int(G.degree(n))} for n in G.nodes]
+    network_edges = [
+        {
+            "source": str(u),
+            "target": str(v),
+            "score": float(G[u][v].get("score", 0.5)),
+        }
+        for u, v in G.edges
+    ]
+
+    return pathway_nodes_count, shortest_path_distance, scored, network_nodes, network_edges
 
 
 @app.get("/", response_class=HTMLResponse)
@@ -1475,6 +1636,8 @@ async def analyze_resistance(req: ResistanceRequest) -> ResistanceBypassReport:
             pathway_nodes_count=pathway_nodes_count,
             shortest_path_distance=shortest_path_distance,
             ranked_combinations=ranked_combinations,
+            network_nodes=[{"id": primary_target_canonical, "degree": 1}],
+            network_edges=[],
         )
 
     else:
@@ -1547,7 +1710,7 @@ async def analyze_resistance(req: ResistanceRequest) -> ResistanceBypassReport:
 
         # THREAD SAFETY: Offload heavy NetworkX CPU-bound math via asyncio.to_thread
         try:
-            pathway_nodes_count, shortest_path_distance, scored_raw = (
+            pathway_nodes_count, shortest_path_distance, scored_raw, net_nodes, net_edges = (
                 await asyncio.to_thread(
                     _sync_build_and_score,
                     interactions,
@@ -1583,4 +1746,7 @@ async def analyze_resistance(req: ResistanceRequest) -> ResistanceBypassReport:
             pathway_nodes_count=pathway_nodes_count,
             shortest_path_distance=shortest_path_distance,
             ranked_combinations=ranked_combinations,
+            network_nodes=net_nodes,
+            network_edges=net_edges,
         )
+
