@@ -79,23 +79,24 @@ INDEX_HTML = """<!DOCTYPE html>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.28.1/cytoscape.min.js"></script>
     <style>
         :root {
-            --bg-lab: #f1f5f9;
-            --card-bg: #ffffff;
-            --border-lab: #cbd5e1;
-            --border-subtle: #e2e8f0;
-            --genomic-blue: #0284c7;
-            --genomic-blue-hover: #0369a1;
-            --mutation-red: #e11d48;
-            --approved-green: #059669;
-            --purple-pathway: #7c3aed;
-            --amber-phase: #d97706;
-            --text-main: #0f172a;
-            --text-secondary: #334155;
-            --text-muted: #64748b;
+            --bg-lab: #090d16;
+            --card-bg: #0f172a;
+            --panel-bg: #1e293b;
+            --border-lab: #1e293b;
+            --border-subtle: #334155;
+            --genomic-blue: #38bdf8;
+            --genomic-blue-hover: #0284c7;
+            --mutation-red: #f43f5e;
+            --approved-green: #10b981;
+            --purple-pathway: #c084fc;
+            --amber-phase: #f59e0b;
+            --text-main: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --text-muted: #94a3b8;
             --font-main: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             --font-mono: 'JetBrains Mono', monospace;
-            --shadow-lab: 0 4px 20px -2px rgba(15, 23, 42, 0.08), 0 2px 6px -1px rgba(15, 23, 42, 0.04);
-            --shadow-hover: 0 10px 25px -5px rgba(2, 132, 199, 0.15), 0 8px 10px -6px rgba(15, 23, 42, 0.06);
+            --shadow-lab: 0 10px 30px -5px rgba(0, 0, 0, 0.5), 0 4px 12px -2px rgba(0, 0, 0, 0.3);
+            --shadow-hover: 0 15px 35px -5px rgba(56, 189, 248, 0.2), 0 8px 15px -4px rgba(0, 0, 0, 0.4);
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -104,14 +105,14 @@ INDEX_HTML = """<!DOCTYPE html>
             font-family: var(--font-main);
             background-color: var(--bg-lab);
             background-image: 
-                radial-gradient(circle at 10% 10%, rgba(2, 132, 199, 0.05) 0%, transparent 40%),
-                radial-gradient(circle at 90% 90%, rgba(124, 58, 237, 0.05) 0%, transparent 40%),
-                linear-gradient(to right, rgba(203, 213, 225, 0.3) 1px, transparent 1px),
-                linear-gradient(to bottom, rgba(203, 213, 225, 0.3) 1px, transparent 1px);
+                radial-gradient(circle at 10% 10%, rgba(56, 189, 248, 0.06) 0%, transparent 40%),
+                radial-gradient(circle at 90% 90%, rgba(192, 132, 252, 0.06) 0%, transparent 40%),
+                linear-gradient(to right, rgba(30, 41, 59, 0.4) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(30, 41, 59, 0.4) 1px, transparent 1px);
             background-size: 100% 100%, 100% 100%, 32px 32px, 32px 32px;
             color: var(--text-secondary);
             min-height: 100vh;
-            padding: 1rem 1.25rem;
+            padding: 1.25rem;
             line-height: 1.45;
             -webkit-font-smoothing: antialiased;
         }
@@ -130,7 +131,7 @@ INDEX_HTML = """<!DOCTYPE html>
             background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
             border: 1px solid #334155;
             border-radius: 14px;
-            box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.3);
+            box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.5);
             margin-bottom: 1.25rem;
             flex-wrap: wrap;
             gap: 1rem;
@@ -236,10 +237,10 @@ INDEX_HTML = """<!DOCTYPE html>
             border-color: #38bdf8;
         }
 
-        /* Main Section: Academic Matrix Featured Prominently */
+        /* Main Section: Dark Slate Academic Matrix */
         .academic-matrix-section {
             background: var(--card-bg);
-            border: 1px solid var(--border-lab);
+            border: 1px solid #1e293b;
             border-radius: 14px;
             padding: 1.35rem;
             margin-bottom: 1.25rem;
@@ -267,16 +268,16 @@ INDEX_HTML = """<!DOCTYPE html>
         .matrix-tabs-container {
             display: flex;
             gap: 0.4rem;
-            border-bottom: 2px solid var(--border-subtle);
+            border-bottom: 2px solid #1e293b;
             padding-bottom: 0.6rem;
             margin-bottom: 1rem;
             overflow-x: auto;
         }
 
         .btn-matrix-tab {
-            background: #f8fafc;
-            border: 1px solid var(--border-lab);
-            color: var(--text-muted);
+            background: #1e293b;
+            border: 1px solid #334155;
+            color: #94a3b8;
             padding: 0.45rem 0.85rem;
             border-radius: 8px;
             font-size: 0.82rem;
@@ -290,11 +291,11 @@ INDEX_HTML = """<!DOCTYPE html>
         }
 
         .btn-matrix-tab.active {
-            background: #f0f9ff;
-            color: var(--genomic-blue);
-            border-color: #93c5fd;
-            border-bottom: 3px solid var(--genomic-blue);
-            box-shadow: 0 2px 8px rgba(2, 132, 199, 0.12);
+            background: rgba(56, 189, 248, 0.15);
+            color: #38bdf8;
+            border-color: #38bdf8;
+            border-bottom: 3px solid #38bdf8;
+            box-shadow: 0 2px 10px rgba(56, 189, 248, 0.2);
         }
 
         .prevalence-cards-grid {
@@ -304,8 +305,8 @@ INDEX_HTML = """<!DOCTYPE html>
         }
 
         .prevalence-card {
-            background: #f8fafc;
-            border: 1px solid var(--border-lab);
+            background: #1e293b;
+            border: 1px solid #334155;
             border-left: 4px solid var(--genomic-blue);
             border-radius: 10px;
             padding: 1rem;
@@ -314,7 +315,7 @@ INDEX_HTML = """<!DOCTYPE html>
         }
 
         .prevalence-card:hover {
-            background: #ffffff;
+            background: #0f172a;
             border-color: var(--genomic-blue);
             transform: translateY(-2px);
             box-shadow: var(--shadow-hover);
@@ -342,15 +343,15 @@ INDEX_HTML = """<!DOCTYPE html>
             font-size: 0.72rem;
             font-weight: 800;
             font-family: var(--font-mono);
-            background: #fef2f2;
-            color: var(--mutation-red);
-            border: 1px solid #fecaca;
+            background: rgba(244, 63, 94, 0.15);
+            color: #fb7185;
+            border: 1px solid rgba(244, 63, 94, 0.3);
         }
 
         .badge-prevalence.high {
-            background: #fffbe6;
-            color: #b45309;
-            border-color: #fde68a;
+            background: rgba(245, 158, 11, 0.15);
+            color: #fbbf24;
+            border-color: rgba(245, 158, 11, 0.3);
         }
 
         .locus-tag {
@@ -381,7 +382,7 @@ INDEX_HTML = """<!DOCTYPE html>
 
         .panel {
             background: var(--card-bg);
-            border: 1px solid var(--border-lab);
+            border: 1px solid #1e293b;
             border-radius: 14px;
             padding: 1.35rem;
             box-shadow: var(--shadow-lab);
@@ -393,7 +394,7 @@ INDEX_HTML = """<!DOCTYPE html>
             align-items: center;
             margin-bottom: 1rem;
             padding-bottom: 0.65rem;
-            border-bottom: 1px solid var(--border-subtle);
+            border-bottom: 1px solid #1e293b;
         }
 
         .panel-title-text {
@@ -423,10 +424,10 @@ INDEX_HTML = """<!DOCTYPE html>
         input.input-field {
             width: 100%;
             padding: 0.7rem 0.9rem;
-            background: #f8fafc;
-            border: 1px solid var(--border-lab);
+            background: #1e293b;
+            border: 1px solid #334155;
             border-radius: 8px;
-            color: var(--text-main);
+            color: #f8fafc;
             font-family: var(--font-main);
             font-size: 0.9rem;
             font-weight: 600;
@@ -435,9 +436,9 @@ INDEX_HTML = """<!DOCTYPE html>
 
         input.input-field:focus {
             outline: none;
-            background: #ffffff;
+            background: #0f172a;
             border-color: var(--genomic-blue);
-            box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
+            box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.25);
         }
 
         .btn-run {
@@ -455,20 +456,20 @@ INDEX_HTML = """<!DOCTYPE html>
             align-items: center;
             justify-content: center;
             gap: 0.5rem;
-            box-shadow: 0 4px 14px rgba(2, 132, 199, 0.3);
+            box-shadow: 0 4px 14px rgba(2, 132, 199, 0.4);
             margin-top: 0.5rem;
         }
 
         .btn-run:hover {
             opacity: 0.95;
             transform: translateY(-1px);
-            box-shadow: 0 6px 18px rgba(2, 132, 199, 0.4);
+            box-shadow: 0 6px 18px rgba(2, 132, 199, 0.5);
         }
 
         /* Large & Spacious Point-and-Click Picker Palette */
         .spacious-picker-section {
             margin-top: 1.25rem;
-            border-top: 2px solid var(--border-subtle);
+            border-top: 2px solid #1e293b;
             padding-top: 1rem;
         }
 
@@ -489,8 +490,8 @@ INDEX_HTML = """<!DOCTYPE html>
         }
 
         .btn-clear-picker {
-            background: #f1f5f9;
-            border: 1px solid var(--border-lab);
+            background: #1e293b;
+            border: 1px solid #334155;
             color: var(--text-muted);
             padding: 0.25rem 0.55rem;
             border-radius: 6px;
@@ -501,8 +502,8 @@ INDEX_HTML = """<!DOCTYPE html>
 
         .btn-clear-picker:hover {
             color: var(--mutation-red);
-            border-color: #fecaca;
-            background: #fef2f2;
+            border-color: var(--mutation-red);
+            background: rgba(244, 63, 94, 0.15);
         }
 
         .picker-category-label {
@@ -522,16 +523,16 @@ INDEX_HTML = """<!DOCTYPE html>
         }
 
         .btn-spacious-chip {
-            background: #ffffff;
-            border: 1px solid var(--border-lab);
-            color: var(--text-main);
+            background: #1e293b;
+            border: 1px solid #334155;
+            color: #f8fafc;
             padding: 0.5rem 0.95rem;
             border-radius: 8px;
             font-size: 0.85rem;
             font-weight: 700;
             cursor: pointer;
             transition: all 0.2s ease;
-            box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
             display: flex;
             align-items: center;
             gap: 0.35rem;
@@ -539,37 +540,38 @@ INDEX_HTML = """<!DOCTYPE html>
 
         .btn-spacious-chip:hover {
             transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(2, 132, 199, 0.15);
+            box-shadow: 0 4px 12px rgba(56, 189, 248, 0.25);
+            background: #0f172a;
         }
 
         .btn-spacious-chip.target-chip {
             border-left: 4px solid var(--genomic-blue);
-            background: #f0f9ff;
+            background: rgba(56, 189, 248, 0.1);
         }
         .btn-spacious-chip.target-chip:hover { border-color: var(--genomic-blue); }
 
         .btn-spacious-chip.drug-chip {
             border-left: 4px solid var(--approved-green);
-            background: #ecfdf5;
+            background: rgba(16, 185, 129, 0.1);
         }
         .btn-spacious-chip.drug-chip:hover { border-color: var(--approved-green); }
 
         .btn-spacious-chip.marker-chip {
             border-left: 4px solid var(--mutation-red);
-            background: #fef2f2;
+            background: rgba(244, 63, 94, 0.1);
         }
         .btn-spacious-chip.marker-chip:hover { border-color: var(--mutation-red); }
 
-        /* Results Canvas (Clean Vector SVG Interactive Visualizer) */
+        /* Results Canvas */
         .vector-graph-canvas {
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-            border: 1px solid #334155;
+            background: linear-gradient(135deg, #030712 0%, #0f172a 100%);
+            border: 1px solid #1e293b;
             border-radius: 12px;
             padding: 1.5rem;
             color: #fff;
             text-align: center;
             margin-bottom: 1rem;
-            box-shadow: inset 0 2px 10px rgba(0,0,0,0.5);
+            box-shadow: inset 0 2px 10px rgba(0,0,0,0.8);
         }
 
         .metrics-grid {
@@ -580,8 +582,8 @@ INDEX_HTML = """<!DOCTYPE html>
         }
 
         .metric-tile {
-            background: #f8fafc;
-            border: 1px solid var(--border-lab);
+            background: #1e293b;
+            border: 1px solid #334155;
             border-radius: 10px;
             padding: 0.85rem;
             text-align: center;
@@ -611,9 +613,9 @@ INDEX_HTML = """<!DOCTYPE html>
         }
 
         .pill-badge {
-            background: #f0f9ff;
-            border: 1px solid #bae6fd;
-            color: #0369a1;
+            background: rgba(56, 189, 248, 0.15);
+            border: 1px solid rgba(56, 189, 248, 0.35);
+            color: #38bdf8;
             padding: 0.35rem 0.7rem;
             border-radius: 6px;
             font-size: 0.8rem;
@@ -622,8 +624,8 @@ INDEX_HTML = """<!DOCTYPE html>
         }
 
         .candidate-card {
-            background: #ffffff;
-            border: 1px solid var(--border-lab);
+            background: #1e293b;
+            border: 1px solid #334155;
             border-radius: 10px;
             padding: 1.1rem;
             margin-bottom: 0.85rem;
@@ -632,7 +634,7 @@ INDEX_HTML = """<!DOCTYPE html>
         }
 
         .candidate-card:hover {
-            border-color: #93c5fd;
+            border-color: var(--genomic-blue);
             box-shadow: var(--shadow-hover);
         }
 
@@ -655,20 +657,20 @@ INDEX_HTML = """<!DOCTYPE html>
             font-size: 0.74rem;
             font-weight: 800;
             font-family: var(--font-mono);
-            background: #fffbe6;
-            color: #b45309;
-            border: 1px solid #fde68a;
+            background: rgba(245, 158, 11, 0.15);
+            color: #fbbf24;
+            border: 1px solid rgba(245, 158, 11, 0.3);
         }
 
         .badge-phase.approved {
-            background: #ecfdf5;
+            background: rgba(16, 185, 129, 0.15);
             color: var(--approved-green);
-            border-color: #a7f3d0;
+            border-color: rgba(16, 185, 129, 0.3);
         }
 
         .progress-track {
             height: 7px;
-            background: #e2e8f0;
+            background: #0f172a;
             border-radius: 999px;
             overflow: hidden;
             margin: 0.6rem 0;
@@ -687,7 +689,7 @@ INDEX_HTML = """<!DOCTYPE html>
             display: none;
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(15, 23, 42, 0.65);
+            background: rgba(3, 7, 18, 0.85);
             backdrop-filter: blur(8px);
             z-index: 1000;
             align-items: center;
@@ -696,16 +698,16 @@ INDEX_HTML = """<!DOCTYPE html>
         }
 
         .modal-box {
-            background: #ffffff;
-            border: 1px solid var(--border-lab);
+            background: #0f172a;
+            border: 1px solid #334155;
             border-radius: 16px;
             max-width: 760px;
             width: 100%;
             max-height: 88vh;
             overflow-y: auto;
             padding: 1.75rem;
-            color: var(--text-secondary);
-            box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.25);
+            color: #cbd5e1;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
         }
 
         .modal-top {
@@ -714,7 +716,7 @@ INDEX_HTML = """<!DOCTYPE html>
             align-items: center;
             margin-bottom: 1.25rem;
             padding-bottom: 0.75rem;
-            border-bottom: 1px solid var(--border-subtle);
+            border-bottom: 1px solid #1e293b;
         }
 
         .modal-heading {
@@ -730,6 +732,7 @@ INDEX_HTML = """<!DOCTYPE html>
             font-size: 1.5rem;
             cursor: pointer;
         }
+
     </style>
 </head>
 <body>
@@ -764,26 +767,26 @@ INDEX_HTML = """<!DOCTYPE html>
             </div>
         </header>
 
-        <!-- Academic Clinical Resistance Matrix Section (Featured Prominently) -->
+        <!-- Prevalent Tumor Resistance Genotypes Section (Academic & Professional) -->
         <section class="academic-matrix-section">
             <div class="matrix-top-bar">
                 <div class="matrix-title-text">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0284c7" stroke-width="2.2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-                    <span>🔬 Academic Clinical Resistance Matrix</span>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2.2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                    <span>Prevalent Tumor Resistance Genotypes & Clinical Bypass Pathways</span>
                 </div>
-                <div style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600;">
-                    Select an epidemiological scenario to auto-populate inputs & run network analysis
+                <div style="font-size: 0.8rem; color: #94a3b8; font-weight: 600;">
+                    Instantiate characterized clinical phenotypes and high-prevalence resistance loci across 9 primary oncology indications:
                 </div>
             </div>
 
             <div class="matrix-tabs-container">
-                <button class="btn-matrix-tab active" onclick="switchMatrixCategory('nsclc')">🫁 NSCLC (Lung)</button>
-                <button class="btn-matrix-tab" onclick="switchMatrixCategory('breast')">🎗️ Breast Cancer</button>
-                <button class="btn-matrix-tab" onclick="switchMatrixCategory('crc')">🧬 Colorectal Cancer</button>
-                <button class="btn-matrix-tab" onclick="switchMatrixCategory('melanoma')">☀️ Cutaneous Melanoma</button>
-                <button class="btn-matrix-tab" onclick="switchMatrixCategory('cml')">🩸 Hematologic (CML)</button>
-                <button class="btn-matrix-tab" onclick="switchMatrixCategory('prostate')">🩺 Prostate Cancer</button>
-                <button class="btn-matrix-tab" onclick="switchMatrixCategory('ovarian')">🎗️ Ovarian & GYN</button>
+                <button class="btn-matrix-tab active" onclick="switchMatrixCategory('nsclc')">🫁 NSCLC Loci</button>
+                <button class="btn-matrix-tab" onclick="switchMatrixCategory('breast')">🎗️ Breast Carcinoma</button>
+                <button class="btn-matrix-tab" onclick="switchMatrixCategory('crc')">🧬 Colorectal Loci</button>
+                <button class="btn-matrix-tab" onclick="switchMatrixCategory('melanoma')">☀️ Melanoma Axis</button>
+                <button class="btn-matrix-tab" onclick="switchMatrixCategory('cml')">🩸 Hematologic Myeloma</button>
+                <button class="btn-matrix-tab" onclick="switchMatrixCategory('prostate')">🩺 Prostate Axis</button>
+                <button class="btn-matrix-tab" onclick="switchMatrixCategory('ovarian')">🎗️ Ovarian Signatures</button>
                 <button class="btn-matrix-tab" onclick="switchMatrixCategory('glioma')">🧠 Glioma & CNS</button>
                 <button class="btn-matrix-tab" onclick="switchMatrixCategory('thyroid')">🫀 Thyroid & Rare Fusions</button>
             </div>
@@ -935,19 +938,19 @@ INDEX_HTML = """<!DOCTYPE html>
 
         <!-- Workstation Grid -->
         <div class="workstation-grid">
-            <!-- Left Panel: Form & Spacious Point-and-Click Picker -->
+            <!-- Left Panel: Form & Molecular Target Selector -->
             <div class="panel">
                 <div class="panel-header">
                     <div class="panel-title-text">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0284c7" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><path d="m10 15 5-3-5-3v6z"/></svg>
-                        <span>Analysis Parameters & Inputs</span>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><path d="m10 15 5-3-5-3v6z"/></svg>
+                        <span>Molecular Target & Drug Parameters</span>
                     </div>
                 </div>
 
                 <form id="analyzeForm" onsubmit="runAnalysis(event)">
                     <div class="form-group">
-                        <label class="field-label" for="primary_target">Primary Target Symbol</label>
-                        <input class="input-field" type="text" id="primary_target" value="EGFR" required placeholder="Select or type gene symbol (e.g. EGFR)..." list="targets_list" autocomplete="off">
+                        <label class="field-label" for="primary_target">Primary Target Gene Locus</label>
+                        <input class="input-field" type="text" id="primary_target" value="EGFR" required placeholder="Specify primary target locus (e.g. EGFR, ERBB2)..." list="targets_list" autocomplete="off">
                         <datalist id="targets_list">
                             <option value="EGFR">Epidermal Growth Factor Receptor (Chr 7p11.2)</option>
                             <option value="ERBB2">ERBB2 / HER2 Receptor Tyrosine Kinase (Chr 17q12)</option>
@@ -965,8 +968,8 @@ INDEX_HTML = """<!DOCTYPE html>
                     </div>
 
                     <div class="form-group">
-                        <label class="field-label" for="primary_drug">Primary Targeted Drug Name</label>
-                        <input class="input-field" type="text" id="primary_drug" value="Osimertinib" required placeholder="Select or type drug name..." list="drugs_list" autocomplete="off">
+                        <label class="field-label" for="primary_drug">Frontline Targeted Inhibitor</label>
+                        <input class="input-field" type="text" id="primary_drug" value="Osimertinib" required placeholder="Specify frontline therapeutic agent..." list="drugs_list" autocomplete="off">
                         <datalist id="drugs_list">
                             <option value="Osimertinib">Osimertinib (3rd-gen EGFR TKI)</option>
                             <option value="Gefitinib">Gefitinib (1st-gen EGFR TKI)</option>
@@ -984,8 +987,8 @@ INDEX_HTML = """<!DOCTYPE html>
                     </div>
 
                     <div class="form-group">
-                        <label class="field-label" for="resistance_marker">Secondary Resistance Marker</label>
-                        <input class="input-field" type="text" id="resistance_marker" value="MET" required placeholder="Select or type marker..." list="markers_list" autocomplete="off">
+                        <label class="field-label" for="resistance_marker">Secondary Bypass Resistance Marker</label>
+                        <input class="input-field" type="text" id="resistance_marker" value="MET" required placeholder="Specify bypass marker or secondary mutation..." list="markers_list" autocomplete="off">
                         <datalist id="markers_list">
                             <option value="MET">MET Amplification / Bypass Hyperactivation</option>
                             <option value="EGFR">EGFR Secondary Gatekeeper (C797S / T790M)</option>
@@ -999,8 +1002,8 @@ INDEX_HTML = """<!DOCTYPE html>
                     </div>
 
                     <div class="form-group">
-                        <label class="field-label" for="cancer_type">Cancer Indication</label>
-                        <input class="input-field" type="text" id="cancer_type" value="Non-Small Cell Lung Cancer" placeholder="Select or type indication..." list="indications_list" autocomplete="off">
+                        <label class="field-label" for="cancer_type">Oncology Indication</label>
+                        <input class="input-field" type="text" id="cancer_type" value="Non-Small Cell Lung Cancer" placeholder="Select tumor type..." list="indications_list" autocomplete="off">
                         <datalist id="indications_list">
                             <option value="Non-Small Cell Lung Cancer">Non-Small Cell Lung Cancer (NSCLC)</option>
                             <option value="HER2+ Breast Cancer">HER2+ Breast Cancer</option>
@@ -1011,22 +1014,22 @@ INDEX_HTML = """<!DOCTYPE html>
                     </div>
 
                     <button type="submit" id="submitBtn" class="btn-run">
-                        <span>Execute Resistance Pipeline</span>
+                        <span>Compute Network Graph Algorithms</span>
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
                     </button>
                 </form>
 
-                <!-- Large & Spacious Point-and-Click Picker Palette -->
+                <!-- Molecular Target & Inhibitor Selector Palette -->
                 <div class="spacious-picker-section">
                     <div class="picker-header">
                         <div class="picker-title">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0284c7" stroke-width="2.2"><path d="M15 15l5 5M4 4l16 16"/></svg>
-                            <span>🖱️ Point-and-Click Marker Picker</span>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2.2"><path d="M15 15l5 5M4 4l16 16"/></svg>
+                            <span>Molecular Target & Inhibitor Selector</span>
                         </div>
                         <button type="button" class="btn-clear-picker" onclick="clearInputs()">Reset Fields</button>
                     </div>
 
-                    <div class="picker-category-label">Target Driver Genes:</div>
+                    <div class="picker-category-label">Target Driver Loci:</div>
                     <div class="picker-chip-grid">
                         <button type="button" class="btn-spacious-chip target-chip" onclick="quickFill('primary_target', 'EGFR')">EGFR</button>
                         <button type="button" class="btn-spacious-chip target-chip" onclick="quickFill('primary_target', 'ERBB2')">HER2</button>
@@ -1038,7 +1041,7 @@ INDEX_HTML = """<!DOCTYPE html>
                         <button type="button" class="btn-spacious-chip target-chip" onclick="quickFill('primary_target', 'ABL1')">ABL1</button>
                     </div>
 
-                    <div class="picker-category-label">Frontline Targeted Agents:</div>
+                    <div class="picker-category-label">Frontline Inhibitor Molecules:</div>
                     <div class="picker-chip-grid">
                         <button type="button" class="btn-spacious-chip drug-chip" onclick="quickFill('primary_drug', 'Osimertinib')">Osimertinib</button>
                         <button type="button" class="btn-spacious-chip drug-chip" onclick="quickFill('primary_drug', 'Trastuzumab')">Trastuzumab</button>
@@ -1049,7 +1052,7 @@ INDEX_HTML = """<!DOCTYPE html>
                         <button type="button" class="btn-spacious-chip drug-chip" onclick="quickFill('primary_drug', 'Imatinib')">Imatinib</button>
                     </div>
 
-                    <div class="picker-category-label">Secondary Resistance Markers:</div>
+                    <div class="picker-category-label">Acquired Resistance Loci:</div>
                     <div class="picker-chip-grid">
                         <button type="button" class="btn-spacious-chip marker-chip" onclick="quickFill('resistance_marker', 'MET')">MET Bypass</button>
                         <button type="button" class="btn-spacious-chip marker-chip" onclick="quickFill('resistance_marker', 'EGFR')">EGFR C797S</button>
@@ -1062,59 +1065,118 @@ INDEX_HTML = """<!DOCTYPE html>
                 </div>
             </div>
 
-            <!-- Right Panel: Results Canvas (No stock photos/images, clean interactive vector graph) -->
+            <!-- Right Panel: Signal Transduction Pathway & Synergy Matrix -->
             <div class="panel">
                 <div class="panel-header">
                     <div class="panel-title-text">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0284c7" stroke-width="2.2"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
-                        <span>Genomic Resistance Pathway & Synergy Analysis</span>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2.2"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
+                        <span>Signal Transduction Pathway Topology & Dual-Target Synergy Matrix</span>
                     </div>
-                    <button id="copyJsonBtn" class="btn-header" style="display: none; color: var(--text-main);" onclick="copyResultJson()">📋 Copy JSON</button>
+                    <button id="copyJsonBtn" class="btn-header" style="display: none; color: #fff;" onclick="copyResultJson()">📋 Copy Report JSON</button>
                 </div>
 
-                <div id="errorBanner" style="display:none; background:#fef2f2; border:1px solid #fecaca; padding:0.85rem; border-radius:8px; color:#991b1b; margin-bottom:1rem; font-size:0.85rem;"></div>
+                <div id="errorBanner" style="display:none; background:rgba(244, 63, 94, 0.15); border:1px solid rgba(244, 63, 94, 0.3); padding:0.85rem; border-radius:8px; color:#fb7185; margin-bottom:1rem; font-size:0.85rem;"></div>
 
                 <div id="loader" style="display: none; text-align: center; padding: 3rem 1rem;">
-                    <div style="width: 40px; height: 40px; border: 3px solid #e2e8f0; border-radius: 50%; border-top-color: #0284c7; animation: spin 0.8s linear infinite; margin: 0 auto 1rem auto;"></div>
-                    <p style="font-weight: 800; color: var(--text-main);">Querying Biological PPI & Clinical APIs...</p>
-                    <p style="font-size: 0.82rem; color: var(--text-muted);">Resolving HGNC IDs • Building NetworkX LCC Topology • Querying ChEMBL & Open Targets</p>
+                    <div style="width: 44px; height: 44px; border: 3px solid #1e293b; border-radius: 50%; border-top-color: #38bdf8; animation: spin 0.8s linear infinite; margin: 0 auto 1rem auto;"></div>
+                    <p style="font-weight: 800; color: #f8fafc;">Querying REST/GraphQL PPI Biological Databases...</p>
+                    <p style="font-size: 0.82rem; color: #94a3b8;">Resolving Canonical HGNC IDs • Extracting NetworkX LCC Topology • Querying ChEMBL & Open Targets</p>
                 </div>
 
-                <!-- Clean Vector SVG Canvas Placeholder (No static image stock photo) -->
+                <!-- Multi-Kinase Cell Membrane SVG Signaling Visualizer (Professional & Dynamic) -->
                 <div id="placeholder">
-                    <div class="vector-graph-canvas">
-                        <svg width="100%" height="200" viewBox="0 0 600 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <!-- Network Edges -->
-                            <line x1="100" y1="100" x2="220" y2="60" stroke="#0284c7" stroke-width="2.5" stroke-dasharray="4 4"/>
-                            <line x1="100" y1="100" x2="220" y2="140" stroke="#0284c7" stroke-width="2.5"/>
-                            <line x1="220" y1="60" x2="380" y2="60" stroke="#7c3aed" stroke-width="2.5"/>
-                            <line x1="220" y1="140" x2="380" y2="140" stroke="#0284c7" stroke-width="2.5"/>
-                            <line x1="380" y1="60" x2="500" y2="100" stroke="#e11d48" stroke-width="2.5"/>
-                            <line x1="380" y1="140" x2="500" y2="100" stroke="#059669" stroke-width="2.5"/>
+                    <div class="vector-graph-canvas" style="background: #030712; border: 1px solid #1e293b; border-radius: 12px; padding: 1.5rem; color: #fff; text-align: center; position: relative;">
+                        <svg width="100%" height="240" viewBox="0 0 700 240" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <defs>
+                                <linearGradient id="primaryGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" stop-color="#38bdf8" />
+                                    <stop offset="100%" stop-color="#0284c7" />
+                                </linearGradient>
+                                <linearGradient id="resistGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" stop-color="#f43f5e" />
+                                    <stop offset="100%" stop-color="#e11d48" />
+                                </linearGradient>
+                                <linearGradient id="purpleGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" stop-color="#c084fc" />
+                                    <stop offset="100%" stop-color="#7c3aed" />
+                                </linearGradient>
+                                <linearGradient id="greenGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" stop-color="#34d399" />
+                                    <stop offset="100%" stop-color="#059669" />
+                                </linearGradient>
+                                <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+                                    <feGaussianBlur stdDeviation="4" result="blur" />
+                                    <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                                </filter>
+                            </defs>
 
-                            <!-- Primary Target Node -->
-                            <circle cx="100" cy="100" r="28" fill="#0284c7" fill-opacity="0.2" stroke="#38bdf8" stroke-width="2.5"/>
-                            <text x="100" y="104" text-anchor="middle" fill="#38bdf8" font-weight="800" font-size="12">EGFR</text>
+                            <!-- Lipid Bilayer Membrane Layer -->
+                            <line x1="20" y1="40" x2="680" y2="40" stroke="#334155" stroke-width="6" stroke-dasharray="8 6"/>
+                            <text x="30" y="26" fill="#94a3b8" font-size="10" font-weight="700" font-family="sans-serif">EXTRACELLULAR RECEPTOR DOMAIN</text>
+                            <text x="30" y="58" fill="#64748b" font-size="10" font-weight="700" font-family="sans-serif">PLASMA MEMBRANE LIPID BILAYER</text>
 
-                            <!-- Adapter / Bottleneck Nodes -->
-                            <circle cx="220" cy="60" r="22" fill="#7c3aed" fill-opacity="0.2" stroke="#a855f7" stroke-width="2"/>
-                            <text x="220" y="64" text-anchor="middle" fill="#c084fc" font-weight="700" font-size="10">GRB2</text>
+                            <!-- Signal Transduction Edges -->
+                            <path d="M 120 40 L 120 120 L 250 80 L 400 80 L 520 120 L 520 40" stroke="#38bdf8" stroke-width="2.5" stroke-dasharray="6 4" fill="none"/>
+                            <path d="M 250 80 L 320 170 L 450 170 L 520 120" stroke="#c084fc" stroke-width="2.5" fill="none"/>
+                            <path d="M 400 80 L 580 160" stroke="#34d399" stroke-width="2" stroke-dasharray="4 4" fill="none"/>
 
-                            <circle cx="220" cy="140" r="22" fill="#0284c7" fill-opacity="0.2" stroke="#38bdf8" stroke-width="2"/>
-                            <text x="220" y="144" text-anchor="middle" fill="#7dd3fc" font-weight="700" font-size="10">GAB1</text>
+                            <!-- Primary Target RTK Domain (EGFR) -->
+                            <g transform="translate(120, 40)">
+                                <rect x="-18" y="-20" width="36" height="40" rx="6" fill="url(#primaryGrad)" filter="url(#glow)"/>
+                                <text x="0" y="4" text-anchor="middle" fill="#fff" font-weight="800" font-size="11">EGFR</text>
+                                <circle cx="0" cy="30" r="14" fill="#0284c7" stroke="#38bdf8" stroke-width="2"/>
+                                <text x="0" y="34" text-anchor="middle" fill="#fff" font-size="9" font-weight="800">p-Y</text>
+                            </g>
+                            <text x="120" y="10" text-anchor="middle" fill="#38bdf8" font-size="10" font-weight="700">Chr 7p11.2 (Primary Driver)</text>
 
-                            <circle cx="380" cy="60" r="22" fill="#7c3aed" fill-opacity="0.2" stroke="#a855f7" stroke-width="2"/>
-                            <text x="380" y="64" text-anchor="middle" fill="#c084fc" font-weight="700" font-size="10">SOS1</text>
+                            <!-- Resistance Marker RTK Domain (MET) -->
+                            <g transform="translate(520, 40)">
+                                <rect x="-18" y="-20" width="36" height="40" rx="6" fill="url(#resistGrad)" filter="url(#glow)"/>
+                                <text x="0" y="4" text-anchor="middle" fill="#fff" font-weight="800" font-size="11">MET</text>
+                                <circle cx="0" cy="30" r="14" fill="#e11d48" stroke="#f43f5e" stroke-width="2"/>
+                                <text x="0" y="34" text-anchor="middle" fill="#fff" font-size="9" font-weight="800">p-Y</text>
+                            </g>
+                            <text x="520" y="10" text-anchor="middle" fill="#f43f5e" font-size="10" font-weight="700">Chr 7q31.2 (Bypass Locus)</text>
 
-                            <circle cx="380" cy="140" r="22" fill="#059669" fill-opacity="0.2" stroke="#34d399" stroke-width="2"/>
-                            <text x="380" y="144" text-anchor="middle" fill="#6ee7b7" font-weight="700" font-size="10">PIK3R1</text>
+                            <!-- Downstream Kinase Cascades -->
+                            <!-- GRB2/SOS1 Adaptor -->
+                            <g transform="translate(250, 80)">
+                                <circle cx="0" cy="0" r="22" fill="url(#purpleGrad)" filter="url(#glow)"/>
+                                <text x="0" y="4" text-anchor="middle" fill="#fff" font-weight="800" font-size="10">GRB2</text>
+                            </g>
 
-                            <!-- Resistance Marker Node -->
-                            <circle cx="500" cy="100" r="28" fill="#e11d48" fill-opacity="0.2" stroke="#f43f5e" stroke-width="2.5"/>
-                            <text x="500" y="104" text-anchor="middle" fill="#fb7185" font-weight="800" font-size="12">MET</text>
+                            <!-- KRAS GTPase -->
+                            <g transform="translate(400, 80)">
+                                <rect x="-24" y="-18" width="48" height="36" rx="10" fill="url(#purpleGrad)" filter="url(#glow)"/>
+                                <text x="0" y="4" text-anchor="middle" fill="#fff" font-weight="800" font-size="10">KRAS</text>
+                            </g>
+
+                            <!-- PI3K/AKT Pathway -->
+                            <g transform="translate(320, 170)">
+                                <circle cx="0" cy="0" r="20" fill="url(#greenGrad)"/>
+                                <text x="0" y="4" text-anchor="middle" fill="#fff" font-weight="800" font-size="9">PIK3CA</text>
+                            </g>
+
+                            <g transform="translate(450, 170)">
+                                <circle cx="0" cy="0" r="20" fill="url(#greenGrad)"/>
+                                <text x="0" y="4" text-anchor="middle" fill="#fff" font-weight="800" font-size="9">AKT1</text>
+                            </g>
+
+                            <!-- ERK Translocation -->
+                            <g transform="translate(580, 160)">
+                                <circle cx="0" cy="0" r="24" fill="url(#resistGrad)" filter="url(#glow)"/>
+                                <text x="0" y="4" text-anchor="middle" fill="#fff" font-weight="800" font-size="10">MAPK1</text>
+                            </g>
+
+                            <!-- Phosphosite & Signal Pulse Annotations -->
+                            <rect x="280" y="45" width="90" height="20" rx="4" fill="#1e293b" stroke="#38bdf8" stroke-width="1"/>
+                            <text x="325" y="59" text-anchor="middle" fill="#38bdf8" font-size="9" font-weight="700">SOS1 Activation</text>
+
+                            <rect x="470" y="195" width="100" height="20" rx="4" fill="#1e293b" stroke="#f43f5e" stroke-width="1"/>
+                            <text x="520" y="209" text-anchor="middle" fill="#f43f5e" font-size="9" font-weight="700">Bypass Signal Cascade</text>
                         </svg>
-                        <p style="font-weight: 800; font-size: 1rem; color: #fff; margin-top: 0.5rem;">Targeted Oncology Signaling Graph Canvas</p>
-                        <p style="font-size: 0.82rem; color: #94a3b8; margin-top: 0.2rem;">Select an academic scenario above or enter target parameters to construct network topologies.</p>
+                        <p style="font-weight: 800; font-size: 1.05rem; color: #f8fafc; margin-top: 0.5rem;">Receptor Tyrosine Kinase (RTK) Downstream Signaling Topology Map</p>
+                        <p style="font-size: 0.83rem; color: #94a3b8; margin-top: 0.2rem;">Select a clinical tumor phenotype above or specify oncogenic driver parameters to compute network graph algorithms.</p>
                     </div>
                 </div>
 
@@ -1375,10 +1437,13 @@ INDEX_HTML = """<!DOCTYPE html>
                             'font-weight': 'bold',
                             'text-valign': 'center',
                             'text-halign': 'center',
-                            'width': 'mapData(degree, 1, 20, 32, 60)',
-                            'height': 'mapData(degree, 1, 20, 32, 60)',
-                            'border-width': '2px',
-                            'border-color': '#a855f7'
+                            'width': 'mapData(degree, 1, 20, 36, 65)',
+                            'height': 'mapData(degree, 1, 20, 36, 65)',
+                            'border-width': '2.5px',
+                            'border-color': '#c084fc',
+                            'shadow-blur': '12px',
+                            'shadow-color': '#7c3aed',
+                            'shadow-opacity': 0.6
                         }
                     },
                     {
@@ -1386,10 +1451,13 @@ INDEX_HTML = """<!DOCTYPE html>
                         style: {
                             'background-color': '#0284c7',
                             'border-color': '#38bdf8',
-                            'border-width': '3.5px',
-                            'width': '58px',
-                            'height': '58px',
-                            'font-size': '12px'
+                            'border-width': '4px',
+                            'width': '64px',
+                            'height': '64px',
+                            'font-size': '13px',
+                            'shadow-blur': '20px',
+                            'shadow-color': '#38bdf8',
+                            'shadow-opacity': 0.8
                         }
                     },
                     {
@@ -1397,10 +1465,13 @@ INDEX_HTML = """<!DOCTYPE html>
                         style: {
                             'background-color': '#e11d48',
                             'border-color': '#f43f5e',
-                            'border-width': '3.5px',
-                            'width': '58px',
-                            'height': '58px',
-                            'font-size': '12px'
+                            'border-width': '4px',
+                            'width': '64px',
+                            'height': '64px',
+                            'font-size': '13px',
+                            'shadow-blur': '20px',
+                            'shadow-color': '#f43f5e',
+                            'shadow-opacity': 0.8
                         }
                     },
                     {
@@ -1408,35 +1479,39 @@ INDEX_HTML = """<!DOCTYPE html>
                         style: {
                             'background-color': '#059669',
                             'border-color': '#34d399',
-                            'border-width': '3px',
-                            'width': '50px',
-                            'height': '50px',
-                            'font-size': '11px'
+                            'border-width': '3.5px',
+                            'width': '54px',
+                            'height': '54px',
+                            'font-size': '12px',
+                            'shadow-blur': '15px',
+                            'shadow-color': '#34d399',
+                            'shadow-opacity': 0.7
                         }
                     },
                     {
                         selector: 'edge',
                         style: {
-                            'width': 'mapData(score, 0.4, 1, 1.5, 4.5)',
+                            'width': 'mapData(score, 0.4, 1, 2, 5.5)',
                             'line-color': '#334155',
                             'curve-style': 'bezier',
-                            'opacity': 0.75
+                            'opacity': 0.85
                         }
                     }
                 ],
                 layout: {
                     name: 'cose',
                     animate: true,
-                    animationDuration: 600,
-                    padding: 30
+                    animationDuration: 700,
+                    padding: 35
                 }
             });
 
             cyInstance.on('tap', 'node', function(evt){
                 const node = evt.target;
-                alert(`Biological Node: ${node.id()}\nConnections: ${node.data('degree')}\nNetwork Role: ${node.data('role').toUpperCase()}`);
+                alert(`Genomic Node: ${node.id()}\nDegree Centrality: ${node.data('degree')}\nBiological Role: ${node.data('role').toUpperCase()}`);
             });
         }
+
 
         function resetGraphZoom() {
             if (cyInstance) cyInstance.fit(30);
