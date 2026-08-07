@@ -1,41 +1,71 @@
-# Targeted Oncology Resistance Bypass Engine
+# 🔬 Targeted Oncology Resistance Bypass Engine
 
-[![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue.svg)](https://www.python.org/)
-[![FastAPI](https://img.shields.io/badge/FastAPI-0.110.0-009688.svg)](https://fastapi.tiangolo.com/)
-[![NetworkX](https://img.shields.io/badge/NetworkX-3.2.1-orange.svg)](https://networkx.org/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+<div align="center">
 
-**Author:** [Ahmadreza Shirdel](https://github.com/realrezi)  
-**Live Platform:** [https://resistance-bypass-engine.vercel.app/](https://resistance-bypass-engine.vercel.app/)
+![Targeted Oncology Banner](https://raw.githubusercontent.com/realrezi/Resistance-Bypass-Engine/main/src/static/lab_mutation.png)
 
----
+### **A Computational Graph Engine for Modeling Acquired Drug Resistance & Resolving Dual-Target Combination Therapies in Human Malignancies**
 
-## Executive Summary
+[![Live Demo](https://img.shields.io/badge/🌐_Live_Workstation-resistance--bypass--engine.vercel.app-0080FF?style=for-the-badge)](https://resistance-bypass-engine.vercel.app/)
+[![GitHub Repo](https://img.shields.io/badge/GitHub-realrezi%2FResistance--Bypass--Engine-181717?style=for-the-badge&logo=github)](https://github.com/realrezi/Resistance-Bypass-Engine)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge)](LICENSE)
+[![Python 3.11+](https://img.shields.io/badge/Python-3.11%2B-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.110-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
 
-The **Targeted Oncology Resistance Bypass Engine** is an open-source computational biology microservice designed to model acquired drug resistance mechanisms in human malignancies. When cancer patients experience disease progression on frontline targeted therapies (such as EGFR, ALK, BRAF, or KRAS inhibitors), tumor cells frequently acquire secondary resistance through **on-target gatekeeper mutations** (e.g., *EGFR* C797S, *ABL1* T315I) or **off-target receptor tyrosine kinase (RTK) bypass hyperactivation** (e.g., *MET* amplification, *HER2* overexpression, *PIK3CA* activation).
+**Author:** [Ahmadreza Shirdel](https://github.com/realrezi)
 
-This engine resolves biological target identifiers, queries REST/GraphQL bioactivity endpoints with automated subnetwork expansion, constructs an undirected signaling network graph in `NetworkX`, evaluates **Hub-Penalized Bottleneck Centrality**, and ranks active, non-withdrawn clinical combination therapies to overcome therapeutic resistance.
-
----
-
-## Key Features
-
-- **Zero PDF/OCR Scraping:** Operates 100% on clean, structured REST and GraphQL biological APIs (Open Targets, ChEMBL, STRING-DB).
-- **Deterministic Graph Mathematics:** Evaluates Dijkstra shortest path distances, isolates the Largest Connected Component ($G_{\text{LCC}}$), strips self-loops, and guards against empty topologies.
-- **Hub-Penalized Bottleneck Centrality:** Penalizes non-specific promiscuous super-hubs while identifying critical signaling bottlenecks.
-- **Interactive Biological Network Visualization:** Dynamic Cytoscape.js visualizer with interaction confidence edge-scaling and node inspection.
-- **Deep Multi-Omics Node Inspector & 3D Structure Viewer:** Integrates Ensembl IDs, UniProt accession codes, COSMIC clinical resistance hotspot variants, and interactive 3D protein structure rendering via `3Dmol.js`.
-- **Prevalent Clinical Resistance Matrix:** Interactive clinical scenario selector covering 9 tumor types (NSCLC, Breast Carcinoma, Colorectal, Melanoma, CML/AML, Prostate, Ovarian, Glioma, Thyroid).
+</div>
 
 ---
 
-## Mathematical Formulation & Scoring Engine
+## 🎯 Overview
 
-### 1. Network Topology Construction
+When patients with advanced solid tumors or hematologic malignancies undergo treatment with targeted small-molecule inhibitors (e.g., Osimertinib, Alectinib, Sotorasib, Dabrafenib), cancer cells rapidly evolve secondary resistance. These resistance mechanisms broadly fall into two biological categories:
 
-Given a primary target gene $T_{\text{primary}}$ and a secondary resistance marker $M_{\text{resistance}}$, the engine queries the STRING-DB REST API to retrieve physical protein-protein interactions (PPI) with confidence scores $w \ge 0.400$. The resulting undirected graph $G = (V, E, W)$ is constructed with edge weights defined by confidence scores $w(u, v) \in [0.4, 1.0]$.
+1. **On-Target Gatekeeper & ATP Pocket Mutations:** Mutations within the drug-binding domain (e.g., *EGFR* C797S, *ABL1* T315I, *ALK* G1202R) that disrupt drug binding.
+2. **Off-Target RTK Bypass Hyperactivation:** Alternative receptor tyrosine kinase signaling pathways (e.g., *MET* gene amplification, *HER2* overexpression, *PIK3CA* mutations) that bypass frontline inhibition and sustain cell survival.
 
-To prevent topology fragmentation, the engine extracts the Largest Connected Component ($G_{\text{LCC}}$):
+The **Targeted Oncology Resistance Bypass Engine** models these complex signaling networks using `NetworkX`, extracts Largest Connected Components ($G_{\text{LCC}}$), computes **Hub-Penalized Bottleneck Centrality**, and ranks active, non-withdrawn clinical combination therapies.
+
+---
+
+## 🧬 Biological Network & Signaling Topology
+
+```mermaid
+flowchart TD
+    subgraph Primary_Inhibition ["Frontline Target Blockade"]
+        A["Primary Inhibitor (e.g., Osimertinib)"] -->|Blocks| B["Primary RTK (EGFR L858R)"]
+    end
+
+    subgraph Resistance_Evasion ["Acquired Resistance Evasion"]
+        B -.->|On-Target Gatekeeper| C["Secondary Mutation (EGFR C797S)"]
+        B -.->|Off-Target RTK Bypass| D["Amplified Bypass RTK (MET / ERBB2)"]
+    end
+
+    subgraph Signal_Flux ["Redundant Survival Cascade"]
+        D -->|Trans-Phosphorylates| E["Adaptor Node (GRB2 / GAB1)"]
+        E -->|Activates| F["Lipid Kinase (PIK3CA / PDK1)"]
+        F -->|Phosphorylates| G["Central Survival Engine (AKT1 / mTORC1)"]
+    end
+
+    subgraph Combination_Solution ["Dual-Target Bypass Solution"]
+        H["Candidate Combination (Osimertinib + Capmatinib)"] ==>|Dual Inhibition| B & D
+        H ==>|Collapses Signal Flux| G
+    end
+
+    style A fill:#0284c7,stroke:#0284c7,color:#fff
+    style D fill:#e11d48,stroke:#e11d48,color:#fff
+    style G fill:#059669,stroke:#059669,color:#fff
+    style H fill:#7c3aed,stroke:#7c3aed,color:#fff
+```
+
+---
+
+## 📐 Mathematical Formulation
+
+### 1. Graph Topology & Connected Component Extraction
+
+Given a target gene $s$ and secondary resistance marker $t$, the system queries the STRING-DB physical interaction network ($w \ge 0.400$) to construct an undirected graph $G = (V, E, W)$. The engine isolates the Largest Connected Component ($G_{\text{LCC}}$):
 
 $$G_{\text{LCC}} = \arg\max_{C \subseteq G} |V(C)| \quad \text{subject to } |V(G_{\text{LCC}})| \ge 2$$
 
@@ -43,160 +73,81 @@ $$G_{\text{LCC}} = \arg\max_{C \subseteq G} |V(C)| \quad \text{subject to } |V(G
 
 ### 2. Hub-Penalized Bottleneck Centrality
 
-Standard betweenness centrality $C_B(v)$ identifies bottleneck nodes that control signal flow:
-
-$$C_B(v) = \sum_{s \neq v \neq t \in V} \frac{\sigma_{st}(v)}{\sigma_{st}}$$
-
-To prevent non-specific promiscuous proteins from dominating network topology, the engine applies a logarithmic degree penalty:
+To prevent non-specific promiscuous super-hubs (e.g., Ubiquitin, P53) from skewing network calculations, raw betweenness centrality $C_B(v)$ is adjusted using a degree logarithmic penalty:
 
 $$C_{\text{target}}(v) = \frac{C_B(v) + 0.5 \times \frac{\text{degree}(v)}{\text{max\_degree}(G_{\text{LCC}})}}{\log_2(\text{degree}(v) + 2)}$$
 
-This formulation guarantees non-zero score attribution for peripheral secondary targets while penalizing topological super-hubs.
+---
+
+### 3. Combination Synergy Score ($S$)
+
+Combination candidate therapies targeting secondary node $v$ are evaluated using a multi-objective scoring formula:
+
+$$\text{Synergy Score } (S) = \alpha \cdot C_{\text{norm}}(v) + \beta \cdot (1.0 - d_{\text{norm}}(s, v)) + \gamma \cdot \text{Aff}_{\text{norm}}(v)$$
+
+- $\alpha = 0.40, \beta = 0.30, \gamma = 0.30$ (when binding affinity $p\text{ChEMBL}$ is available)
+- $\alpha = 0.55, \beta = 0.45, \gamma = 0.00$ (when binding affinity is pending)
 
 ---
 
-### 3. Multi-Objective Combination Synergy Scoring
+## 📊 Prevalent Clinical Resistance Matrix
 
-Candidate combination therapies targeting secondary target $v$ are scored based on topological proximity, centrality bottlenecking, and bioactivity affinity ($p\text{ChEMBL} = -\log_{10}(\text{IC}_{50} \times 10^{-9})$):
+<div align="center">
 
-#### **Case A: Bioactivity Affinity Available ($p\text{ChEMBL}$ Present)**
+![Biological Network Artifact](https://raw.githubusercontent.com/realrezi/Resistance-Bypass-Engine/main/src/static/network.png)
 
-$$S_{\text{combination}} = 0.40 \cdot C_{\text{norm}}(v) + 0.30 \cdot (1.0 - d_{\text{norm}}(s, v)) + 0.30 \cdot \text{Aff}_{\text{norm}}(v)$$
+</div>
 
-#### **Case B: Bioactivity Affinity Missing**
-
-$$S_{\text{combination}} = 0.55 \cdot C_{\text{norm}}(v) + 0.45 \cdot (1.0 - d_{\text{norm}}(s, v))$$
-
-Where $d(s, v)$ is the Dijkstra shortest path length between the primary target $s$ and secondary target $v$.
-
----
-
-## Data Architecture & External Services
-
-| API Service | Data Type | Protocol | Compliance / Caching |
-| :--- | :--- | :--- | :--- |
-| **Open Targets Platform** | Disease-target associations & clinical drug trials | GraphQL | Async `httpx`, custom `User-Agent` |
-| **ChEMBL Database** | Compound bioactivity ($\text{IC}_{50}$ / $K_i$) & mechanism of action | REST API v33 | Exhaustive pagination, non-withdrawn drug filter |
-| **STRING-DB** | Physical protein-protein interaction network graph | REST API v12 | Confidence threshold $w \ge 0.400$ |
-| **Ensembl & UniProt** | Gene loci, Ensembl IDs, UniProt accessions, 3D PDB models | REST / Static | `diskcache` 7-day TTL, 1GB cache limit |
+| Tumor Indication | Primary Driver | Frontline Agent | Secondary Bypass Marker | Mechanism of Action |
+| :--- | :--- | :--- | :--- | :--- |
+| **NSCLC (Lung)** | `EGFR L858R` | Osimertinib | `MET Amplification` | Off-Target RTK Bypass via ERBB3/PI3K |
+| **NSCLC (Lung)** | `EGFR L858R` | Osimertinib | `EGFR C797S` | On-Target Covalent Binding Disruption |
+| **NSCLC (Lung)** | `EML4-ALK` | Alectinib | `MET Bypass` | Parallel RTK Activation |
+| **HER2+ Breast** | `ERBB2 / HER2` | Trastuzumab | `MET Amplification` | Monoclonal Antibody Bypass Evasion |
+| **HR+ Breast** | `ESR1` | Fulvestrant | `CDK4 / Cyclin D1` | Endocrine Escape via Cell Cycle Activation |
+| **Colorectal (CRC)** | `KRAS G12C` | Sotorasib | `EGFR Feedback` | Rapid RTK Feedback Reactivation |
+| **Colorectal (CRC)** | `BRAF V600E` | Encorafenib | `EGFR Feedback` | Monotherapy BRAF Escape Loop |
+| **Melanoma** | `BRAF V600E` | Dabrafenib | `MAP2K1 / MEK1` | MAPK Cascade Re-activation |
+| **CML / AML** | `BCR-ABL1` | Imatinib | `ABL1 T315I` | Gatekeeper Steric Binding Loss |
 
 ---
 
-## Repository Structure
+## 💻 Tech Stack & Architecture
 
-```
-resistance-bypass-engine/
-├── api/
-│   └── index.py             # Vercel serverless entrypoint
-├── src/
-│   ├── clients/             # Async HTTP API clients (ChEMBL, Open Targets, STRING-DB)
-│   │   ├── base.py
-│   │   ├── chembl.py
-│   │   ├── open_targets.py
-│   │   └── string_db.py
-│   ├── engine/              # Graph math & synergy scoring engine
-│   │   ├── graph_builder.py
-│   │   └── scorer.py
-│   ├── schemas/             # Pydantic v2 data contracts
-│   │   └── models.py
-│   ├── services/            # Bio-data services & multi-omics annotation lookup
-│   │   ├── gene_annotation.py
-│   │   └── id_mapper.py
-│   └── main.py              # FastAPI application & clinical workstation UI
-├── tests/                   # Pytest automated test suite (25 tests)
-├── pyproject.toml           # Python dependencies & project config
-├── requirements.txt         # Vercel deployment requirements
-└── README.md                # Project documentation
-```
+- **Backend Framework:** Python 3.11+, FastAPI, Uvicorn, Pydantic v2
+- **Graph Computations:** NetworkX, SciPy, NumPy
+- **Network I/O & Concurrency:** `asyncio.Semaphore(5)`, `httpx`, `tenacity` exponential backoff
+- **Caching & Persistence:** `diskcache` (7-day TTL, 1GB storage limit)
+- **Frontend Workstation:** Vanilla CSS (Glassmorphism), Cytoscape.js, 3Dmol.js (Macromolecular PDB viewer)
 
 ---
 
-## Getting Started
+## 🛠️ Installation & Local Setup
 
-### Prerequisites
-- **Python:** Version 3.11 or higher
-- **Package Manager:** `uv` or `pip`
+```bash
+# 1. Clone Repository
+git clone https://github.com/realrezi/Resistance-Bypass-Engine.git
+cd Resistance-Bypass-Engine
 
-### Installation
+# 2. Initialize Environment via uv
+uv venv
+source .venv/bin/activate
 
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/realrezi/Resistance-Bypass-Engine.git
-   cd Resistance-Bypass-Engine
-   ```
+# 3. Install Dependencies
+uv pip install -e .
 
-2. Create a virtual environment and install dependencies:
-   ```bash
-   uv venv
-   source .venv/bin/activate  # On Windows: .venv\Scripts\activate
-   uv pip install -e .
-   ```
+# 4. Run Test Suite
+uv run pytest -v
 
-3. Run the automated test suite:
-   ```bash
-   uv run pytest -v
-   ```
-
-4. Start the development server:
-   ```bash
-   uv run uvicorn src.main:app --reload --port 8000
-   ```
-   Navigate to `http://localhost:8000` to access the clinical workstation.
-
----
-
-## REST API Specification
-
-### `POST /api/v1/bypass-candidates`
-
-Computes active combination therapies for a given drug resistance scenario.
-
-#### **Request Body Example:**
-```json
-{
-  "primary_target_symbol": "EGFR",
-  "primary_drug_name": "Osimertinib",
-  "secondary_resistance_marker": "MET",
-  "cancer_indication": "Non-Small Cell Lung Cancer"
-}
-```
-
-#### **Response Body Example:**
-```json
-{
-  "primary_target_resolved": "EGFR",
-  "secondary_marker_resolved": "MET",
-  "mechanistic_branch": "Off-Target Bypass Hyperactivation",
-  "network_nodes": [
-    { "id": "EGFR", "degree": 14, "role": "primary" },
-    { "id": "MET", "degree": 10, "role": "resistance" },
-    { "id": "GRB2", "degree": 16, "role": "secondary" }
-  ],
-  "ranked_combinations": [
-    {
-      "secondary_drug": "Capmatinib",
-      "secondary_target": "MET",
-      "clinical_phase": 4,
-      "synergy_score": 0.8420,
-      "hub_penalized_centrality": 0.6250,
-      "shortest_path_distance": 2.0,
-      "biological_rationale": "Dual EGFR (Osimertinib) + MET (Capmatinib) inhibition neutralizes parallel ERBB3/PI3K reactivation."
-    }
-  ]
-}
+# 5. Launch Clinical Workstation
+uv run uvicorn src.main:app --reload --port 8000
 ```
 
 ---
 
-## Author & Contact
+## 📄 License & Attribution
 
-**Ahmadreza Shirdel**  
-- **GitHub:** [https://github.com/realrezi](https://github.com/realrezi)  
-- **Project Repo:** [https://github.com/realrezi/Resistance-Bypass-Engine](https://github.com/realrezi/Resistance-Bypass-Engine)  
-- **Live Platform:** [https://resistance-bypass-engine.vercel.app/](https://resistance-bypass-engine.vercel.app/)
+Distributed under the **MIT License**. See [`LICENSE`](LICENSE) for details.
 
----
-
-## License
-
-This project is licensed under the MIT License - see the `LICENSE` file for details.
+**Author:** [Ahmadreza Shirdel](https://github.com/realrezi)  
+**Repository:** [https://github.com/realrezi/Resistance-Bypass-Engine](https://github.com/realrezi/Resistance-Bypass-Engine)
