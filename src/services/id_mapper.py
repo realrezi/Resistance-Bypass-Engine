@@ -1,6 +1,9 @@
-from typing import Optional
-from src.clients.base import BaseHTTPClient
+import logging
+
+from src.clients.base import BaseHTTPClient, _stable_cache_key, cache
 from src.schemas.models import IDMappingResult
+
+logger = logging.getLogger(__name__)
 
 
 class IDMapper(BaseHTTPClient):
@@ -38,28 +41,32 @@ class IDMapper(BaseHTTPClient):
 
         return canonical_symbol, ensembl_id
 
-
     async def resolve_uniprot(self, canonical_symbol: str) -> str:
         """Resolve UniProt primary accession for human gene symbol."""
         url = "https://rest.uniprot.org/uniprotkb/search"
         params = {
-            "query": f"gene_exact:{canonical_symbol} AND organism_id:9606",
+            "query": f"gene_exact:{canonical_symbol} AND organism_id:9606 AND reviewed:true",
             "format": "json",
+            "size": 5,
         }
         data = await self.get_json(url, params=params)
         results = data.get("results", [])
         if not results:
             # Fallback search without gene_exact constraint
-            params["query"] = f"gene:{canonical_symbol} AND organism_id:9606"
+            params["query"] = (
+                f"gene:{canonical_symbol} AND organism_id:9606 AND reviewed:true"
+            )
             data = await self.get_json(url, params=params)
             results = data.get("results", [])
 
         if not results:
-            raise ValueError(f"UniProt ID not found for gene symbol '{canonical_symbol}'.")
+            raise ValueError(
+                f"UniProt ID not found for gene symbol '{canonical_symbol}'."
+            )
 
         return results[0]["primaryAccession"]
 
-    async def resolve_chembl_target(self, uniprot_id: str) -> Optional[str]:
+    async def resolve_chembl_target(self, uniprot_id: str) -> str | None:
         """Resolve ChEMBL target ID strictly filtered for SINGLE PROTEIN targets."""
         url = "https://www.ebi.ac.uk/chembl/api/data/target.json"
         params = {"target_components__accession": uniprot_id}
@@ -79,14 +86,26 @@ class IDMapper(BaseHTTPClient):
     async def map_identifier(self, symbol: str) -> IDMappingResult:
         """Complete ID resolution flow returning an IDMappingResult instance."""
         clean_symbol = symbol.strip().upper()
+        cache_key = _stable_cache_key("ID-MAP", "hgnc-uniprot-chembl", clean_symbol)
+        try:
+            cached = cache.get(cache_key)
+            if isinstance(cached, dict):
+                return IDMappingResult.model_validate(cached)
+        except (OSError, TypeError, ValueError) as exc:
+            logger.debug("ID mapping cache read failed: %s", exc)
         canonical_symbol, ensembl_id = await self.resolve_hgnc(clean_symbol)
         uniprot_id = await self.resolve_uniprot(canonical_symbol)
         chembl_target_id = await self.resolve_chembl_target(uniprot_id)
 
-        return IDMappingResult(
+        result = IDMappingResult(
             original_input=symbol,
             canonical_symbol=canonical_symbol,
             ensembl_id=ensembl_id,
             uniprot_id=uniprot_id,
             chembl_target_id=chembl_target_id,
         )
+        try:
+            cache.set(cache_key, result.model_dump(mode="json"), expire=604800)
+        except (OSError, TypeError, ValueError) as exc:
+            logger.debug("ID mapping cache write failed: %s", exc)
+        return result

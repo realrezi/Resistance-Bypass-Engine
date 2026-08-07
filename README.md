@@ -21,6 +21,14 @@ When patients with advanced solid tumors or hematologic malignancies undergo tre
 
 The **Targeted Oncology Resistance Bypass Engine** models these complex signaling networks using `NetworkX`, extracts Largest Connected Components ($G_{\text{LCC}}$), computes **Hub-Penalized Bottleneck Centrality**, and ranks active, non-withdrawn clinical combination therapies.
 
+The output is research-use evidence prioritization, not proof of combination efficacy or a patient-specific treatment recommendation. Reports retain the legacy `synergy_score` field for compatibility, but it represents a computational priority value rather than experimental synergy.
+
+### Evidence and uncertainty
+
+Each report now includes additive `evidence_claims` records with source, retrieval date, evidence level, review state, limitations, and unresolved questions. Structured request fields distinguish mutations, amplifications, deletions, fusions, expression changes, splice variants, and pathway activation. When upstream clinical evidence is absent, the service returns an explicit warning and an empty candidate list instead of inventing a drug identity.
+
+Reports also include reproducibility metadata: a generation timestamp, methodology version, source set, and a stable request fingerprint that does not contain patient identifiers.
+
 ---
 
 ## 🧬 Biological Network & Signaling Topology
@@ -75,34 +83,38 @@ where $\Delta(G_{\text{LCC}}) = \max_{u \in V} \text{degree}(u)$ denotes the max
 
 ---
 
-### 3. Combination Synergy Score ($S$)
+### 3. Heuristic Combination Priority Score ($P$)
 
-Combination candidate therapies targeting secondary node $v$ are evaluated using a multi-objective scoring formula:
+Candidate therapies targeting secondary node $v$ are ranked using a computational prioritization formula. This is not an experimental synergy measurement and does not establish clinical benefit:
 
-$$\text{Synergy Score } (S) = \alpha \cdot C_{\text{norm}}(v) + \beta \cdot (1.0 - d_{\text{norm}}(s, v)) + \gamma \cdot \text{Aff}_{\text{norm}}(v)$$
+$$\text{Priority Score } (P) = \alpha \cdot C_{\text{norm}}(v) + \beta \cdot (1.0 - d_{\text{norm}}(s, v)) + \gamma \cdot \text{Aff}_{\text{norm}}(v)$$
 
 - $\alpha = 0.40, \beta = 0.30, \gamma = 0.30$ (when binding affinity $p\text{ChEMBL}$ is available)
-- $\alpha = 0.55, \beta = 0.45, \gamma = 0.00$ (when binding affinity is pending)
+- If binding affinity is missing, the available topology and proximity weights are renormalized; missing pharmacology contributes no positive evidence.
+
+The legacy `synergy_score` response field is retained for compatibility, but it should be interpreted as this heuristic priority value. It is not Bliss, Loewe, HSA, ZIP, or another experimental synergy metric.
+
+The implementation uses fixed transforms rather than candidate-pool min–max normalization: topology is `1 - exp(-4x)`, proximity is `exp(-distance)`, and pharmacology uses a logistic transform centered at pChEMBL 7. Adding another candidate therefore does not change an existing candidate's score.
 
 ---
 
-## 📊 Prevalent Clinical Resistance Matrix
+## 📊 Clinical Resistance Scenario Matrix
 
 | Tumor Indication | Primary Driver | Frontline Agent | Secondary Bypass Marker | Literature Prevalence | Mechanism of Action |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| **NSCLC (Lung)** | `EGFR L858R` | Osimertinib | `MET Amplification` | **15–20% Acquired** | Off-Target RTK Bypass via ERBB3/PI3K |
-| **NSCLC (Lung)** | `EGFR L858R` | Osimertinib | `EGFR C797S` | **7–10% Gatekeeper** | On-Target Covalent Binding Disruption |
-| **NSCLC (Lung)** | `EML4-ALK` | Alectinib | `MET Bypass` | **8–12% Bypass** | Parallel RTK Activation in ALK+ NSCLC |
-| **HER2+ Breast** | `ERBB2 / HER2` | Trastuzumab | `MET Amplification` | **10–15% RTK Bypass** | Monoclonal Antibody Bypass Evasion |
-| **HR+ Breast** | `ESR1` | Fulvestrant | `CDK4 / Cyclin D1` | **25–40% Post-Aromatase Inhibitors (AI)** | Endocrine Escape post-Aromatase Inhibitor failure via Cell Cycle Activation |
-| **Colorectal (CRC)** | `KRAS G12C` | Sotorasib | `EGFR Feedback` | **70–85% Feedback** | Rapid RTK Feedback Reactivation |
-| **Colorectal (CRC)** | `BRAF V600E` | Encorafenib | `EGFR Feedback` | **75–85% Feedback** | Monotherapy BRAF Escape Loop |
-| **Melanoma** | `BRAF V600E` | Dabrafenib | `MAP2K1 / MEK1` | **35–45% Acquired** | MAPK Cascade Re-activation |
-| **CML / AML** | `BCR-ABL1` | Imatinib | `ABL1 T315I` | **15–20% Gatekeeper** | Gatekeeper Steric Binding Loss |
-| **Prostate (mCRPC)** | `AR` | Enzalutamide | `PIK3CA / PTEN` | **40–50% PTEN/PI3K** | Reciprocal AR-PI3K Feedback Crosstalk |
-| **Ovarian / GYN** | `PIK3CA` | Alpelisib | `KRAS` | **15–25% Co-mutation** | Parallel RAS/MAPK Activation |
-| **Glioma (GBM)** | `EGFRvIII` | Gefitinib | `MET` | **10–15% Redundancy** | Co-activation of Multiple RTKs |
-| **Thyroid** | `RET Fusion` | Selpercatinib | `MET` | **10–15% Acquired** | MET Bypass emerging after RET TKI |
+| **NSCLC (Lung)** | `EGFR L858R` | Osimertinib | `MET Amplification` | **Frequency varies by cohort, line, and assay** | Off-Target RTK Bypass via ERBB3/PI3K |
+| **NSCLC (Lung)** | `EGFR L858R` | Osimertinib | `EGFR C797S` | **Frequency varies by treatment line and assay** | On-Target Covalent Binding Disruption |
+| **NSCLC (Lung)** | `EML4-ALK` | Alectinib | `MET Bypass` | **Frequency varies by cohort** | Parallel RTK Activation in ALK+ NSCLC |
+| **HER2+ Breast** | `ERBB2 / HER2` | Trastuzumab | `MET Amplification` | **Context-specific RTK bypass frequency** | Monoclonal Antibody Bypass Evasion |
+| **HR+ Breast** | `ESR1` | Fulvestrant | `CDK4 / Cyclin D1` | **Frequency varies after aromatase-inhibitor therapy** | Endocrine Escape post-Aromatase Inhibitor failure via Cell Cycle Activation |
+| **Colorectal (CRC)** | `KRAS G12C` | Sotorasib | `EGFR Feedback` | **Context-specific; frequency varies by cohort** | Rapid RTK Feedback Reactivation |
+| **Colorectal (CRC)** | `BRAF V600E` | Encorafenib | `EGFR Feedback` | **Mechanism documented; frequency varies by cohort** | Monotherapy BRAF Escape Loop |
+| **Melanoma** | `BRAF V600E` | Dabrafenib | `MAP2K1 / MEK1` | **Acquired frequency varies by cohort** | MAPK Cascade Re-activation |
+| **CML / AML** | `BCR-ABL1` | Imatinib | `ABL1 T315I` | **TKI-resistance frequency is context-specific** | Gatekeeper Steric Binding Loss |
+| **Prostate (mCRPC)** | `AR` | Enzalutamide | `PIK3CA / PTEN` | **PTEN/PI3K alteration frequency varies by cohort** | Reciprocal AR-PI3K Feedback Crosstalk |
+| **Ovarian / GYN** | `PIK3CA` | Alpelisib | `KRAS` | **Co-alteration frequency varies by cohort** | Parallel RAS/MAPK Activation |
+| **Glioma (GBM)** | `EGFRvIII` | Gefitinib | `MET` | **RTK redundancy is context-specific** | Co-activation of Multiple RTKs |
+| **Thyroid** | `RET Fusion` | Selpercatinib | `MET` | **Acquired bypass frequency varies by cohort** | MET Bypass emerging after RET TKI |
 
 ---
 
@@ -110,9 +122,13 @@ $$\text{Synergy Score } (S) = \alpha \cdot C_{\text{norm}}(v) + \beta \cdot (1.0
 
 - **Backend Framework:** Python 3.11+, FastAPI, Uvicorn, Pydantic v2
 - **Graph Computations:** NetworkX, SciPy, NumPy
-- **Network I/O & Concurrency:** `asyncio.Semaphore(5)`, `httpx`, `tenacity` exponential backoff
+- **Network I/O & Concurrency:** pooled `httpx` keep-alive connections, `asyncio.Semaphore(5)`, `asyncio.gather`, `tenacity` exponential backoff
 - **Caching & Persistence:** `diskcache` (7-day TTL, 1GB storage limit)
-- **Frontend Workstation:** Vanilla CSS (Glassmorphism), Cytoscape.js, 3Dmol.js (Macromolecular PDB viewer)
+- **Frontend Workstation:** Vanilla CSS genomic-atlas UI, Cytoscape.js, 3Dmol.js (Macromolecular PDB viewer)
+
+The analysis report includes a non-identifying trace ID, per-source timing, and any partial-source failures. `GET /api/v1/structure/{symbol}` exposes only curated local PDB mappings; unknown targets return an explicit unavailable state rather than fabricated UniProt, Ensembl, or PDB identifiers. Set `CHEMBL_ACTIVITY_MAX_PAGES` (default `2`) to control the bounded activity scan when latency matters.
+
+Set `ALLOWED_ORIGINS` to a comma-separated allowlist in hosted environments. The default wildcard is intended only for local exploration and does not permit credentialed cross-origin requests.
 
 ---
 

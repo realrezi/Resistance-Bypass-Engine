@@ -1,11 +1,12 @@
 from unittest.mock import AsyncMock, patch
+
 import pytest
+
 from src.clients.base import USER_AGENT, BaseHTTPClient, _stable_cache_key
 from src.clients.chembl import ChEMBLClient
 from src.clients.open_targets import OpenTargetsClient
 from src.clients.string_db import StringDBClient
 from src.services.id_mapper import IDMapper
-
 
 
 @pytest.mark.asyncio
@@ -83,6 +84,7 @@ async def test_user_agent_header():
     base_client = BaseHTTPClient()
     assert base_client.headers["User-Agent"] == USER_AGENT
     assert "ResistanceBypassEngine/1.0" in USER_AGENT
+    assert base_client.headers["mailto"] == "developer@example.com"
 
 
 @pytest.mark.asyncio
@@ -90,7 +92,12 @@ async def test_string_db_client():
     """Verify STRING-DB client parameters and payload handling."""
     client = StringDBClient()
     mock_network = [
-        {"stringId_A": "9606.ENSP00000275493", "preferredName_A": "EGFR", "preferredName_B": "MET", "score": 900}
+        {
+            "stringId_A": "9606.ENSP00000275493",
+            "preferredName_A": "EGFR",
+            "preferredName_B": "MET",
+            "score": 900,
+        }
     ]
     with patch.object(client, "get_json", new_callable=AsyncMock) as mock_get:
         mock_get.return_value = mock_network
@@ -99,7 +106,12 @@ async def test_string_db_client():
         assert res[0]["preferredName_A"] == "EGFR"
         mock_get.assert_called_once_with(
             "https://string-db.org/api/json/network",
-            params={"identifiers": "EGFR\rMET", "species": 9606, "required_score": 400, "add_nodes": 25},
+            params={
+                "identifiers": "EGFR\rMET",
+                "species": 9606,
+                "required_score": 400,
+                "add_nodes": 25,
+            },
         )
 
 
@@ -145,6 +157,81 @@ async def test_open_targets_client():
         assert drugs[0]["prefName"] == "OSIMERTINIB"
         assert drugs[0]["phase"] == 4
 
+
+@pytest.mark.asyncio
+async def test_open_targets_parses_disease_and_pair_evidence():
+    client = OpenTargetsClient()
+    response = {
+        "data": {
+            "target": {
+                "approvedSymbol": "MET",
+                "drugAndClinicalCandidates": {
+                    "rows": [
+                        {
+                            "maxClinicalStage": "PHASE_3",
+                            "diseases": [
+                                {
+                                    "diseaseFromSource": "NSCLC",
+                                    "disease": {
+                                        "id": "EFO_0003060",
+                                        "name": "non-small cell lung cancer",
+                                    },
+                                }
+                            ],
+                            "clinicalReports": [
+                                {
+                                    "id": "nct00000001",
+                                    "source": "AACT",
+                                    "clinicalStage": "PHASE_2",
+                                    "trialOverallStatus": "RECRUITING",
+                                    "url": "https://clinicaltrials.gov/study/NCT00000001",
+                                    "title": "Osimertinib plus capmatinib in NSCLC",
+                                }
+                            ],
+                            "drug": {
+                                "id": "CHEMBL1",
+                                "name": "CAPMATINIB",
+                                "drugType": "Small molecule",
+                                "mechanismsOfAction": {"rows": []},
+                            },
+                        }
+                    ]
+                },
+            }
+        }
+    }
+    with patch.object(client, "post_json", new_callable=AsyncMock) as mock_post:
+        mock_post.return_value = response
+        drugs = await client.get_known_drugs(
+            "ENSG00000105976",
+            cancer_type="Non-Small Cell Lung Cancer",
+            primary_drug="Osimertinib",
+        )
+
+    assert drugs[0]["indicationMatch"] is True
+    assert drugs[0]["combinationEvidence"] is True
+    assert drugs[0]["clinicalStatus"] == "active_or_completed"
+    assert drugs[0]["evidence"][0].stable_id == "nct00000001"
+
+
+@pytest.mark.asyncio
+async def test_open_targets_does_not_fabricate_unknown_phase_or_status():
+    client = OpenTargetsClient()
+    response = {
+        "data": {
+            "target": {
+                "approvedSymbol": "MET",
+                "drugAndClinicalCandidates": {
+                    "rows": [{"drug": {"id": "CHEMBL1", "name": "Example"}}]
+                },
+            }
+        }
+    }
+    with patch.object(client, "post_json", new_callable=AsyncMock) as mock_post:
+        mock_post.return_value = response
+        drugs = await client.get_known_drugs("ENSG00000105976")
+    assert drugs[0]["phase"] is None
+    assert drugs[0]["clinicalStatus"] == "status_not_reported"
 
 
 def test_cache_key_determinism():

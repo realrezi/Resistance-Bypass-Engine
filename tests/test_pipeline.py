@@ -1,6 +1,7 @@
 from unittest.mock import AsyncMock, patch
-import pytest
+
 from fastapi.testclient import TestClient
+
 from src.main import app
 from src.schemas.models import IDMappingResult
 
@@ -186,6 +187,7 @@ def test_invalid_gene_symbol_error_handling(mock_id_mapper_cls):
     assert response.status_code == 422
     data = response.json()
     assert "ID Resolution failed" in data["detail"]
+    assert "INVALIDGENEXXX" not in data["detail"]
 
 
 @patch("src.main.IDMapper")
@@ -301,4 +303,3 @@ def test_withdrawn_drug_filtering(
     drug_names = [c["secondary_drug"] for c in report["ranked_combinations"]]
     assert "ACTIVEDRUG" in drug_names
     assert "WITHDRAWNDRUG" not in drug_names
-

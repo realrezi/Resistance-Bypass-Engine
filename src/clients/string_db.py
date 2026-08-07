@@ -1,4 +1,5 @@
-from typing import Any, Dict, List
+from typing import Any
+
 from src.clients.base import BaseHTTPClient
 
 
@@ -12,7 +13,7 @@ class StringDBClient(BaseHTTPClient):
         add_nodes: int = 25,
         required_score: int = 400,
         species: int = 9606,
-    ) -> List[Dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
         """Fetch protein interaction network from STRING-DB."""
         params = {
             "identifiers": f"{t_primary}\r{t_resistance}",

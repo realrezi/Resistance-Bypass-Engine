@@ -1,5 +1,6 @@
 import math
-from typing import Any, Dict, List, Optional
+from typing import Any
+
 import networkx as nx
 
 
@@ -22,9 +23,7 @@ def normalize_value(
     return min(max(val, 0.0), 1.0)
 
 
-def normalize_series(
-    values: List[float], zero_var_default: float = 0.0
-) -> List[float]:
+def normalize_series(values: list[float], zero_var_default: float = 0.0) -> list[float]:
     """Normalize a list of float values to [0.0, 1.0].
 
     Args:
@@ -36,7 +35,6 @@ def normalize_series(
     min_v = min(values)
     max_v = max(values)
     return [normalize_value(v, min_v, max_v, zero_var_default) for v in values]
-
 
 
 class PathwayScorer:
@@ -57,13 +55,13 @@ class PathwayScorer:
         return G.subgraph(lcc_nodes).copy()
 
     @staticmethod
-    def calculate_bottleneck_centralities(G_lcc: nx.Graph) -> Dict[str, float]:
+    def calculate_bottleneck_centralities(G_lcc: nx.Graph) -> dict[str, float]:
         """Calculate betweenness centrality with degree penalization:
 
         C_B,adjusted(v) = C_B(v) / log2(degree(v) + 2)
         """
         C_B = nx.betweenness_centrality(G_lcc, weight="weight")
-        adjusted_centrality: Dict[str, float] = {}
+        adjusted_centrality: dict[str, float] = {}
 
         for node in G_lcc.nodes():
             cb_val = C_B.get(node, 0.0)
@@ -73,11 +71,10 @@ class PathwayScorer:
 
         return adjusted_centrality
 
-
     @staticmethod
     def calculate_shortest_distance(
         G_lcc: nx.Graph, source_node: str, target_node: str
-    ) -> float:
+    ) -> float | None:
         """Calculate Dijkstra shortest path distance d between source_node and target_node."""
         if (
             source_node in G_lcc
@@ -89,15 +86,15 @@ class PathwayScorer:
                     G_lcc, source_node, target_node, weight="weight"
                 )
             )
-        return 2.0
+        return None
 
     @classmethod
     def score_candidates(
         cls,
         G: nx.Graph,
         primary_target: str,
-        candidates: List[Dict[str, Any]],
-    ) -> List[Dict[str, Any]]:
+        candidates: list[dict[str, Any]],
+    ) -> list[dict[str, Any]]:
         """Score candidate target combinations on the network graph.
 
         Each candidate dict should have keys:
@@ -113,7 +110,7 @@ class PathwayScorer:
         # 2. Centrality calculation
         adjusted_centralities = cls.calculate_bottleneck_centralities(G_lcc)
 
-        raw_scores: List[Dict[str, Any]] = []
+        raw_scores: list[dict[str, Any]] = []
 
         # 3. Calculate raw distance, composite centrality, and affinity for each candidate
         for cand in candidates:
@@ -157,50 +154,115 @@ class PathwayScorer:
                 }
             )
 
+        scored_results: list[dict[str, Any]] = []
 
-        # 4. Batch Normalization across candidate pool
-        # Centrality: zero-variance → 0.0 (no signal detected)
-        cb_raw = [item["cb_adj"] for item in raw_scores]
-        cb_normed = normalize_series(cb_raw, zero_var_default=0.0)
-
-        # Distance: zero-variance → 0.0 so (1.0 - d_norm) = 1.0 (no penalty)
-        dist_raw = [item["distance"] for item in raw_scores]
-        dist_normed = normalize_series(dist_raw, zero_var_default=0.0)
-
-        # Affinity: per-candidate branching
-        # Collect non-None affinities for normalization range
-        non_none_affinities = [
-            item["affinity"] for item in raw_scores if item["affinity"] is not None
-        ]
-        aff_min = min(non_none_affinities) if non_none_affinities else 0.0
-        aff_max = max(non_none_affinities) if non_none_affinities else 0.0
-
-        scored_results: List[Dict[str, Any]] = []
-
-        for i, item in enumerate(raw_scores):
-            cb_n = cb_normed[i]
-            d_n = dist_normed[i]
-
+        for item in raw_scores:
+            # Fixed, candidate-pool-independent transforms. Existing scores do not
+            # change merely because another candidate is added to the request.
+            cb_n = 1.0 - math.exp(-4.0 * max(item["cb_adj"], 0.0))
+            target_present = item["distance"] is not None
+            proximity = math.exp(-max(item["distance"], 0.0)) if target_present else 0.0
             if item["affinity"] is not None:
-                # Case A (has affinity): Synergy = 0.40 * C_B + 0.30 * (1 - d) + 0.30 * Aff
-                aff_n = normalize_value(item["affinity"], aff_min, aff_max, zero_var_default=1.0)
-                synergy = 0.40 * cb_n + 0.30 * (1.0 - d_n) + 0.30 * aff_n
+                # Logistic transform centered at pChEMBL 7 (~100 nM).
+                aff_n = 1.0 / (1.0 + math.exp(-1.0 * (item["affinity"] - 7.0)))
+                synergy = 0.40 * cb_n + 0.30 * proximity + 0.30 * aff_n
             else:
-                # Case B (missing affinity): Synergy = 0.55 * C_B + 0.45 * (1 - d)
-                synergy = 0.55 * cb_n + 0.45 * (1.0 - d_n)
+                # Missing pharmacology is an evidence gap, not a reason to
+                # increase the weight of the remaining heuristic components.
+                synergy = 0.40 * cb_n + 0.30 * proximity
+            if not target_present:
+                synergy = 0.0
 
             candidate_res = dict(item["candidate"])
             candidate_res["synergy_score"] = round(synergy, 4)
-            # Retain absolute hub centrality score if min-max normalization zeroes out lowest candidate
-            centrality_disp = cb_n if (cb_n > 0.0 or len(raw_scores) == 1) else round(item["cb_adj"], 4)
-            candidate_res["hub_penalized_centrality"] = round(centrality_disp, 4)
-            candidate_res["shortest_path_distance"] = round(item["distance"], 4)
-
-
-
+            candidate_res["score_components"] = {
+                "topology": round(cb_n, 4),
+                "proximity": round(proximity, 4),
+                "pharmacology": round(aff_n, 4)
+                if item["affinity"] is not None
+                else None,
+                "clinical_evidence": None,
+            }
+            evidence_parts = [
+                item["candidate"].get("pchembl_value") is not None
+                or item["candidate"].get("chembl_ic50_nm") is not None,
+                item["candidate"].get("indication_match") is True,
+                item["candidate"].get("combination_evidence") is True,
+            ]
+            candidate_res["evidence_completeness"] = round(
+                sum(evidence_parts) / len(evidence_parts), 4
+            )
+            candidate_res["hub_penalized_centrality"] = round(cb_n, 4)
+            candidate_res["shortest_path_distance"] = (
+                round(item["distance"], 4) if item["distance"] is not None else None
+            )
+            candidate_res["scoring_status"] = (
+                "scored"
+                if target_present
+                else "abstained_target_not_in_validated_topology"
+            )
+            candidate_res["target_in_graph"] = target_present
+            if not target_present:
+                candidate_res["evidence_status"] = "abstained"
+                candidate_res["evidence_notes"] = [
+                    "The target was not present in the validated network topology."
+                ]
+            elif item["candidate"].get("combination_evidence") is True:
+                candidate_res["evidence_status"] = "pair_co_mention"
+                candidate_res["evidence_notes"] = [
+                    "A returned clinical record co-mentioned the primary drug; this does not prove same-arm efficacy."
+                ]
+            elif item["affinity"] is not None:
+                candidate_res["evidence_status"] = "pharmacology_available"
+                candidate_res["evidence_notes"] = [
+                    "Drug-specific activity was available, but activity is not clinical response."
+                ]
+            else:
+                candidate_res["evidence_status"] = "computational_hypothesis"
+                candidate_res["evidence_notes"] = [
+                    "The result is supported by network heuristics without drug-specific activity."
+                ]
 
             scored_results.append(candidate_res)
 
-        # Sort candidates descending by synergy_score
-        scored_results.sort(key=lambda x: x["synergy_score"], reverse=True)
+        # Sort by computational score, then transparent evidence completeness.
+        # The final name sort is only deterministic ordering inside a true tie.
+        scored_results.sort(
+            key=lambda x: (
+                x["synergy_score"],
+                x.get("evidence_completeness", 0.0),
+                x.get("secondary_drug", ""),
+            ),
+            reverse=True,
+        )
+        previous_key = None
+        rank = 0
+        tie_group = 0
+        for index, candidate in enumerate(scored_results):
+            tie_key = (
+                round(float(candidate["synergy_score"]), 4),
+                round(float(candidate.get("evidence_completeness", 0.0)), 4),
+            )
+            if tie_key != previous_key:
+                rank = index + 1
+                tie_group += 1
+                previous_key = tie_key
+            candidate["rank"] = rank
+            candidate["tie_group"] = tie_group
+            candidate["_tie_key"] = tie_key
+        tie_counts: dict[tuple[float, float], int] = {}
+        for candidate in scored_results:
+            tie_counts[candidate["_tie_key"]] = (
+                tie_counts.get(candidate["_tie_key"], 0) + 1
+            )
+        for candidate in scored_results:
+            if (
+                tie_counts[candidate["_tie_key"]] > 1
+                and candidate.get("score_components", {}).get("pharmacology") is None
+            ):
+                candidate["tie_reason"] = (
+                    "Insufficient drug-specific evidence; topology and proximity "
+                    "were not enough to separate this candidate."
+                )
+            candidate.pop("_tie_key", None)
         return scored_results

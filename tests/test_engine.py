@@ -1,5 +1,6 @@
 import networkx as nx
 import pytest
+
 from src.engine.graph_builder import HUB_EXCLUSION_SET, build_signaling_graph
 from src.engine.scorer import PathwayScorer, normalize_series, normalize_value
 
@@ -88,6 +89,12 @@ def test_case_a_vs_case_b_scoring():
     for item in scored_a:
         assert "synergy_score" in item
         assert 0.0 <= item["synergy_score"] <= 1.0
+        assert set(item["score_components"]) == {
+            "topology",
+            "proximity",
+            "pharmacology",
+            "clinical_evidence",
+        }
 
     candidates_missing_affinity = [
         {"secondary_target": "MET"},
@@ -99,6 +106,7 @@ def test_case_a_vs_case_b_scoring():
     for item in scored_b:
         assert "synergy_score" in item
         assert 0.0 <= item["synergy_score"] <= 1.0
+        assert item["score_components"]["pharmacology"] is None
 
 
 def test_duplicate_edge_resolution():
@@ -142,6 +150,31 @@ def test_mixed_affinity_per_candidate_branching():
         assert 0.0 <= item["synergy_score"] <= 1.0
 
 
+def test_candidate_outside_validated_topology_abstains():
+    G = nx.Graph()
+    G.add_edge("EGFR", "MET", weight=0.2)
+    scored = PathwayScorer.score_candidates(
+        G, "EGFR", [{"secondary_target": "UNKNOWN"}]
+    )
+    assert scored[0]["synergy_score"] == 0.0
+    assert scored[0]["shortest_path_distance"] is None
+    assert scored[0]["target_in_graph"] is False
+    assert scored[0]["scoring_status"].startswith("abstained_")
+    assert scored[0]["evidence_status"] == "abstained"
+
+
+def test_evidence_status_is_not_a_clinical_confidence_score():
+    G = nx.Graph()
+    G.add_edge("EGFR", "MET", weight=0.2)
+    scored = PathwayScorer.score_candidates(
+        G,
+        "EGFR",
+        [{"secondary_target": "MET", "pchembl_value": 8.0}],
+    )
+    assert scored[0]["evidence_status"] == "pharmacology_available"
+    assert "clinical response" in scored[0]["evidence_notes"][0]
+
+
 def test_zero_centrality_normalization():
     """Verify that a graph where all nodes have zero betweenness centrality
     does NOT give them max centrality score."""
@@ -154,9 +187,47 @@ def test_zero_centrality_normalization():
     assert centralities["EGFR"] == 0.0
     assert centralities["MET"] == 0.0
 
-    # Now score candidates: zero centrality with zero variance → normalized to 0.0
+    # The fixed transform retains the composite degree signal without candidate-pool normalization.
     candidates = [{"secondary_target": "MET"}]
     scored = PathwayScorer.score_candidates(G, "EGFR", candidates)
     assert len(scored) == 1
-    # With zero centrality normalized to 0.0, synergy should be driven only by distance
-    assert scored[0]["hub_penalized_centrality"] == 0.0
+    assert 0.0 < scored[0]["hub_penalized_centrality"] < 1.0
+
+
+def test_score_is_invariant_to_adding_another_candidate():
+    G = nx.Graph()
+    G.add_edge("EGFR", "MET", weight=0.2)
+    G.add_edge("MET", "ERBB3", weight=0.3)
+
+    one = PathwayScorer.score_candidates(
+        G, "EGFR", [{"secondary_target": "MET", "pchembl_value": 8.0}]
+    )[0]
+    two = PathwayScorer.score_candidates(
+        G,
+        "EGFR",
+        [
+            {"secondary_target": "MET", "pchembl_value": 8.0},
+            {"secondary_target": "ERBB3", "pchembl_value": 6.0},
+        ],
+    )[0]
+
+    assert two["synergy_score"] == one["synergy_score"]
+
+
+def test_target_level_ties_are_explicit():
+    """Drugs sharing a target without drug-specific activity are marked as tied."""
+    G = nx.Graph()
+    G.add_edge("EGFR", "MET", weight=0.2)
+    scored = PathwayScorer.score_candidates(
+        G,
+        "EGFR",
+        [
+            {"secondary_drug": "DRUG_B", "secondary_target": "MET"},
+            {"secondary_drug": "DRUG_A", "secondary_target": "MET"},
+        ],
+    )
+    assert [item["rank"] for item in scored] == [1, 1]
+    assert [item["tie_group"] for item in scored] == [1, 1]
+    assert all(
+        "Insufficient drug-specific evidence" in item["tie_reason"] for item in scored
+    )

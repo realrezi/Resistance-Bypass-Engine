@@ -1,10 +1,11 @@
-from typing import Any, Dict, List, Set
+from typing import Any
+
 import networkx as nx
 
-HUB_EXCLUSION_SET: Set[str] = {"TP53", "UBC", "UBB", "RPS27A"}
+HUB_EXCLUSION_SET: set[str] = {"TP53", "UBC", "UBB", "RPS27A"}
 
 
-def build_signaling_graph(string_interactions: List[Dict[str, Any]]) -> nx.Graph:
+def build_signaling_graph(string_interactions: list[dict[str, Any]]) -> nx.Graph:
     """Build a weighted, undirected NetworkX graph from STRING-DB interactor payloads.
 
     Excludes master regulator hubs (TP53, UBC, UBB, RPS27A), calculates Dijkstra weights,

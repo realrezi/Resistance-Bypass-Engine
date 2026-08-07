@@ -1,6 +1,6 @@
-from typing import Any, Dict, List
+from typing import Any
 
-GENE_ANNOTATIONS: Dict[str, Dict[str, Any]] = {
+GENE_ANNOTATIONS: dict[str, dict[str, Any]] = {
     "EGFR": {
         "symbol": "EGFR",
         "name": "Epidermal Growth Factor Receptor",
@@ -8,16 +8,20 @@ GENE_ANNOTATIONS: Dict[str, Dict[str, Any]] = {
         "ensembl_id": "ENSG00000146648",
         "uniprot_id": "P00533",
         "pdb_id": "1M17",
-        "druggability": "Tier 1: FDA Approved TKI Target",
+        "druggability": "Clinically targeted RTK; regulatory status is indication-specific",
         "role": "Receptor Tyrosine Kinase (RTK) Initiator",
         "hotspots": [
             "C797S (Exon 20 3rd-Gen TKI Resistance)",
             "T790M (1st/2nd-Gen Gatekeeper Mutation)",
             "L858R (Exon 21 Sensitizing Driver)",
             "Exon 19 In-Frame Deletion (ELREA)",
-            "G719X (Exon 18 Atypical Activation)"
+            "G719X (Exon 18 Atypical Activation)",
         ],
-        "pathways": ["RAS/RAF/MEK/ERK Cascade", "PI3K/AKT/mTOR Survival Axis", "STAT3 Signaling"]
+        "pathways": [
+            "RAS/RAF/MEK/ERK Cascade",
+            "PI3K/AKT/mTOR Survival Axis",
+            "STAT3 Signaling",
+        ],
     },
     "MET": {
         "symbol": "MET",
@@ -26,15 +30,19 @@ GENE_ANNOTATIONS: Dict[str, Dict[str, Any]] = {
         "ensembl_id": "ENSG00000105976",
         "uniprot_id": "P08581",
         "pdb_id": "3R7O",
-        "druggability": "Tier 1: FDA Approved TKI Target",
+        "druggability": "Clinically targeted RTK; regulatory status is indication-specific",
         "role": "RTK Bypass Hyperactivation & HGF Receptor",
         "hotspots": [
             "MET Gene Amplification (Off-Target RTK Bypass)",
             "Exon 14 Splice Site Skipping (METex14)",
             "D1228N / Y1230C (Type I TKI Solvent Front Resistance)",
-            "L1195V (Kinase Activation Loop Mutation)"
+            "L1195V (Kinase Activation Loop Mutation)",
         ],
-        "pathways": ["ERBB3 Trans-Phosphorylation", "FAK Cell Motility Axis", "PI3K Parallel Survival"]
+        "pathways": [
+            "ERBB3 Trans-Phosphorylation",
+            "FAK Cell Motility Axis",
+            "PI3K Parallel Survival",
+        ],
     },
     "ERBB2": {
         "symbol": "ERBB2",
@@ -43,15 +51,19 @@ GENE_ANNOTATIONS: Dict[str, Dict[str, Any]] = {
         "ensembl_id": "ENSG00000141736",
         "uniprot_id": "P04626",
         "pdb_id": "1N8Z",
-        "druggability": "Tier 1: FDA Approved mAb & ADC Target",
+        "druggability": "Clinically targeted receptor; regulatory status is indication-specific",
         "role": "RTK Heterodimerization Partner",
         "hotspots": [
             "HER2 Gene Amplification / Overexpression",
             "Exon 20 YVMA Insertion",
             "L755S (Kinase Domain Lapatinib Resistance)",
-            "S310F (Extracellular Domain Hotspot)"
+            "S310F (Extracellular Domain Hotspot)",
         ],
-        "pathways": ["HER2/HER3 Heterodimer Signaling", "PI3K/AKT Pathway", "MAPK Cascade"]
+        "pathways": [
+            "HER2/HER3 Heterodimer Signaling",
+            "PI3K/AKT Pathway",
+            "MAPK Cascade",
+        ],
     },
     "ALK": {
         "symbol": "ALK",
@@ -60,15 +72,15 @@ GENE_ANNOTATIONS: Dict[str, Dict[str, Any]] = {
         "ensembl_id": "ENSG00000171094",
         "uniprot_id": "Q9UM73",
         "pdb_id": "3L9P",
-        "druggability": "Tier 1: FDA Approved TKI Target",
+        "druggability": "Clinically targeted kinase; regulatory status is indication-specific",
         "role": "Oncogenic Fusion Kinase (EML4-ALK)",
         "hotspots": [
             "EML4-ALK Translocation / Fusion Variant 1/3",
             "G1202R (Solvent Front Master Resistance)",
             "L1196M (Gatekeeper Mutation)",
-            "I1171N/T (Alectinib Resistance Variant)"
+            "I1171N/T (Alectinib Resistance Variant)",
         ],
-        "pathways": ["STAT3 Survival Pathway", "RAS/MAPK Axis", "PLCgamma Signaling"]
+        "pathways": ["STAT3 Survival Pathway", "RAS/MAPK Axis", "PLCgamma Signaling"],
     },
     "KRAS": {
         "symbol": "KRAS",
@@ -77,15 +89,19 @@ GENE_ANNOTATIONS: Dict[str, Dict[str, Any]] = {
         "ensembl_id": "ENSG00000133703",
         "uniprot_id": "P01116",
         "pdb_id": "6OIM",
-        "druggability": "Tier 1: FDA Approved Covalent Target",
+        "druggability": "Clinically targeted protein; regulatory status is indication-specific",
         "role": "Small GTPase Molecular Switch",
         "hotspots": [
             "G12C (Switch-II Covalent Target)",
             "G12D / G12V (Constitutive Active GTP-bound)",
             "Y96D (Sotorasib Switch-II Pocket Resistance)",
-            "Q61K / Q61R (Glutamine 61 Catalytic Loss)"
+            "Q61K / Q61R (Glutamine 61 Catalytic Loss)",
         ],
-        "pathways": ["RAF/MEK/ERK Signaling", "PI3K/PDK1/AKT Axis", "RAL-GEF Effector Cascade"]
+        "pathways": [
+            "RAF/MEK/ERK Signaling",
+            "PI3K/PDK1/AKT Axis",
+            "RAL-GEF Effector Cascade",
+        ],
     },
     "BRAF": {
         "symbol": "BRAF",
@@ -94,15 +110,19 @@ GENE_ANNOTATIONS: Dict[str, Dict[str, Any]] = {
         "ensembl_id": "ENSG00000157764",
         "uniprot_id": "P15056",
         "pdb_id": "4EB9",
-        "druggability": "Tier 1: FDA Approved Kinase Target",
+        "druggability": "Clinically targeted kinase; regulatory status is indication-specific",
         "role": "MAPK Pathway Central Signal Node",
         "hotspots": [
             "V600E (Class 1 Monomeric Hyperactivation)",
             "V600K / V600R (Exon 15 Hotspots)",
             "BRAF Splice Variants / Homodimer Paradox",
-            "L597V / K601E (Class 2 Dimer Activation)"
+            "L597V / K601E (Class 2 Dimer Activation)",
         ],
-        "pathways": ["MEK1/2 (MAP2K1/2) Phosphorylation", "ERK1/2 Translocation", "Cyclin D1 Transcription"]
+        "pathways": [
+            "MEK1/2 (MAP2K1/2) Phosphorylation",
+            "ERK1/2 Translocation",
+            "Cyclin D1 Transcription",
+        ],
     },
     "PIK3CA": {
         "symbol": "PIK3CA",
@@ -111,14 +131,18 @@ GENE_ANNOTATIONS: Dict[str, Dict[str, Any]] = {
         "ensembl_id": "ENSG00000121879",
         "uniprot_id": "P42336",
         "pdb_id": "4L23",
-        "druggability": "Tier 1: FDA Approved Inhibitor Target",
+        "druggability": "Clinically targeted enzyme; regulatory status is indication-specific",
         "role": "Lipid Kinase PIP3 Generator",
         "hotspots": [
             "H1047R (Exon 20 Kinase Domain Hotspot)",
             "E542K / E545K (Exon 9 Helical Domain)",
-            "C420R (C2 Domain Membrane Interaction)"
+            "C420R (C2 Domain Membrane Interaction)",
         ],
-        "pathways": ["PIP3 Production at Plasma Membrane", "PDK1 & AKT1 Activation", "mTORC1 Translation"]
+        "pathways": [
+            "PIP3 Production at Plasma Membrane",
+            "PDK1 & AKT1 Activation",
+            "mTORC1 Translation",
+        ],
     },
     "ESR1": {
         "symbol": "ESR1",
@@ -127,14 +151,18 @@ GENE_ANNOTATIONS: Dict[str, Dict[str, Any]] = {
         "ensembl_id": "ENSG00000091831",
         "uniprot_id": "P03372",
         "pdb_id": "1ERE",
-        "druggability": "Tier 1: FDA Approved SERD Target",
+        "druggability": "Clinically targeted receptor; regulatory status is indication-specific",
         "role": "Nuclear Hormone Receptor Transcription Factor",
         "hotspots": [
             "Y537S / Y537N (Ligand-Independent Activation)",
             "D538G (Exon 8 LBD Resistance Hotspot)",
-            "E380Q (Helical Domain Mutation)"
+            "E380Q (Helical Domain Mutation)",
         ],
-        "pathways": ["Estrogen Response Element (ERE) Genes", "Cyclin D1 & CDK4/6 Cell Cycle", "MYC Transcription"]
+        "pathways": [
+            "Estrogen Response Element (ERE) Genes",
+            "Cyclin D1 & CDK4/6 Cell Cycle",
+            "MYC Transcription",
+        ],
     },
     "ABL1": {
         "symbol": "ABL1",
@@ -143,15 +171,19 @@ GENE_ANNOTATIONS: Dict[str, Dict[str, Any]] = {
         "ensembl_id": "ENSG00000097007",
         "uniprot_id": "P00519",
         "pdb_id": "2GQG",
-        "druggability": "Tier 1: FDA Approved TKI Target",
+        "druggability": "Clinically targeted kinase; regulatory status is indication-specific",
         "role": "Oncogenic Fusion Protein (BCR-ABL1)",
         "hotspots": [
             "T315I (Gatekeeper Master Steric Clash)",
             "E255K / Y253F (P-Loop ATP Binding Hotspot)",
             "F317L (Dasatinib Resistance Mutation)",
-            "H396P (Activation Loop Mutation)"
+            "H396P (Activation Loop Mutation)",
         ],
-        "pathways": ["STAT5 Leukemogenic Signaling", "CRKL Adaptor Phosphorylation", "PI3K/AKT Survival Axis"]
+        "pathways": [
+            "STAT5 Leukemogenic Signaling",
+            "CRKL Adaptor Phosphorylation",
+            "PI3K/AKT Survival Axis",
+        ],
     },
     "CDK4": {
         "symbol": "CDK4",
@@ -160,14 +192,18 @@ GENE_ANNOTATIONS: Dict[str, Dict[str, Any]] = {
         "ensembl_id": "ENSG00000135446",
         "uniprot_id": "P11802",
         "pdb_id": "2C6O",
-        "druggability": "Tier 1: FDA Approved CDK4/6 Target",
+        "druggability": "Clinically targeted cell-cycle node; regulatory status is indication-specific",
         "role": "G1/S Phase Transition Kinase",
         "hotspots": [
             "CCND1 (Cyclin D1) Amplification",
             "RB1 Loss of Function (CDK4/6 Resistance)",
-            "FAT1 Loss (CDK4/6 Upregulation)"
+            "FAT1 Loss (CDK4/6 Upregulation)",
         ],
-        "pathways": ["Rb (Retinoblastoma) Phosphorylation", "E2F Transcription Release", "Cell Cycle Progression"]
+        "pathways": [
+            "Rb (Retinoblastoma) Phosphorylation",
+            "E2F Transcription Release",
+            "Cell Cycle Progression",
+        ],
     },
     "MAP2K1": {
         "symbol": "MAP2K1",
@@ -176,14 +212,18 @@ GENE_ANNOTATIONS: Dict[str, Dict[str, Any]] = {
         "ensembl_id": "ENSG00000169032",
         "uniprot_id": "Q02750",
         "pdb_id": "3E8N",
-        "druggability": "Tier 1: FDA Approved Allosteric Target",
+        "druggability": "Clinically targeted kinase; regulatory status is indication-specific",
         "role": "Dual Specificity Kinase (MEK1)",
         "hotspots": [
             "C121S (MEK1 Allosteric Inhibitor Resistance)",
             "P124L / K57E (Activating Helix Mutations)",
-            "E203K (Kinase Domain Activation)"
+            "E203K (Kinase Domain Activation)",
         ],
-        "pathways": ["ERK1/2 Dual Phosphorylation", "AP-1 Transcription Complex", "Cell Growth & Survival"]
+        "pathways": [
+            "ERK1/2 Dual Phosphorylation",
+            "AP-1 Transcription Complex",
+            "Cell Growth & Survival",
+        ],
     },
     "AKT1": {
         "symbol": "AKT1",
@@ -192,14 +232,18 @@ GENE_ANNOTATIONS: Dict[str, Dict[str, Any]] = {
         "ensembl_id": "ENSG00000142208",
         "uniprot_id": "P31749",
         "pdb_id": "3QKM",
-        "druggability": "Tier 1: FDA Approved Kinase Target",
+        "druggability": "Clinically targeted kinase; regulatory status is indication-specific",
         "role": "Central Survival & Metabolism Kinase",
         "hotspots": [
             "E17K (PH Domain Membrane Hyper-recruitment)",
             "L52R (Allosteric Binding Pocket Mutation)",
-            "p-Ser473 / p-Thr308 Hyper-phosphorylation"
+            "p-Ser473 / p-Thr308 Hyper-phosphorylation",
         ],
-        "pathways": ["mTORC1 / S6K Protein Synthesis", "FOXO Transcription Factor Inhibition", "BAD Antiapoptotic Inactivation"]
+        "pathways": [
+            "mTORC1 / S6K Protein Synthesis",
+            "FOXO Transcription Factor Inhibition",
+            "BAD Antiapoptotic Inactivation",
+        ],
     },
     "ROS1": {
         "symbol": "ROS1",
@@ -208,14 +252,18 @@ GENE_ANNOTATIONS: Dict[str, Dict[str, Any]] = {
         "ensembl_id": "ENSG00000047936",
         "uniprot_id": "P08922",
         "pdb_id": "3ZBF",
-        "druggability": "Tier 1: FDA Approved TKI Target",
+        "druggability": "Clinically targeted kinase; regulatory status is indication-specific",
         "role": "Oncogenic Rearrangement Kinase (CD74-ROS1)",
         "hotspots": [
             "G2032R (Solvent Front Master Resistance)",
             "D2033N (Kinase Binding Pocket Resistance)",
-            "S1986Y/F (Gatekeeper Region Mutation)"
+            "S1986Y/F (Gatekeeper Region Mutation)",
         ],
-        "pathways": ["SHP2 / RAS Activation", "PI3K/AKT Pathway", "STAT3 Survival Cascade"]
+        "pathways": [
+            "SHP2 / RAS Activation",
+            "PI3K/AKT Pathway",
+            "STAT3 Survival Cascade",
+        ],
     },
     "RET": {
         "symbol": "RET",
@@ -224,15 +272,15 @@ GENE_ANNOTATIONS: Dict[str, Dict[str, Any]] = {
         "ensembl_id": "ENSG00000165731",
         "uniprot_id": "P07949",
         "pdb_id": "2IVT",
-        "druggability": "Tier 1: FDA Approved TKI Target",
+        "druggability": "Clinically targeted kinase; regulatory status is indication-specific",
         "role": "RTK Fusion & Activating Mutation Target",
         "hotspots": [
             "G810R/S (Solvent Front Resistance Variant)",
             "V804M / V804L (Gatekeeper Mutation)",
             "K703E (ATP Binding Pocket Mutation)",
-            "KCC6-RET / CCDC6-RET Translocations"
+            "KCC6-RET / CCDC6-RET Translocations",
         ],
-        "pathways": ["RAS/MAPK Axis", "PI3K/AKT Axis", "PLCgamma Pathway"]
+        "pathways": ["RAS/MAPK Axis", "PI3K/AKT Axis", "PLCgamma Pathway"],
     },
     "NTRK1": {
         "symbol": "NTRK1",
@@ -241,14 +289,18 @@ GENE_ANNOTATIONS: Dict[str, Dict[str, Any]] = {
         "ensembl_id": "ENSG00000198400",
         "uniprot_id": "P04629",
         "pdb_id": "4AOJ",
-        "druggability": "Tier 1: FDA Approved Agnostic TKI Target",
+        "druggability": "Clinically targeted kinase; regulatory status is indication-specific",
         "role": "Agnostic Oncogenic Fusion Kinase",
         "hotspots": [
             "G595R (Solvent Front Larotrectinib Resistance)",
             "G667C (xDFG Motif Resistance)",
-            "F589L (Gatekeeper Mutation)"
+            "F589L (Gatekeeper Mutation)",
         ],
-        "pathways": ["TRK Kinase Fusion Signaling", "PLCgamma Pathway", "PI3K Survival Cascade"]
+        "pathways": [
+            "TRK Kinase Fusion Signaling",
+            "PLCgamma Pathway",
+            "PI3K Survival Cascade",
+        ],
     },
     "TP53": {
         "symbol": "TP53",
@@ -257,15 +309,19 @@ GENE_ANNOTATIONS: Dict[str, Dict[str, Any]] = {
         "ensembl_id": "ENSG00000141510",
         "uniprot_id": "P04637",
         "pdb_id": "1TUP",
-        "druggability": "Tier 2: Master Tumor Suppressor",
+        "druggability": "Tumor suppressor; no blanket druggability claim",
         "role": "Guardian of the Genome & Apoptosis Regulator",
         "hotspots": [
             "R273H / R273C (DNA Binding Hotspot)",
             "R175H (Conformational Structural Loss)",
             "R248Q / R248W (Contact Hotspot Variant)",
-            "Y220C (Small Molecule Reactivation Pocket)"
+            "Y220C (Small Molecule Reactivation Pocket)",
         ],
-        "pathways": ["Cell Cycle Arrest (p21/CDKN1A)", "BAX/PUMA Pro-Apoptotic Axis", "DNA Repair Surveillance"]
+        "pathways": [
+            "Cell Cycle Arrest (p21/CDKN1A)",
+            "BAX/PUMA Pro-Apoptotic Axis",
+            "DNA Repair Surveillance",
+        ],
     },
     "PTEN": {
         "symbol": "PTEN",
@@ -274,14 +330,18 @@ GENE_ANNOTATIONS: Dict[str, Dict[str, Any]] = {
         "ensembl_id": "ENSG00000171862",
         "uniprot_id": "P60484",
         "pdb_id": "1D5R",
-        "druggability": "Tier 2: Master Lipid Phosphatase Suppressor",
+        "druggability": "Tumor suppressor; pathway relevance does not imply direct druggability",
         "role": "PI3K/AKT De-phosphorylation Brake",
         "hotspots": [
             "Homozygous Genomic Deletion",
             "R130G / R130Q (Phosphatase Catalytic Domain)",
-            "C124S (Enzymatic Active Site Inactivation)"
+            "C124S (Enzymatic Active Site Inactivation)",
         ],
-        "pathways": ["PIP3 Dephosphorylation to PIP2", "Negative Regulation of AKT Signaling", "Cell Migration Control"]
+        "pathways": [
+            "PIP3 Dephosphorylation to PIP2",
+            "Negative Regulation of AKT Signaling",
+            "Cell Migration Control",
+        ],
     },
     "GRB2": {
         "symbol": "GRB2",
@@ -290,14 +350,18 @@ GENE_ANNOTATIONS: Dict[str, Dict[str, Any]] = {
         "ensembl_id": "ENSG00000177885",
         "uniprot_id": "P62993",
         "pdb_id": "1TZE",
-        "druggability": "Tier 3: Bottleneck Adaptor Protein",
+        "druggability": "Adaptor protein; direct druggability is context-specific",
         "role": "SH2/SH3 Adaptor Bridge Protein",
         "hotspots": [
             "SH2 Domain Phosphotyrosine Binding Loop",
             "N-terminal SH3 Domain SOS1 Interaction",
-            "C-terminal SH3 Domain GAB1 Docking"
+            "C-terminal SH3 Domain GAB1 Docking",
         ],
-        "pathways": ["RTK-to-RAS Signal Coupling", "GAB1 Membrane Complex", "SOS1 Guanine Exchange"]
+        "pathways": [
+            "RTK-to-RAS Signal Coupling",
+            "GAB1 Membrane Complex",
+            "SOS1 Guanine Exchange",
+        ],
     },
     "SOS1": {
         "symbol": "SOS1",
@@ -311,33 +375,46 @@ GENE_ANNOTATIONS: Dict[str, Dict[str, Any]] = {
         "hotspots": [
             "GDP-to-GTP Nucleotide Exchange Pocket",
             "Allosteric RAS Binding Site",
-            "Nozonanib / BI-3406 Inhibitor Binding Site"
+            "BI-3406 allosteric inhibitor binding site",
         ],
-        "pathways": ["KRAS GDP-to-GTP Exchange", "RAC1 Signaling Axis", "RAS-GTP Activation"]
-    }
+        "pathways": [
+            "KRAS GDP-to-GTP Exchange",
+            "RAC1 Signaling Axis",
+            "RAS-GTP Activation",
+        ],
+    },
 }
 
 
-def get_gene_annotation(symbol: str) -> Dict[str, Any]:
+def get_gene_annotation(symbol: str) -> dict[str, Any]:
     """Retrieve canonical multi-omics annotation metadata for a gene symbol."""
     sym_clean = (symbol or "").strip().upper()
     if sym_clean in GENE_ANNOTATIONS:
-        return GENE_ANNOTATIONS[sym_clean]
+        annotation = dict(GENE_ANNOTATIONS[sym_clean])
+        annotation["structure_status"] = "curated_structure_mapping"
+        annotation["structure_source"] = "RCSB Protein Data Bank"
+        annotation["annotation_source"] = (
+            "Local curated annotation panel; verify against current primary literature"
+        )
+        return annotation
 
     # Dynamic fallback for unlisted genes
     return {
         "symbol": sym_clean,
         "name": f"{sym_clean} Human Protein Target",
         "locus": "Genomic Locus",
-        "ensembl_id": f"ENSG0000_{sym_clean}",
-        "uniprot_id": f"P_{sym_clean}",
-        "pdb_id": "3D_MODEL",
-        "druggability": "Tier 2: Targeted Clinical Candidate",
+        "ensembl_id": None,
+        "uniprot_id": None,
+        "pdb_id": None,
+        "structure_status": "unavailable",
+        "structure_source": None,
+        "annotation_source": "No local curated annotation available",
+        "druggability": "Not annotated in the curated local target panel",
         "role": "Signal Transduction Pathway Interactor",
         "hotspots": [
             f"Oncogenic Amplification / Hyperactivation in {sym_clean}",
             f"Kinase Domain Variants in {sym_clean}",
-            f"Acquired Bypass Resistance Locus"
+            "Acquired Bypass Resistance Locus",
         ],
-        "pathways": ["Signal Transduction Cascade", "Oncogenic Survival Network"]
+        "pathways": ["Signal Transduction Cascade", "Oncogenic Survival Network"],
     }
