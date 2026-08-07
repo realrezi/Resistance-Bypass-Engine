@@ -1017,54 +1017,9 @@ INDEX_HTML = """<!DOCTYPE html>
                     <button type="submit" id="submitBtn" class="btn-run">
                         <span>Compute Network Graph Algorithms</span>
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-                    </button>
                 </form>
-
-                <!-- Molecular Target & Inhibitor Selector Palette -->
-                <div class="spacious-picker-section">
-                    <div class="picker-header">
-                        <div class="picker-title">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2.2"><path d="M15 15l5 5M4 4l16 16"/></svg>
-                            <span>Molecular Target & Inhibitor Selector</span>
-                        </div>
-                        <button type="button" class="btn-clear-picker" onclick="clearInputs()">Reset Fields</button>
-                    </div>
-
-                    <div class="picker-category-label">Target Driver Loci:</div>
-                    <div class="picker-chip-grid">
-                        <button type="button" class="btn-spacious-chip target-chip" onclick="quickFill('primary_target', 'EGFR')">EGFR</button>
-                        <button type="button" class="btn-spacious-chip target-chip" onclick="quickFill('primary_target', 'ERBB2')">HER2</button>
-                        <button type="button" class="btn-spacious-chip target-chip" onclick="quickFill('primary_target', 'ALK')">ALK</button>
-                        <button type="button" class="btn-spacious-chip target-chip" onclick="quickFill('primary_target', 'KRAS')">KRAS</button>
-                        <button type="button" class="btn-spacious-chip target-chip" onclick="quickFill('primary_target', 'BRAF')">BRAF</button>
-                        <button type="button" class="btn-spacious-chip target-chip" onclick="quickFill('primary_target', 'PIK3CA')">PIK3CA</button>
-                        <button type="button" class="btn-spacious-chip target-chip" onclick="quickFill('primary_target', 'ESR1')">ESR1</button>
-                        <button type="button" class="btn-spacious-chip target-chip" onclick="quickFill('primary_target', 'ABL1')">ABL1</button>
-                    </div>
-
-                    <div class="picker-category-label">Frontline Inhibitor Molecules:</div>
-                    <div class="picker-chip-grid">
-                        <button type="button" class="btn-spacious-chip drug-chip" onclick="quickFill('primary_drug', 'Osimertinib')">Osimertinib</button>
-                        <button type="button" class="btn-spacious-chip drug-chip" onclick="quickFill('primary_drug', 'Trastuzumab')">Trastuzumab</button>
-                        <button type="button" class="btn-spacious-chip drug-chip" onclick="quickFill('primary_drug', 'Alectinib')">Alectinib</button>
-                        <button type="button" class="btn-spacious-chip drug-chip" onclick="quickFill('primary_drug', 'Sotorasib')">Sotorasib</button>
-                        <button type="button" class="btn-spacious-chip drug-chip" onclick="quickFill('primary_drug', 'Dabrafenib')">Dabrafenib</button>
-                        <button type="button" class="btn-spacious-chip drug-chip" onclick="quickFill('primary_drug', 'Fulvestrant')">Fulvestrant</button>
-                        <button type="button" class="btn-spacious-chip drug-chip" onclick="quickFill('primary_drug', 'Imatinib')">Imatinib</button>
-                    </div>
-
-                    <div class="picker-category-label">Acquired Resistance Loci:</div>
-                    <div class="picker-chip-grid">
-                        <button type="button" class="btn-spacious-chip marker-chip" onclick="quickFill('resistance_marker', 'MET')">MET Bypass</button>
-                        <button type="button" class="btn-spacious-chip marker-chip" onclick="quickFill('resistance_marker', 'EGFR')">EGFR C797S</button>
-                        <button type="button" class="btn-spacious-chip marker-chip" onclick="quickFill('resistance_marker', 'KRAS')">KRAS Activation</button>
-                        <button type="button" class="btn-spacious-chip marker-chip" onclick="quickFill('resistance_marker', 'BRAF')">BRAF V600E</button>
-                        <button type="button" class="btn-spacious-chip marker-chip" onclick="quickFill('resistance_marker', 'PIK3CA')">PIK3CA Mutation</button>
-                        <button type="button" class="btn-spacious-chip marker-chip" onclick="quickFill('resistance_marker', 'ABL1')">ABL1 T315I</button>
-                        <button type="button" class="btn-spacious-chip marker-chip" onclick="quickFill('resistance_marker', 'CDK4')">CDK4/6 Axis</button>
-                    </div>
-                </div>
             </div>
+
 
             <!-- Right Panel: Signal Transduction Pathway & Synergy Matrix -->
             <div class="panel">
@@ -1250,42 +1205,43 @@ INDEX_HTML = """<!DOCTYPE html>
 
     <!-- Modals -->
     <div id="guidanceModal" class="modal-wrapper" onclick="if(event.target===this) toggleModal('guidanceModal', false)">
-        <div class="modal-box">
-            <div class="modal-top">
-                <div class="modal-heading">💡 Purpose & Workflow</div>
-                <button class="modal-close" onclick="toggleModal('guidanceModal', false)">&times;</button>
+        <div class="modal-box" style="max-width: 600px; background: #0f172a; border: 1px solid #334155; border-radius: 14px; color: #f8fafc;">
+            <div class="modal-top" style="border-bottom: 1px solid #1e293b; padding-bottom: 0.75rem; margin-bottom: 1rem;">
+                <div class="modal-heading" style="font-size: 1.25rem; font-weight: 800; color: #f8fafc;">💡 Purpose & Workflow</div>
+                <button class="modal-close" style="color: #94a3b8;" onclick="toggleModal('guidanceModal', false)">&times;</button>
             </div>
-            <p style="margin-bottom: 1rem; font-size: 0.9rem;">
+            <p style="margin-bottom: 1rem; font-size: 0.88rem; color: #cbd5e1; line-height: 1.5;">
                 This clinical engine models acquired therapeutic drug resistance in cancer using real-time REST/GraphQL biological APIs (HGNC, UniProt, STRING-DB, Open Targets, ChEMBL v4) and pure Python NetworkX graph algorithms.
             </p>
-            <div style="background:#f8fafc; border:1px solid var(--border-lab); padding:0.85rem; border-radius:8px; margin-bottom:0.75rem;">
-                <div style="font-weight:700; color:var(--genomic-blue);">1. Resolve Biological Identifiers</div>
-                <div style="font-size:0.82rem;">Resolves alias symbols (e.g. HER2 ➔ ERBB2) to official HGNC IDs and UniProt Accession codes.</div>
+            <div style="background: #1e293b; border: 1px solid #334155; padding: 0.85rem; border-radius: 8px; margin-bottom: 0.75rem;">
+                <div style="font-weight: 700; color: #38bdf8;">1. Resolve Canonical Identifiers</div>
+                <div style="font-size: 0.82rem; color: #cbd5e1; margin-top: 0.2rem;">Resolves alias symbols (e.g. HER2 ➔ ERBB2) to official HGNC IDs and UniProt Accession codes.</div>
             </div>
-            <div style="background:#f8fafc; border:1px solid var(--border-lab); padding:0.85rem; border-radius:8px; margin-bottom:0.75rem;">
-                <div style="font-weight:700; color:var(--genomic-blue);">2. Build PPI Signaling Graph</div>
-                <div style="font-size:0.82rem;">Queries STRING-DB for protein-protein interaction networks and extracts the Largest Connected Component (LCC).</div>
+            <div style="background: #1e293b; border: 1px solid #334155; padding: 0.85rem; border-radius: 8px; margin-bottom: 0.75rem;">
+                <div style="font-weight: 700; color: #c084fc;">2. Build Biological PPI Signaling Graph</div>
+                <div style="font-size: 0.82rem; color: #cbd5e1; margin-top: 0.2rem;">Queries STRING-DB for protein-protein interaction networks and extracts the Largest Connected Component (LCC).</div>
             </div>
-            <div style="background:#f8fafc; border:1px solid var(--border-lab); padding:0.85rem; border-radius:8px;">
-                <div style="font-weight:700; color:var(--genomic-blue);">3. Hub-Penalized Centrality & Therapy Ranking</div>
-                <div style="font-size:0.82rem;">Computes <code>Betweenness / log2(Degree + 2)</code> to isolate non-generic bottleneck targets and ranks active clinical combinations.</div>
+            <div style="background: #1e293b; border: 1px solid #334155; padding: 0.85rem; border-radius: 8px;">
+                <div style="font-weight: 700; color: #34d399;">3. Hub-Penalized Centrality & Therapy Ranking</div>
+                <div style="font-size: 0.82rem; color: #cbd5e1; margin-top: 0.2rem;">Computes <code>Betweenness / log2(Degree + 2)</code> to isolate non-generic bottleneck targets and ranks active clinical combinations.</div>
             </div>
         </div>
     </div>
 
     <div id="clinicianModal" class="modal-wrapper" onclick="if(event.target===this) toggleModal('clinicianModal', false)">
-        <div class="modal-box">
-            <div class="modal-top">
-                <div class="modal-heading">📖 Methodological & Clinical Guide</div>
-                <button class="modal-close" onclick="toggleModal('clinicianModal', false)">&times;</button>
+        <div class="modal-box" style="max-width: 600px; background: #0f172a; border: 1px solid #334155; border-radius: 14px; color: #f8fafc;">
+            <div class="modal-top" style="border-bottom: 1px solid #1e293b; padding-bottom: 0.75rem; margin-bottom: 1rem;">
+                <div class="modal-heading" style="font-size: 1.25rem; font-weight: 800; color: #f8fafc;">📖 Methodological & Clinical Guide</div>
+                <button class="modal-close" style="color: #94a3b8;" onclick="toggleModal('clinicianModal', false)">&times;</button>
             </div>
-            <div style="font-size:0.88rem; line-height:1.5;">
-                <p style="margin-bottom:0.75rem;"><strong>Off-Target Bypass:</strong> Hyperactivation of a parallel signaling pathway (e.g., MET amplification) that bypasses frontline drug blockade.</p>
-                <p style="margin-bottom:0.75rem;"><strong>On-Target Mutation:</strong> Secondary mutations directly inside the primary target gene (e.g., EGFR C797S or ABL1 T315I) altering drug binding affinity.</p>
-                <p><strong>Hub-Penalized Bottleneck Centrality:</strong> Evaluated as <code>Betweenness / log2(Degree + 2)</code> to strip non-specific hub proteins (like TP53 or Ubiquitin) while pinpointing critical resistance signaling nodes.</p>
+            <div style="font-size: 0.88rem; line-height: 1.5; color: #cbd5e1;">
+                <p style="margin-bottom: 0.75rem;"><strong style="color: #38bdf8;">Off-Target Bypass:</strong> Hyperactivation of a parallel signaling pathway (e.g., MET amplification) that bypasses frontline drug blockade.</p>
+                <p style="margin-bottom: 0.75rem;"><strong style="color: #f43f5e;">On-Target Mutation:</strong> Secondary mutations directly inside the primary target gene (e.g., EGFR C797S or ABL1 T315I) altering drug binding affinity.</p>
+                <p><strong style="color: #34d399;">Hub-Penalized Bottleneck Centrality:</strong> Evaluated as <code>Betweenness / log2(Degree + 2)</code> to strip non-specific hub proteins (like TP53 or Ubiquitin) while pinpointing critical resistance signaling nodes.</p>
             </div>
         </div>
     </div>
+
 
     <!-- Deep Multi-Omics Node Inspector Modal -->
     <div id="nodeModal" class="modal-wrapper" onclick="if(event.target===this) toggleModal('nodeModal', false)">
@@ -1646,9 +1602,10 @@ INDEX_HTML = """<!DOCTYPE html>
                         <span class="drug-pair-name">#${idx+1} ${c.secondary_drug} + ${primaryDrug}</span>
                         <span class="badge-phase ${isApproved ? 'approved' : ''}">${isApproved ? 'FDA Approved' : 'Phase ' + c.clinical_phase}</span>
                     </div>
-                    <div style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 0.3rem;">
-                        Secondary Target: <strong style="color:var(--text-main);">${c.secondary_target}</strong> | Synergy Score: <strong style="color:var(--genomic-blue);">${c.synergy_score}</strong> | Hub Centrality: ${c.hub_penalized_centrality}
+                    <div style="font-size: 0.82rem; color: #cbd5e1; margin-bottom: 0.35rem;">
+                        Secondary Target: <strong style="color:#f8fafc;">${c.secondary_target}</strong> | Synergy Score: <strong style="color:#38bdf8;">${c.synergy_score}</strong> | Hub Bottleneck Centrality: <strong style="color:#c084fc;">${(c.hub_penalized_centrality && c.hub_penalized_centrality > 0) ? c.hub_penalized_centrality.toFixed(3) : '0.000 (Direct Target Node)'}</strong>
                     </div>
+
                     <div class="progress-track">
                         <div class="progress-fill" style="width: ${pct}%"></div>
                     </div>

@@ -38,6 +38,7 @@ def normalize_series(
     return [normalize_value(v, min_v, max_v, zero_var_default) for v in values]
 
 
+
 class PathwayScorer:
     @staticmethod
     def extract_lcc(G: nx.Graph) -> nx.Graph:
@@ -71,6 +72,7 @@ class PathwayScorer:
             adjusted_centrality[node] = cb_val / deg_penalty
 
         return adjusted_centrality
+
 
     @staticmethod
     def calculate_shortest_distance(
