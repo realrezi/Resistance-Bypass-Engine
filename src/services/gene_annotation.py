@@ -1,6 +1,6 @@
-from typing import Any, Dict, List
+from typing import Any
 
-GENE_ANNOTATIONS: Dict[str, Dict[str, Any]] = {
+GENE_ANNOTATIONS: dict[str, dict[str, Any]] = {
     "EGFR": {
         "symbol": "EGFR",
         "name": "Epidermal Growth Factor Receptor",
@@ -15,9 +15,13 @@ GENE_ANNOTATIONS: Dict[str, Dict[str, Any]] = {
             "T790M (1st/2nd-Gen Gatekeeper Mutation)",
             "L858R (Exon 21 Sensitizing Driver)",
             "Exon 19 In-Frame Deletion (ELREA)",
-            "G719X (Exon 18 Atypical Activation)"
+            "G719X (Exon 18 Atypical Activation)",
         ],
-        "pathways": ["RAS/RAF/MEK/ERK Cascade", "PI3K/AKT/mTOR Survival Axis", "STAT3 Signaling"]
+        "pathways": [
+            "RAS/RAF/MEK/ERK Cascade",
+            "PI3K/AKT/mTOR Survival Axis",
+            "STAT3 Signaling",
+        ],
     },
     "MET": {
         "symbol": "MET",
@@ -32,9 +36,13 @@ GENE_ANNOTATIONS: Dict[str, Dict[str, Any]] = {
             "MET Gene Amplification (Off-Target RTK Bypass)",
             "Exon 14 Splice Site Skipping (METex14)",
             "D1228N / Y1230C (Type I TKI Solvent Front Resistance)",
-            "L1195V (Kinase Activation Loop Mutation)"
+            "L1195V (Kinase Activation Loop Mutation)",
         ],
-        "pathways": ["ERBB3 Trans-Phosphorylation", "FAK Cell Motility Axis", "PI3K Parallel Survival"]
+        "pathways": [
+            "ERBB3 Trans-Phosphorylation",
+            "FAK Cell Motility Axis",
+            "PI3K Parallel Survival",
+        ],
     },
     "ERBB2": {
         "symbol": "ERBB2",
@@ -49,9 +57,13 @@ GENE_ANNOTATIONS: Dict[str, Dict[str, Any]] = {
             "HER2 Gene Amplification / Overexpression",
             "Exon 20 YVMA Insertion",
             "L755S (Kinase Domain Lapatinib Resistance)",
-            "S310F (Extracellular Domain Hotspot)"
+            "S310F (Extracellular Domain Hotspot)",
         ],
-        "pathways": ["HER2/HER3 Heterodimer Signaling", "PI3K/AKT Pathway", "MAPK Cascade"]
+        "pathways": [
+            "HER2/HER3 Heterodimer Signaling",
+            "PI3K/AKT Pathway",
+            "MAPK Cascade",
+        ],
     },
     "ALK": {
         "symbol": "ALK",
@@ -66,9 +78,9 @@ GENE_ANNOTATIONS: Dict[str, Dict[str, Any]] = {
             "EML4-ALK Translocation / Fusion Variant 1/3",
             "G1202R (Solvent Front Master Resistance)",
             "L1196M (Gatekeeper Mutation)",
-            "I1171N/T (Alectinib Resistance Variant)"
+            "I1171N/T (Alectinib Resistance Variant)",
         ],
-        "pathways": ["STAT3 Survival Pathway", "RAS/MAPK Axis", "PLCgamma Signaling"]
+        "pathways": ["STAT3 Survival Pathway", "RAS/MAPK Axis", "PLCgamma Signaling"],
     },
     "KRAS": {
         "symbol": "KRAS",
@@ -83,9 +95,13 @@ GENE_ANNOTATIONS: Dict[str, Dict[str, Any]] = {
             "G12C (Switch-II Covalent Target)",
             "G12D / G12V (Constitutive Active GTP-bound)",
             "Y96D (Sotorasib Switch-II Pocket Resistance)",
-            "Q61K / Q61R (Glutamine 61 Catalytic Loss)"
+            "Q61K / Q61R (Glutamine 61 Catalytic Loss)",
         ],
-        "pathways": ["RAF/MEK/ERK Signaling", "PI3K/PDK1/AKT Axis", "RAL-GEF Effector Cascade"]
+        "pathways": [
+            "RAF/MEK/ERK Signaling",
+            "PI3K/PDK1/AKT Axis",
+            "RAL-GEF Effector Cascade",
+        ],
     },
     "BRAF": {
         "symbol": "BRAF",
@@ -100,9 +116,13 @@ GENE_ANNOTATIONS: Dict[str, Dict[str, Any]] = {
             "V600E (Class 1 Monomeric Hyperactivation)",
             "V600K / V600R (Exon 15 Hotspots)",
             "BRAF Splice Variants / Homodimer Paradox",
-            "L597V / K601E (Class 2 Dimer Activation)"
+            "L597V / K601E (Class 2 Dimer Activation)",
         ],
-        "pathways": ["MEK1/2 (MAP2K1/2) Phosphorylation", "ERK1/2 Translocation", "Cyclin D1 Transcription"]
+        "pathways": [
+            "MEK1/2 (MAP2K1/2) Phosphorylation",
+            "ERK1/2 Translocation",
+            "Cyclin D1 Transcription",
+        ],
     },
     "PIK3CA": {
         "symbol": "PIK3CA",
@@ -116,9 +136,13 @@ GENE_ANNOTATIONS: Dict[str, Dict[str, Any]] = {
         "hotspots": [
             "H1047R (Exon 20 Kinase Domain Hotspot)",
             "E542K / E545K (Exon 9 Helical Domain)",
-            "C420R (C2 Domain Membrane Interaction)"
+            "C420R (C2 Domain Membrane Interaction)",
         ],
-        "pathways": ["PIP3 Production at Plasma Membrane", "PDK1 & AKT1 Activation", "mTORC1 Translation"]
+        "pathways": [
+            "PIP3 Production at Plasma Membrane",
+            "PDK1 & AKT1 Activation",
+            "mTORC1 Translation",
+        ],
     },
     "ESR1": {
         "symbol": "ESR1",
@@ -132,9 +156,13 @@ GENE_ANNOTATIONS: Dict[str, Dict[str, Any]] = {
         "hotspots": [
             "Y537S / Y537N (Ligand-Independent Activation)",
             "D538G (Exon 8 LBD Resistance Hotspot)",
-            "E380Q (Helical Domain Mutation)"
+            "E380Q (Helical Domain Mutation)",
         ],
-        "pathways": ["Estrogen Response Element (ERE) Genes", "Cyclin D1 & CDK4/6 Cell Cycle", "MYC Transcription"]
+        "pathways": [
+            "Estrogen Response Element (ERE) Genes",
+            "Cyclin D1 & CDK4/6 Cell Cycle",
+            "MYC Transcription",
+        ],
     },
     "ABL1": {
         "symbol": "ABL1",
@@ -149,9 +177,13 @@ GENE_ANNOTATIONS: Dict[str, Dict[str, Any]] = {
             "T315I (Gatekeeper Master Steric Clash)",
             "E255K / Y253F (P-Loop ATP Binding Hotspot)",
             "F317L (Dasatinib Resistance Mutation)",
-            "H396P (Activation Loop Mutation)"
+            "H396P (Activation Loop Mutation)",
         ],
-        "pathways": ["STAT5 Leukemogenic Signaling", "CRKL Adaptor Phosphorylation", "PI3K/AKT Survival Axis"]
+        "pathways": [
+            "STAT5 Leukemogenic Signaling",
+            "CRKL Adaptor Phosphorylation",
+            "PI3K/AKT Survival Axis",
+        ],
     },
     "CDK4": {
         "symbol": "CDK4",
@@ -165,9 +197,13 @@ GENE_ANNOTATIONS: Dict[str, Dict[str, Any]] = {
         "hotspots": [
             "CCND1 (Cyclin D1) Amplification",
             "RB1 Loss of Function (CDK4/6 Resistance)",
-            "FAT1 Loss (CDK4/6 Upregulation)"
+            "FAT1 Loss (CDK4/6 Upregulation)",
         ],
-        "pathways": ["Rb (Retinoblastoma) Phosphorylation", "E2F Transcription Release", "Cell Cycle Progression"]
+        "pathways": [
+            "Rb (Retinoblastoma) Phosphorylation",
+            "E2F Transcription Release",
+            "Cell Cycle Progression",
+        ],
     },
     "MAP2K1": {
         "symbol": "MAP2K1",
@@ -181,9 +217,13 @@ GENE_ANNOTATIONS: Dict[str, Dict[str, Any]] = {
         "hotspots": [
             "C121S (MEK1 Allosteric Inhibitor Resistance)",
             "P124L / K57E (Activating Helix Mutations)",
-            "E203K (Kinase Domain Activation)"
+            "E203K (Kinase Domain Activation)",
         ],
-        "pathways": ["ERK1/2 Dual Phosphorylation", "AP-1 Transcription Complex", "Cell Growth & Survival"]
+        "pathways": [
+            "ERK1/2 Dual Phosphorylation",
+            "AP-1 Transcription Complex",
+            "Cell Growth & Survival",
+        ],
     },
     "AKT1": {
         "symbol": "AKT1",
@@ -197,9 +237,13 @@ GENE_ANNOTATIONS: Dict[str, Dict[str, Any]] = {
         "hotspots": [
             "E17K (PH Domain Membrane Hyper-recruitment)",
             "L52R (Allosteric Binding Pocket Mutation)",
-            "p-Ser473 / p-Thr308 Hyper-phosphorylation"
+            "p-Ser473 / p-Thr308 Hyper-phosphorylation",
         ],
-        "pathways": ["mTORC1 / S6K Protein Synthesis", "FOXO Transcription Factor Inhibition", "BAD Antiapoptotic Inactivation"]
+        "pathways": [
+            "mTORC1 / S6K Protein Synthesis",
+            "FOXO Transcription Factor Inhibition",
+            "BAD Antiapoptotic Inactivation",
+        ],
     },
     "ROS1": {
         "symbol": "ROS1",
@@ -213,9 +257,13 @@ GENE_ANNOTATIONS: Dict[str, Dict[str, Any]] = {
         "hotspots": [
             "G2032R (Solvent Front Master Resistance)",
             "D2033N (Kinase Binding Pocket Resistance)",
-            "S1986Y/F (Gatekeeper Region Mutation)"
+            "S1986Y/F (Gatekeeper Region Mutation)",
         ],
-        "pathways": ["SHP2 / RAS Activation", "PI3K/AKT Pathway", "STAT3 Survival Cascade"]
+        "pathways": [
+            "SHP2 / RAS Activation",
+            "PI3K/AKT Pathway",
+            "STAT3 Survival Cascade",
+        ],
     },
     "RET": {
         "symbol": "RET",
@@ -230,9 +278,9 @@ GENE_ANNOTATIONS: Dict[str, Dict[str, Any]] = {
             "G810R/S (Solvent Front Resistance Variant)",
             "V804M / V804L (Gatekeeper Mutation)",
             "K703E (ATP Binding Pocket Mutation)",
-            "KCC6-RET / CCDC6-RET Translocations"
+            "KCC6-RET / CCDC6-RET Translocations",
         ],
-        "pathways": ["RAS/MAPK Axis", "PI3K/AKT Axis", "PLCgamma Pathway"]
+        "pathways": ["RAS/MAPK Axis", "PI3K/AKT Axis", "PLCgamma Pathway"],
     },
     "NTRK1": {
         "symbol": "NTRK1",
@@ -246,9 +294,13 @@ GENE_ANNOTATIONS: Dict[str, Dict[str, Any]] = {
         "hotspots": [
             "G595R (Solvent Front Larotrectinib Resistance)",
             "G667C (xDFG Motif Resistance)",
-            "F589L (Gatekeeper Mutation)"
+            "F589L (Gatekeeper Mutation)",
         ],
-        "pathways": ["TRK Kinase Fusion Signaling", "PLCgamma Pathway", "PI3K Survival Cascade"]
+        "pathways": [
+            "TRK Kinase Fusion Signaling",
+            "PLCgamma Pathway",
+            "PI3K Survival Cascade",
+        ],
     },
     "TP53": {
         "symbol": "TP53",
@@ -263,9 +315,13 @@ GENE_ANNOTATIONS: Dict[str, Dict[str, Any]] = {
             "R273H / R273C (DNA Binding Hotspot)",
             "R175H (Conformational Structural Loss)",
             "R248Q / R248W (Contact Hotspot Variant)",
-            "Y220C (Small Molecule Reactivation Pocket)"
+            "Y220C (Small Molecule Reactivation Pocket)",
         ],
-        "pathways": ["Cell Cycle Arrest (p21/CDKN1A)", "BAX/PUMA Pro-Apoptotic Axis", "DNA Repair Surveillance"]
+        "pathways": [
+            "Cell Cycle Arrest (p21/CDKN1A)",
+            "BAX/PUMA Pro-Apoptotic Axis",
+            "DNA Repair Surveillance",
+        ],
     },
     "PTEN": {
         "symbol": "PTEN",
@@ -279,9 +335,13 @@ GENE_ANNOTATIONS: Dict[str, Dict[str, Any]] = {
         "hotspots": [
             "Homozygous Genomic Deletion",
             "R130G / R130Q (Phosphatase Catalytic Domain)",
-            "C124S (Enzymatic Active Site Inactivation)"
+            "C124S (Enzymatic Active Site Inactivation)",
         ],
-        "pathways": ["PIP3 Dephosphorylation to PIP2", "Negative Regulation of AKT Signaling", "Cell Migration Control"]
+        "pathways": [
+            "PIP3 Dephosphorylation to PIP2",
+            "Negative Regulation of AKT Signaling",
+            "Cell Migration Control",
+        ],
     },
     "GRB2": {
         "symbol": "GRB2",
@@ -295,9 +355,13 @@ GENE_ANNOTATIONS: Dict[str, Dict[str, Any]] = {
         "hotspots": [
             "SH2 Domain Phosphotyrosine Binding Loop",
             "N-terminal SH3 Domain SOS1 Interaction",
-            "C-terminal SH3 Domain GAB1 Docking"
+            "C-terminal SH3 Domain GAB1 Docking",
         ],
-        "pathways": ["RTK-to-RAS Signal Coupling", "GAB1 Membrane Complex", "SOS1 Guanine Exchange"]
+        "pathways": [
+            "RTK-to-RAS Signal Coupling",
+            "GAB1 Membrane Complex",
+            "SOS1 Guanine Exchange",
+        ],
     },
     "SOS1": {
         "symbol": "SOS1",
@@ -311,33 +375,34 @@ GENE_ANNOTATIONS: Dict[str, Dict[str, Any]] = {
         "hotspots": [
             "GDP-to-GTP Nucleotide Exchange Pocket",
             "Allosteric RAS Binding Site",
-            "Nozonanib / BI-3406 Inhibitor Binding Site"
+            "Nozonanib / BI-3406 Inhibitor Binding Site",
         ],
-        "pathways": ["KRAS GDP-to-GTP Exchange", "RAC1 Signaling Axis", "RAS-GTP Activation"]
-    }
+        "pathways": [
+            "KRAS GDP-to-GTP Exchange",
+            "RAC1 Signaling Axis",
+            "RAS-GTP Activation",
+        ],
+    },
 }
 
 
-def get_gene_annotation(symbol: str) -> Dict[str, Any]:
-    """Retrieve canonical multi-omics annotation metadata for a gene symbol."""
+def get_gene_annotation(symbol: str) -> dict[str, Any]:
+    """Retrieve curated display metadata without fabricating unknown identifiers."""
     sym_clean = (symbol or "").strip().upper()
     if sym_clean in GENE_ANNOTATIONS:
-        return GENE_ANNOTATIONS[sym_clean]
+        return {**GENE_ANNOTATIONS[sym_clean], "source": "curated project metadata"}
 
-    # Dynamic fallback for unlisted genes
+    # Unknown values remain unknown. Invented IDs and clinical claims are unsafe.
     return {
         "symbol": sym_clean,
-        "name": f"{sym_clean} Human Protein Target",
-        "locus": "Genomic Locus",
-        "ensembl_id": f"ENSG0000_{sym_clean}",
-        "uniprot_id": f"P_{sym_clean}",
-        "pdb_id": "3D_MODEL",
-        "druggability": "Tier 2: Targeted Clinical Candidate",
-        "role": "Signal Transduction Pathway Interactor",
-        "hotspots": [
-            f"Oncogenic Amplification / Hyperactivation in {sym_clean}",
-            f"Kinase Domain Variants in {sym_clean}",
-            f"Acquired Bypass Resistance Locus"
-        ],
-        "pathways": ["Signal Transduction Cascade", "Oncogenic Survival Network"]
+        "name": None,
+        "locus": None,
+        "ensembl_id": None,
+        "uniprot_id": None,
+        "pdb_id": None,
+        "druggability": "Unknown",
+        "role": None,
+        "hotspots": [],
+        "pathways": [],
+        "source": None,
     }

@@ -1,137 +1,191 @@
 from unittest.mock import AsyncMock, patch
+
 import pytest
 from fastapi.testclient import TestClient
+
 from src.main import app
 from src.schemas.models import IDMappingResult, ResistanceRequest
 
-client = TestClient(app)
+
+@pytest.fixture(scope="module")
+def client():
+    with TestClient(app) as test_client:
+        yield test_client
 
 
-def test_health_endpoint():
-    """Verify GET /health returns status ok and cache metrics."""
+def mapping(symbol: str) -> IDMappingResult:
+    values = {
+        "EGFR": ("ENSG00000146648", "P00533", "CHEMBL203"),
+        "MET": ("ENSG00000105976", "P08581", "CHEMBL3714"),
+    }
+    ensembl, uniprot, chembl = values[symbol]
+    return IDMappingResult(
+        original_input=symbol,
+        canonical_symbol=symbol,
+        ensembl_id=ensembl,
+        uniprot_id=uniprot,
+        chembl_target_id=chembl,
+    )
+
+
+def candidate(target: str = "MET") -> dict:
+    return {
+        "secondary_drug": "CAPMATINIB",
+        "secondary_target": target,
+        "mechanism_of_action": "MET inhibitor",
+        "clinical_phase": 4,
+        "clinical_status": "active_or_completed",
+        "is_withdrawn": False,
+        "indication_match": True,
+        "combination_evidence": True,
+        "median_pchembl": 8.2,
+        "activity_measurements": 3,
+        "biological_rationale": "Evidence-linked target inhibition.",
+        "evidence": [
+            {
+                "source": "AACT",
+                "record_id": "NCT1",
+                "url": "https://clinicaltrials.gov/study/NCT1",
+            }
+        ],
+    }
+
+
+def test_health_is_truthful_and_has_security_headers(client):
     response = client.get("/health")
     assert response.status_code == 200
-    data = response.json()
-    assert data["status"] == "ok"
-    assert "cache_size_bytes" in data
+    assert response.json()["upstream_status"] == "not_checked"
+    assert response.json()["version"] == "0.2.0"
+    assert response.headers["x-content-type-options"] == "nosniff"
+    assert response.headers["x-frame-options"] == "DENY"
 
 
-def test_input_sanitization_validator():
-    """Verify ResistanceRequest validator strips and uppercases target symbols."""
-    req = ResistanceRequest(
-        primary_drug="Osimertinib",
-        primary_target="  egfr  ",
-        resistance_marker="  met  ",
+def test_input_validation_and_normalization(client):
+    request = ResistanceRequest(
+        primary_drug="  Osimertinib ",
+        primary_target=" egfr ",
+        resistance_marker=" met ",
+        cancer_type=" Non-Small   Cell Lung Cancer ",
     )
-    assert req.primary_target == "EGFR"
-    assert req.resistance_marker == "MET"
+    assert request.primary_target == "EGFR"
+    assert request.resistance_marker == "MET"
+    assert request.primary_drug == "Osimertinib"
+    assert request.cancer_type == "Non-Small Cell Lung Cancer"
+    assert (
+        client.post(
+            "/api/v1/analyze-resistance",
+            json={"primary_drug": "", "primary_target": "", "resistance_marker": ""},
+        ).status_code
+        == 422
+    )
 
 
+@patch("src.main._fetch_candidates_for_target", new_callable=AsyncMock)
 @patch("src.main.IDMapper")
-@patch("src.main.ChEMBLClient")
-def test_on_target_mutation_branching(mock_chembl_cls, mock_id_mapper_cls):
-    """Verify POST /api/v1/analyze-resistance executes On-Target Mutation branch when T_primary == T_resistance."""
-    mock_id_mapper = mock_id_mapper_cls.return_value
-    mock_id_mapper.map_identifier = AsyncMock(
-        side_effect=lambda sym: IDMappingResult(
-            original_input=sym,
-            canonical_symbol="EGFR",
-            ensembl_id="ENSG00000146648",
-            uniprot_id="P00533",
-            chembl_target_id="CHEMBL203",
-        )
-    )
-
-    mock_chembl = mock_chembl_cls.return_value
-    mock_chembl.get_clinical_molecules = AsyncMock(
-        return_value=[
-            {"pref_name": "Lazertinib", "molecule_chembl_id": "CHEMBL4298782", "max_phase": 4}
-        ]
-    )
-
-    payload = {
-        "primary_drug": "Osimertinib",
-        "primary_target": "EGFR",
-        "resistance_marker": "EGFR",
-    }
-    response = client.post("/api/v1/analyze-resistance", json=payload)
-    assert response.status_code == 200
-    data = response.json()
-
-    assert data["primary_target_canonical"] == "EGFR"
-    assert data["resistance_marker_canonical"] == "EGFR"
-    assert data["resistance_type"] == "On-Target Mutation"
-    assert data["pathway_nodes_count"] == 1
-    assert data["shortest_path_distance"] == 0.0
-    assert len(data["ranked_combinations"]) > 0
-    assert data["ranked_combinations"][0]["secondary_drug"] == "LAZERTINIB"
-
-
-@patch("src.main.IDMapper")
-@patch("src.main.StringDBClient")
-@patch("src.main.OpenTargetsClient")
-@patch("src.main.ChEMBLClient")
-def test_off_target_bypass_branching(
-    mock_chembl_cls, mock_ot_cls, mock_string_cls, mock_id_mapper_cls
+def test_on_target_branch_is_honest_and_never_fabricates_candidate(
+    mapper_cls, fetch_candidates, client
 ):
-    """Verify POST /api/v1/analyze-resistance executes Off-Target Bypass branch when T_primary != T_resistance."""
-    mock_id_mapper = mock_id_mapper_cls.return_value
+    mapper_cls.return_value.map_identifier = AsyncMock(return_value=mapping("EGFR"))
+    fetch_candidates.return_value = (
+        [{**candidate("EGFR"), "secondary_drug": "LAZERTINIB"}],
+        [],
+    )
+    response = client.post(
+        "/api/v1/analyze-resistance",
+        json={
+            "primary_drug": "Osimertinib",
+            "primary_target": "EGFR",
+            "resistance_marker": "EGFR",
+            "resistance_alteration": "C797S",
+        },
+    )
+    assert response.status_code == 200
+    report = response.json()
+    assert report["resistance_type"] == "On-Target Alteration"
+    assert report["ranked_combinations"][0]["combination_priority_score"] < 1
+    assert "variant-specific" in " ".join(
+        report["ranked_combinations"][0]["limitations"]
+    )
+    assert report["score_label"].startswith("Heuristic")
 
-    async def mock_map(sym):
-        if "EGFR" in sym.upper():
-            return IDMappingResult(
-                original_input=sym,
-                canonical_symbol="EGFR",
-                ensembl_id="ENSG00000146648",
-                uniprot_id="P00533",
-                chembl_target_id="CHEMBL203",
-            )
-        else:
-            return IDMappingResult(
-                original_input=sym,
-                canonical_symbol="MET",
-                ensembl_id="ENSG00000105976",
-                uniprot_id="P08581",
-                chembl_target_id="CHEMBL3714",
-            )
 
-    mock_id_mapper.map_identifier = AsyncMock(side_effect=mock_map)
+@patch("src.main._fetch_candidates_for_target", new_callable=AsyncMock)
+@patch("src.main.StringDBClient")
+@patch("src.main.IDMapper")
+def test_off_target_branch_uses_relevant_physical_component(
+    mapper_cls, string_cls, fetch_candidates, client
+):
+    async def map_symbol(symbol):
+        return mapping(symbol.upper())
 
-    mock_string = mock_string_cls.return_value
-    mock_string.get_network = AsyncMock(
+    mapper_cls.return_value.map_identifier = AsyncMock(side_effect=map_symbol)
+    string_cls.return_value.get_network = AsyncMock(
         return_value=[
             {"preferredName_A": "EGFR", "preferredName_B": "MET", "score": 900}
         ]
     )
-
-    mock_ot = mock_ot_cls.return_value
-    mock_ot.get_known_drugs = AsyncMock(
-        return_value=[
-            {
-                "prefName": "Capmatinib",
-                "drugId": "CHEMBL3545380",
-                "phase": 4,
-                "mechanismOfAction": "MET Kinase Inhibitor",
-                "targetSymbol": "MET",
-            }
-        ]
+    fetch_candidates.return_value = ([candidate()], [])
+    response = client.post(
+        "/api/v1/analyze-resistance",
+        json={
+            "primary_drug": "Osimertinib",
+            "primary_target": "EGFR",
+            "resistance_marker": "MET",
+            "cancer_type": "Non-Small Cell Lung Cancer",
+        },
+    )
+    assert response.status_code == 200
+    report = response.json()
+    assert report["pathway_nodes_count"] == 2
+    assert report["shortest_path_distance"] == pytest.approx(0.105)
+    assert report["primary_drug"] == "Osimertinib"
+    assert report["ranked_combinations"][0]["secondary_drug"] == "CAPMATINIB"
+    assert any(item.get("network_type") == "physical" for item in report["provenance"])
+    string_cls.return_value.get_network.assert_awaited_once_with(
+        "EGFR", "MET", network_type="physical"
     )
 
-    mock_chembl = mock_chembl_cls.return_value
-    mock_chembl.get_target_activities = AsyncMock(return_value={"CAPMATINIB": 8.5})
 
+@patch("src.main.StringDBClient")
+@patch("src.main.IDMapper")
+def test_disconnected_requested_targets_return_clear_400(
+    mapper_cls, string_cls, client
+):
+    async def map_symbol(symbol):
+        return mapping(symbol.upper())
+
+    mapper_cls.return_value.map_identifier = AsyncMock(side_effect=map_symbol)
+    string_cls.return_value.get_network = AsyncMock(
+        return_value=[
+            {"preferredName_A": "EGFR", "preferredName_B": "GRB2", "score": 900},
+            {"preferredName_A": "MET", "preferredName_B": "GAB1", "score": 900},
+        ]
+    )
+    response = client.post(
+        "/api/v1/analyze-resistance",
+        json={
+            "primary_drug": "Osimertinib",
+            "primary_target": "EGFR",
+            "resistance_marker": "MET",
+        },
+    )
+    assert response.status_code == 400
+    assert "not connected" in response.json()["detail"]
+
+
+@patch("src.main.IDMapper")
+def test_invalid_symbol_is_422_and_upstream_failure_is_502(mapper_cls, client):
+    mapper_cls.return_value.map_identifier = AsyncMock(
+        side_effect=ValueError("not found")
+    )
     payload = {
-        "primary_drug": "Osimertinib",
-        "primary_target": "EGFR",
+        "primary_drug": "Drug",
+        "primary_target": "BAD",
         "resistance_marker": "MET",
     }
-    response = client.post("/api/v1/analyze-resistance", json=payload)
-    assert response.status_code == 200
-    data = response.json()
+    assert client.post("/api/v1/analyze-resistance", json=payload).status_code == 422
 
-    assert data["primary_target_canonical"] == "EGFR"
-    assert data["resistance_marker_canonical"] == "MET"
-    assert data["resistance_type"] == "Off-Target Bypass"
-    assert data["pathway_nodes_count"] == 2
-    assert len(data["ranked_combinations"]) > 0
-    assert data["ranked_combinations"][0]["secondary_drug"] == "CAPMATINIB"
+    mapper_cls.return_value.map_identifier = AsyncMock(
+        side_effect=RuntimeError("offline")
+    )
+    assert client.post("/api/v1/analyze-resistance", json=payload).status_code == 502

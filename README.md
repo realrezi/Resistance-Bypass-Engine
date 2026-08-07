@@ -1,147 +1,163 @@
 # Targeted Oncology Resistance Bypass Engine
 
-**A Computational Graph Engine for Modeling Acquired Drug Resistance & Resolving Dual-Target Combination Therapies in Human Malignancies**
+An open-source, research-use-only service for exploring acquired resistance networks and prioritizing evidence-linked target–drug pairs for expert review.
 
-[![Live Demo](https://img.shields.io/badge/🌐_Live_Workstation-resistance--bypass--engine.vercel.app-0080FF?style=for-the-badge)](https://resistance-bypass-engine.vercel.app/)
-[![GitHub Repo](https://img.shields.io/badge/GitHub-realrezi%2FResistance--Bypass--Engine-181717?style=for-the-badge&logo=github)](https://github.com/realrezi/Resistance-Bypass-Engine)
-[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge)](LICENSE)
-[![Python 3.11+](https://img.shields.io/badge/Python-3.11%2B-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
-[![FastAPI](https://img.shields.io/badge/FastAPI-0.110-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
+[![Live Demo](https://img.shields.io/badge/Live_Workstation-resistance--bypass--engine.vercel.app-0080FF)](https://resistance-bypass-engine.vercel.app/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![Python 3.11+](https://img.shields.io/badge/Python-3.11%2B-3776AB)](https://www.python.org/)
 
-**Author:** [Ahmadreza Shirdel](https://github.com/realrezi)
+> **Important:** This software does not measure experimental drug synergy and must not be used to select treatment for a patient. Its output is hypothesis-generating and requires independent biological, pharmacological, and clinical review.
 
----
+## What version 0.2 does
 
-## 🎯 Overview
+Given a primary drug/target, resistance marker, cancer type, and optional alteration, the engine:
 
-When patients with advanced solid tumors or hematologic malignancies undergo treatment with targeted small-molecule inhibitors (e.g., Osimertinib, Alectinib, Sotorasib, Dabrafenib), cancer cells rapidly evolve secondary resistance. These resistance mechanisms broadly fall into two biological categories:
+1. Resolves canonical HGNC, Ensembl, UniProt, and ChEMBL target identifiers.
+2. Retrieves a human **physical** interaction neighborhood from STRING.
+3. Requires the primary and resistance targets to share a connected component.
+4. Computes deterministic hub-penalized topology and weighted shortest paths.
+5. Selects the resistance marker plus high-priority intermediary network targets.
+6. Retrieves target-linked clinical candidates, disease labels, trial reports, status, and warnings from Open Targets.
+7. Excludes the primary drug, withdrawn/stopped records, and phase-1-only candidates.
+8. Follows ChEMBL pagination up to a documented 50,000-record safety cap and filters human binding activities (IC50, Ki, and Kd).
+9. Returns a decomposed **Heuristic Combination Priority Score**, evidence links, limitations, warnings, and provenance.
 
-1. **On-Target Gatekeeper & ATP Pocket Mutations:** Mutations within the drug-binding domain (e.g., *EGFR* C797S, *ABL1* T315I, *ALK* G1202R) that disrupt drug binding.
-2. **Off-Target RTK Bypass Hyperactivation:** Alternative receptor tyrosine kinase signaling pathways (e.g., *MET* gene amplification, *HER2* overexpression, *PIK3CA* mutations) that bypass frontline inhibition and sustain cell survival.
+The engine never invents a fallback drug, identifier, phase, PDB structure, or clinical claim when evidence is missing.
 
-The **Targeted Oncology Resistance Bypass Engine** models these complex signaling networks using `NetworkX`, extracts Largest Connected Components ($G_{\text{LCC}}$), computes **Hub-Penalized Bottleneck Centrality**, and ranks active, non-withdrawn clinical combination therapies.
+## What it does not do
 
----
+- It does not calculate Bliss, Loewe, HSA, ZIP, or another experimental synergy measure.
+- A target-linked drug is not automatically a validated combination with the primary drug.
+- STRING physical associations are undirected and are not a signed, tissue-specific signaling model.
+- Clinical stage can be global rather than approval for the requested indication.
+- On-target results are not variant-sensitive unless a future curated sensitivity layer supplies that evidence.
+- Safety, dosing, pharmacokinetic compatibility, blood–brain barrier exposure, and patient-specific factors are not modeled.
 
-## 🧬 Biological Network & Signaling Topology
+These limitations are also returned in API responses instead of being hidden by the UI.
 
-```mermaid
-flowchart TD
-    subgraph Primary_Inhibition ["Frontline Target Blockade"]
-        A["Primary Inhibitor (e.g., Osimertinib)"] -->|Blocks| B["Primary RTK (EGFR L858R)"]
-    end
+## Priority model
 
-    subgraph Resistance_Evasion ["Acquired Resistance Evasion"]
-        B -.->|On-Target Gatekeeper| C["Secondary Mutation (EGFR C797S)"]
-        B -.->|Off-Target RTK Bypass| D["Amplified Bypass RTK (MET / ERBB2)"]
-    end
+For candidate drug \(d\) targeting node \(v\), the service reports four bounded components:
 
-    subgraph Signal_Flux ["Redundant Survival Cascade"]
-        D -->|Trans-Phosphorylates| E["Adaptor Node (GRB2 / GAB1)"]
-        E -->|Activates| F["Lipid Kinase (PIK3CA / PDK1)"]
-        F -->|Phosphorylates| G["Central Survival Engine (AKT1 / mTORC1)"]
-    end
+- **Topology:** a stable transform of hub-penalized composite centrality.
+- **Proximity:** \(e^{-distance(primary,v)}\) over confidence-derived edge costs.
+- **Pharmacology:** a logistic transform of median filtered pChEMBL, when available.
+- **Clinical evidence:** phase, indication match, pair-level report mention, and report status.
 
-    subgraph Combination_Solution ["Dual-Target Bypass Solution"]
-        H["Candidate Combination (Osimertinib + Capmatinib)"] ==>|Dual Inhibition| B & D
-        H ==>|Collapses Signal Flux| G
-    end
+The default priority is:
 
-    style A fill:#0284c7,stroke:#0284c7,color:#fff
-    style D fill:#e11d48,stroke:#e11d48,color:#fff
-    style G fill:#059669,stroke:#059669,color:#fff
-    style H fill:#7c3aed,stroke:#7c3aed,color:#fff
+\[
+P(d,v)=0.30T(v)+0.25D(v)+0.20A(d,v)+0.25E(d,v)
+\]
+
+If pharmacology is unavailable, remaining weights are renormalized. Components use fixed transforms: adding or removing another candidate does not change an existing candidate's score. A missing graph target is rejected rather than assigned a default distance.
+
+This is deliberately named a priority score—not a synergy score. The legacy `synergy_score` JSON field is retained temporarily for API compatibility and contains the same heuristic value.
+
+## API
+
+### Request
+
+```json
+POST /api/v1/analyze-resistance
+{
+  "primary_drug": "Osimertinib",
+  "primary_target": "EGFR",
+  "primary_alteration": "L858R",
+  "resistance_marker": "MET",
+  "resistance_alteration": "amplification",
+  "resistance_alteration_type": "amplification",
+  "cancer_type": "Non-Small Cell Lung Cancer"
+}
 ```
 
----
+### Response highlights
 
-## 📐 Mathematical Formulation
+- Canonical identifiers and alteration context
+- Relevant physical-network nodes and edges
+- Primary-to-resistance weighted distance
+- Ranked phase-2+ target–drug research candidates
+- Score components rather than only one opaque number
+- Indication and pair-evidence flags
+- Trial/ChEMBL record links
+- Candidate-specific limitations
+- Global warnings and source provenance
 
-### 1. Graph Topology & Connected Component Extraction
+Interactive OpenAPI documentation is available at `/docs`.
 
-Given a target gene $s$ and secondary resistance marker $t$, the system queries the STRING-DB physical interaction network ($w \ge 0.400$) to construct an undirected graph $G = (V, E, W)$. The engine isolates the Largest Connected Component ($G_{\text{LCC}}$):
+## Architecture
 
-$$G_{\text{LCC}} = \arg\max_{C \subseteq G} |V(C)| \quad \text{subject to } |V(G_{\text{LCC}})| \ge 2$$
+```text
+FastAPI request
+  ├─ canonical ID mapping (HGNC → UniProt → ChEMBL)
+  ├─ STRING physical-network retrieval
+  ├─ NetworkX component validation and target discovery (worker thread)
+  ├─ concurrent Open Targets + ChEMBL evidence retrieval
+  ├─ NetworkX scoring and serialization (worker thread)
+  └─ evidence-rich Pydantic response
+```
 
----
+Network calls use a shared pooled `httpx.AsyncClient`, a global concurrency limit of five, selective exponential backoff with jitter, a seven-day JSON-only disk cache, and identifying request headers. Graph computation is kept outside the event loop.
 
-### 2. Hub-Penalized Bottleneck Centrality
-
-To prevent non-specific promiscuous super-hubs (e.g., Ubiquitin, P53) from skewing network calculations, raw betweenness centrality $C_B(v)$ is adjusted using a degree logarithmic penalty:
-
-$$C_{\text{target}}(v) = \frac{C_B(v) + 0.5 \times \frac{\text{degree}(v)}{\Delta(G_{\text{LCC}})}}{\log_2(\text{degree}(v) + 2)}$$
-
-where $\Delta(G_{\text{LCC}}) = \max_{u \in V} \text{degree}(u)$ denotes the maximum node degree in the connected component.
-
----
-
-### 3. Combination Synergy Score ($S$)
-
-Combination candidate therapies targeting secondary node $v$ are evaluated using a multi-objective scoring formula:
-
-$$\text{Synergy Score } (S) = \alpha \cdot C_{\text{norm}}(v) + \beta \cdot (1.0 - d_{\text{norm}}(s, v)) + \gamma \cdot \text{Aff}_{\text{norm}}(v)$$
-
-- $\alpha = 0.40, \beta = 0.30, \gamma = 0.30$ (when binding affinity $p\text{ChEMBL}$ is available)
-- $\alpha = 0.55, \beta = 0.45, \gamma = 0.00$ (when binding affinity is pending)
-
----
-
-## 📊 Prevalent Clinical Resistance Matrix
-
-| Tumor Indication | Primary Driver | Frontline Agent | Secondary Bypass Marker | Literature Prevalence | Mechanism of Action |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| **NSCLC (Lung)** | `EGFR L858R` | Osimertinib | `MET Amplification` | **15–20% Acquired** | Off-Target RTK Bypass via ERBB3/PI3K |
-| **NSCLC (Lung)** | `EGFR L858R` | Osimertinib | `EGFR C797S` | **7–10% Gatekeeper** | On-Target Covalent Binding Disruption |
-| **NSCLC (Lung)** | `EML4-ALK` | Alectinib | `MET Bypass` | **8–12% Bypass** | Parallel RTK Activation in ALK+ NSCLC |
-| **HER2+ Breast** | `ERBB2 / HER2` | Trastuzumab | `MET Amplification` | **10–15% RTK Bypass** | Monoclonal Antibody Bypass Evasion |
-| **HR+ Breast** | `ESR1` | Fulvestrant | `CDK4 / Cyclin D1` | **25–40% Post-Aromatase Inhibitors (AI)** | Endocrine Escape post-Aromatase Inhibitor failure via Cell Cycle Activation |
-| **Colorectal (CRC)** | `KRAS G12C` | Sotorasib | `EGFR Feedback` | **70–85% Feedback** | Rapid RTK Feedback Reactivation |
-| **Colorectal (CRC)** | `BRAF V600E` | Encorafenib | `EGFR Feedback` | **75–85% Feedback** | Monotherapy BRAF Escape Loop |
-| **Melanoma** | `BRAF V600E` | Dabrafenib | `MAP2K1 / MEK1` | **35–45% Acquired** | MAPK Cascade Re-activation |
-| **CML / AML** | `BCR-ABL1` | Imatinib | `ABL1 T315I` | **15–20% Gatekeeper** | Gatekeeper Steric Binding Loss |
-| **Prostate (mCRPC)** | `AR` | Enzalutamide | `PIK3CA / PTEN` | **40–50% PTEN/PI3K** | Reciprocal AR-PI3K Feedback Crosstalk |
-| **Ovarian / GYN** | `PIK3CA` | Alpelisib | `KRAS` | **15–25% Co-mutation** | Parallel RAS/MAPK Activation |
-| **Glioma (GBM)** | `EGFRvIII` | Gefitinib | `MET` | **10–15% Redundancy** | Co-activation of Multiple RTKs |
-| **Thyroid** | `RET Fusion` | Selpercatinib | `MET` | **10–15% Acquired** | MET Bypass emerging after RET TKI |
-
----
-
-## 💻 Tech Stack & Architecture
-
-- **Backend Framework:** Python 3.11+, FastAPI, Uvicorn, Pydantic v2
-- **Graph Computations:** NetworkX, SciPy, NumPy
-- **Network I/O & Concurrency:** `asyncio.Semaphore(5)`, `httpx`, `tenacity` exponential backoff
-- **Caching & Persistence:** `diskcache` (7-day TTL, 1GB storage limit)
-- **Frontend Workstation:** Vanilla CSS (Glassmorphism), Cytoscape.js, 3Dmol.js (Macromolecular PDB viewer)
-
----
-
-## 🛠️ Installation & Local Setup
+## Installation
 
 ```bash
-# 1. Clone Repository
 git clone https://github.com/realrezi/Resistance-Bypass-Engine.git
 cd Resistance-Bypass-Engine
 
-# 2. Initialize Environment via uv
 uv venv
 source .venv/bin/activate
+uv sync --extra dev
 
-# 3. Install Dependencies
-uv pip install -e .
-
-# 4. Run Test Suite
-uv run pytest -v
-
-# 5. Launch Clinical Workstation
+uv run pytest --cov=src
 uv run uvicorn src.main:app --reload --port 8000
 ```
 
----
+Optional environment variables:
 
-## 📄 License & Attribution
+```bash
+export CONTACT_EMAIL="maintainer@example.org"
+export ALLOWED_ORIGINS="http://localhost:8000,https://your-domain.example"
+export CACHE_DIR="/tmp/bypass_engine_cache"
+```
 
-Distributed under the **MIT License**. See [`LICENSE`](LICENSE) for details.
+## Verification strategy
 
-**Author:** [Ahmadreza Shirdel](https://github.com/realrezi)  
-**Repository:** [https://github.com/realrezi/Resistance-Bypass-Engine](https://github.com/realrezi/Resistance-Bypass-Engine)
+The deterministic suite covers:
+
+- canonicalization and alias handling;
+- physical-network request parameters;
+- self-loop, duplicate-edge, and technical-hub handling;
+- connected-component requirements;
+- deterministic target discovery;
+- stable score transforms and missing-evidence behavior;
+- ChEMBL bounded pagination and aggregation;
+- Open Targets disease, trial, status, and warning parsing;
+- API branching, error mapping, security headers, and absence of fabricated fallbacks.
+
+Live contract smoke tests should be run separately because upstream schemas and availability can change.
+
+## Data sources
+
+- [HGNC REST API](https://www.genenames.org/help/rest/)
+- [UniProt REST API](https://www.uniprot.org/help/api)
+- [STRING API](https://string-db.org/help/api/)
+- [Open Targets GraphQL API](https://platform-docs.opentargets.org/data-access/graphql-api)
+- [ChEMBL Data Web Services](https://chembl.gitbook.io/chembl-interface-documentation/web-services/chembl-data-web-services)
+
+Users are responsible for reviewing source-specific licensing, attribution, and acceptable-use requirements before redistribution or commercial use.
+
+## Roadmap toward scientific validation
+
+- Add signed, directed, tissue-specific pathway evidence.
+- Add structured HGVS/variant normalization and variant-specific sensitivity evidence.
+- Add true pair-level trial-arm and combination-response datasets.
+- Add toxicity, essentiality, exposure, and pharmacokinetic compatibility.
+- Publish a versioned positive/negative benchmark and temporal validation protocol.
+- Calibrate or replace the heuristic score using held-out experimental evidence.
+
+## License
+
+MIT. See [LICENSE](LICENSE).
+
+Author: [Ahmadreza Shirdel](https://github.com/realrezi)

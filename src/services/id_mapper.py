@@ -1,4 +1,5 @@
-from typing import Optional
+from typing import Any
+
 from src.clients.base import BaseHTTPClient
 from src.schemas.models import IDMappingResult
 
@@ -20,7 +21,22 @@ class IDMapper(BaseHTTPClient):
             search_data = await self.get_json(search_url, headers=headers)
             search_docs = search_data.get("response", {}).get("docs", [])
             if search_docs:
-                canonical = search_docs[0].get("symbol", "").upper()
+                clean_symbol = symbol.upper()
+                exact_docs = [
+                    doc
+                    for doc in search_docs
+                    if clean_symbol
+                    in {
+                        str(doc.get("symbol") or "").upper(),
+                        *{str(item).upper() for item in doc.get("alias_symbol", [])},
+                        *{str(item).upper() for item in doc.get("prev_symbol", [])},
+                    }
+                ]
+                canonical = (
+                    (exact_docs[0] if exact_docs else search_docs[0])
+                    .get("symbol", "")
+                    .upper()
+                )
                 if canonical:
                     # Fetch official canonical document for the resolved symbol
                     fetch_url = f"https://rest.genenames.org/fetch/symbol/{canonical}"
@@ -38,28 +54,33 @@ class IDMapper(BaseHTTPClient):
 
         return canonical_symbol, ensembl_id
 
-
     async def resolve_uniprot(self, canonical_symbol: str) -> str:
         """Resolve UniProt primary accession for human gene symbol."""
         url = "https://rest.uniprot.org/uniprotkb/search"
-        params = {
-            "query": f"gene_exact:{canonical_symbol} AND organism_id:9606",
+        params: dict[str, Any] = {
+            "query": (
+                f"gene_exact:{canonical_symbol} AND organism_id:9606 AND reviewed:true"
+            ),
             "format": "json",
+            "fields": "accession,gene_names,reviewed",
+            "size": 5,
         }
         data = await self.get_json(url, params=params)
         results = data.get("results", [])
         if not results:
             # Fallback search without gene_exact constraint
-            params["query"] = f"gene:{canonical_symbol} AND organism_id:9606"
+            params["query"] = f"gene_exact:{canonical_symbol} AND organism_id:9606"
             data = await self.get_json(url, params=params)
             results = data.get("results", [])
 
         if not results:
-            raise ValueError(f"UniProt ID not found for gene symbol '{canonical_symbol}'.")
+            raise ValueError(
+                f"UniProt ID not found for gene symbol '{canonical_symbol}'."
+            )
 
         return results[0]["primaryAccession"]
 
-    async def resolve_chembl_target(self, uniprot_id: str) -> Optional[str]:
+    async def resolve_chembl_target(self, uniprot_id: str) -> str | None:
         """Resolve ChEMBL target ID strictly filtered for SINGLE PROTEIN targets."""
         url = "https://www.ebi.ac.uk/chembl/api/data/target.json"
         params = {"target_components__accession": uniprot_id}
@@ -68,7 +89,10 @@ class IDMapper(BaseHTTPClient):
 
         # Strict filter for target_type == 'SINGLE PROTEIN' to prevent target multiplicity bugs
         single_protein_targets = [
-            t for t in targets if t.get("target_type") == "SINGLE PROTEIN"
+            t
+            for t in targets
+            if t.get("target_type") == "SINGLE PROTEIN"
+            and str(t.get("organism") or "Homo sapiens").lower() == "homo sapiens"
         ]
 
         if single_protein_targets:

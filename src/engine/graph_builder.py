@@ -1,20 +1,23 @@
-from typing import Any, Dict, List, Set
+from typing import Any
+
 import networkx as nx
 
-HUB_EXCLUSION_SET: Set[str] = {"TP53", "UBC", "UBB", "RPS27A"}
+# Ubiquitin/ribosomal pseudo-hubs are excluded. TP53 is deliberately retained:
+# it can be biologically relevant and topology alone should not erase it.
+HUB_EXCLUSION_SET: set[str] = {"UBC", "UBB", "RPS27A"}
 
 
-def build_signaling_graph(string_interactions: List[Dict[str, Any]]) -> nx.Graph:
+def build_signaling_graph(string_interactions: list[dict[str, Any]]) -> nx.Graph:
     """Build a weighted, undirected NetworkX graph from STRING-DB interactor payloads.
 
-    Excludes master regulator hubs (TP53, UBC, UBB, RPS27A), calculates Dijkstra weights,
+    Excludes ubiquitous technical hubs, calculates Dijkstra weights,
     strips homodimer self-loops, and retains the highest-confidence edge when duplicates exist.
     """
     G = nx.Graph()
 
     for interaction in string_interactions:
-        node_a = interaction.get("preferredName_A") or interaction.get("stringId_A")
-        node_b = interaction.get("preferredName_B") or interaction.get("stringId_B")
+        node_a = interaction.get("preferredName_A")
+        node_b = interaction.get("preferredName_B")
 
         if not node_a or not node_b:
             continue
@@ -26,19 +29,21 @@ def build_signaling_graph(string_interactions: List[Dict[str, Any]]) -> nx.Graph
         if node_a == node_b:
             continue
 
-        # Hub Exclusion List: Drop TP53, UBC, UBB, RPS27A
+        # Drop only ubiquitous technical hubs, not cancer-relevant regulators.
         if node_a in HUB_EXCLUSION_SET or node_b in HUB_EXCLUSION_SET:
             continue
 
         # Extract confidence score
         raw_score = interaction.get("score")
         if raw_score is None:
-            raw_score = interaction.get("combined_score", 400)
+            raw_score = interaction.get("combined_score")
+        if raw_score is None:
+            continue
 
         try:
             score_val = float(raw_score)
         except (ValueError, TypeError):
-            score_val = 400.0
+            continue
 
         # Score normalization
         score_norm = score_val if score_val <= 1.0 else score_val / 1000.0
@@ -53,8 +58,15 @@ def build_signaling_graph(string_interactions: List[Dict[str, Any]]) -> nx.Graph
             if weight < existing_weight:
                 G[node_a][node_b]["weight"] = weight
                 G[node_a][node_b]["score"] = score_norm
+                G[node_a][node_b]["source"] = "STRING physical network"
         else:
-            G.add_edge(node_a, node_b, weight=weight, score=score_norm)
+            G.add_edge(
+                node_a,
+                node_b,
+                weight=weight,
+                score=score_norm,
+                source="STRING physical network",
+            )
 
     # CRITICAL TOPOLOGY GUARD: Strip any remaining self-loops
     G.remove_edges_from(list(nx.selfloop_edges(G)))
