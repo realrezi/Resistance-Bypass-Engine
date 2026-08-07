@@ -43,30 +43,31 @@ INDEX_HTML = """<!DOCTYPE html>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-void: #090d16;
-            --panel-bg: rgba(15, 23, 42, 0.85);
-            --panel-border: rgba(255, 255, 255, 0.08);
-            --accent-indigo: #6366f1;
-            --accent-indigo-hover: #4f46e5;
-            --accent-emerald: #10b981;
-            --accent-amber: #f59e0b;
-            --accent-sky: #38bdf8;
-            --text-primary: #f8fafc;
-            --text-secondary: #94a3b8;
-            --text-tertiary: #64748b;
-            --font-main: 'Inter', system-ui, -apple-system, sans-serif;
+            --bg-canvas: #f8fafc;
+            --panel-bg: #ffffff;
+            --panel-border: #e2e8f0;
+            --accent-blue: #2563eb;
+            --accent-blue-hover: #1d4ed8;
+            --accent-emerald: #059669;
+            --accent-amber: #d97706;
+            --text-heading: #0f172a;
+            --text-body: #334155;
+            --text-muted: #64748b;
+            --font-main: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             --font-mono: 'JetBrains Mono', monospace;
+            --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.06), 0 1px 2px rgba(15, 23, 42, 0.04);
+            --shadow-md: 0 10px 25px -5px rgba(15, 23, 42, 0.06), 0 8px 10px -6px rgba(15, 23, 42, 0.04);
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
             font-family: var(--font-main);
-            background-color: var(--bg-void);
+            background-color: var(--bg-canvas);
             background-image: 
-                radial-gradient(circle at 10% 10%, rgba(99, 102, 241, 0.07) 0%, transparent 40%),
-                radial-gradient(circle at 90% 90%, rgba(16, 185, 129, 0.05) 0%, transparent 40%);
-            color: var(--text-primary);
+                radial-gradient(circle at 5% 5%, rgba(37, 99, 235, 0.03) 0%, transparent 40%),
+                radial-gradient(circle at 95% 95%, rgba(13, 148, 136, 0.03) 0%, transparent 40%);
+            color: var(--text-body);
             min-height: 100vh;
             padding: 1.5rem 1rem;
             line-height: 1.5;
@@ -74,18 +75,21 @@ INDEX_HTML = """<!DOCTYPE html>
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 1240px;
             margin: 0 auto;
         }
 
-        /* Navigation Header */
+        /* Top Application Bar */
         header.app-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding-bottom: 1.5rem;
-            margin-bottom: 2rem;
-            border-bottom: 1px solid var(--panel-border);
+            padding: 0.85rem 1.25rem;
+            background: var(--panel-bg);
+            border: 1px solid var(--panel-border);
+            border-radius: 14px;
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 1.5rem;
             flex-wrap: wrap;
             gap: 1rem;
         }
@@ -93,30 +97,30 @@ INDEX_HTML = """<!DOCTYPE html>
         .brand-area {
             display: flex;
             align-items: center;
-            gap: 0.75rem;
+            gap: 0.85rem;
         }
 
         .brand-icon {
-            width: 36px;
-            height: 36px;
-            background: linear-gradient(135deg, #6366f1 0%, #4338ca 100%);
+            width: 40px;
+            height: 40px;
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
             border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
         }
 
         .brand-title {
-            font-size: 1.25rem;
+            font-size: 1.2rem;
             font-weight: 800;
             letter-spacing: -0.02em;
-            color: #fff;
+            color: var(--text-heading);
         }
 
         .brand-subtitle {
             font-size: 0.78rem;
-            color: var(--text-secondary);
+            color: var(--text-muted);
             font-weight: 500;
         }
 
@@ -129,14 +133,14 @@ INDEX_HTML = """<!DOCTYPE html>
         .status-pill {
             display: inline-flex;
             align-items: center;
-            gap: 0.4rem;
-            padding: 0.35rem 0.75rem;
+            gap: 0.45rem;
+            padding: 0.35rem 0.8rem;
             border-radius: 9999px;
-            background: rgba(16, 185, 129, 0.1);
-            border: 1px solid rgba(16, 185, 129, 0.25);
-            color: #34d399;
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            color: #166534;
             font-size: 0.78rem;
-            font-weight: 600;
+            font-weight: 700;
             font-family: var(--font-mono);
         }
 
@@ -144,8 +148,8 @@ INDEX_HTML = """<!DOCTYPE html>
             width: 7px;
             height: 7px;
             border-radius: 50%;
-            background: #10b981;
-            box-shadow: 0 0 8px #10b981;
+            background: #16a34a;
+            box-shadow: 0 0 6px #16a34a;
             animation: pulse-dot 2s infinite;
         }
 
@@ -155,10 +159,10 @@ INDEX_HTML = """<!DOCTYPE html>
         }
 
         .btn-header {
-            background: rgba(255, 255, 255, 0.05);
+            background: #f8fafc;
             border: 1px solid var(--panel-border);
-            color: var(--text-secondary);
-            padding: 0.45rem 0.85rem;
+            color: var(--text-body);
+            padding: 0.45rem 0.9rem;
             border-radius: 8px;
             font-size: 0.82rem;
             font-weight: 600;
@@ -171,26 +175,87 @@ INDEX_HTML = """<!DOCTYPE html>
         }
 
         .btn-header:hover {
-            color: #fff;
-            background: rgba(255, 255, 255, 0.08);
-            border-color: rgba(255, 255, 255, 0.2);
+            color: var(--accent-blue);
+            background: #ffffff;
+            border-color: #cbd5e1;
         }
 
         .btn-header.primary {
-            background: rgba(99, 102, 241, 0.15);
-            border-color: rgba(99, 102, 241, 0.35);
-            color: #a5b4fc;
+            background: #eff6ff;
+            border-color: #bfdbfe;
+            color: #1d4ed8;
         }
 
         .btn-header.primary:hover {
-            background: rgba(99, 102, 241, 0.25);
-            color: #fff;
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        /* Purpose & Guidance Hero Card */
+        .hero-card {
+            background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%);
+            border: 1px solid #cbd5e1;
+            border-left: 5px solid var(--accent-blue);
+            border-radius: 12px;
+            padding: 1.25rem 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .hero-title {
+            font-size: 1.05rem;
+            font-weight: 800;
+            color: var(--text-heading);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.4rem;
+        }
+
+        .hero-text {
+            font-size: 0.88rem;
+            color: var(--text-body);
+            line-height: 1.5;
+            margin-bottom: 0.85rem;
+        }
+
+        .hero-steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 0.75rem;
+        }
+
+        .hero-step {
+            background: rgba(255, 255, 255, 0.8);
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 0.6rem 0.85rem;
+            font-size: 0.82rem;
+            color: var(--text-body);
+            display: flex;
+            align-items: flex-start;
+            gap: 0.6rem;
+        }
+
+        .step-num {
+            background: #dbeafe;
+            color: #1e40af;
+            font-weight: 800;
+            font-size: 0.75rem;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            margin-top: 0.1rem;
         }
 
         /* Workstation Layout */
         .workstation-grid {
             display: grid;
-            grid-template-columns: 400px 1fr;
+            grid-template-columns: 390px 1fr;
             gap: 1.5rem;
         }
 
@@ -200,12 +265,10 @@ INDEX_HTML = """<!DOCTYPE html>
 
         .panel {
             background: var(--panel-bg);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
             border: 1px solid var(--panel-border);
-            border-radius: 16px;
+            border-radius: 14px;
             padding: 1.5rem;
-            box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.6);
+            box-shadow: var(--shadow-md);
         }
 
         .panel-header {
@@ -219,8 +282,8 @@ INDEX_HTML = """<!DOCTYPE html>
 
         .panel-title-text {
             font-size: 1.05rem;
-            font-weight: 700;
-            color: #fff;
+            font-weight: 800;
+            color: var(--text-heading);
             display: flex;
             align-items: center;
             gap: 0.5rem;
@@ -235,9 +298,9 @@ INDEX_HTML = """<!DOCTYPE html>
             display: flex;
             align-items: center;
             justify-content: space-between;
-            font-size: 0.82rem;
-            font-weight: 600;
-            color: var(--text-secondary);
+            font-size: 0.83rem;
+            font-weight: 700;
+            color: var(--text-heading);
             margin-bottom: 0.4rem;
         }
 
@@ -245,23 +308,24 @@ INDEX_HTML = """<!DOCTYPE html>
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            width: 15px;
-            height: 15px;
+            width: 16px;
+            height: 16px;
             border-radius: 50%;
-            background: rgba(255, 255, 255, 0.08);
-            color: var(--text-tertiary);
-            font-size: 0.68rem;
+            background: #f1f5f9;
+            color: var(--text-muted);
+            font-size: 0.7rem;
             cursor: help;
             position: relative;
+            font-weight: 700;
         }
 
         .tooltip-trigger .tooltip-body {
             visibility: hidden;
-            width: 230px;
+            width: 240px;
             background: #0f172a;
-            color: #cbd5e1;
+            color: #f8fafc;
             border-radius: 8px;
-            padding: 0.6rem 0.8rem;
+            padding: 0.65rem 0.85rem;
             position: absolute;
             z-index: 100;
             bottom: 130%;
@@ -269,10 +333,9 @@ INDEX_HTML = """<!DOCTYPE html>
             opacity: 0;
             transition: opacity 0.2s ease;
             font-size: 0.76rem;
-            border: 1px solid var(--panel-border);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.6);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
             font-weight: 400;
-            line-height: 1.35;
+            line-height: 1.4;
         }
 
         .tooltip-trigger:hover .tooltip-body {
@@ -283,29 +346,31 @@ INDEX_HTML = """<!DOCTYPE html>
         input.input-field {
             width: 100%;
             padding: 0.7rem 0.9rem;
-            background: rgba(9, 13, 22, 0.8);
-            border: 1px solid var(--panel-border);
+            background: #f8fafc;
+            border: 1px solid #cbd5e1;
             border-radius: 8px;
-            color: #fff;
+            color: var(--text-heading);
             font-family: var(--font-main);
             font-size: 0.92rem;
+            font-weight: 500;
             transition: border-color 0.2s ease, box-shadow 0.2s ease;
         }
 
         input.input-field:focus {
             outline: none;
-            border-color: var(--accent-indigo);
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+            background: #ffffff;
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
         }
 
         .btn-run {
             width: 100%;
             padding: 0.85rem;
-            background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
             border: none;
             border-radius: 8px;
-            color: #fff;
-            font-size: 0.92rem;
+            color: #ffffff;
+            font-size: 0.95rem;
             font-weight: 700;
             cursor: pointer;
             transition: all 0.2s ease;
@@ -313,14 +378,14 @@ INDEX_HTML = """<!DOCTYPE html>
             align-items: center;
             justify-content: center;
             gap: 0.5rem;
-            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
             margin-top: 0.5rem;
         }
 
         .btn-run:hover {
             opacity: 0.95;
             transform: translateY(-1px);
-            box-shadow: 0 6px 16px rgba(99, 102, 241, 0.35);
+            box-shadow: 0 6px 16px rgba(37, 99, 235, 0.35);
         }
 
         .btn-run:disabled {
@@ -338,8 +403,8 @@ INDEX_HTML = """<!DOCTYPE html>
 
         .preset-group-title {
             font-size: 0.75rem;
-            font-weight: 700;
-            color: var(--text-tertiary);
+            font-weight: 800;
+            color: var(--text-muted);
             text-transform: uppercase;
             letter-spacing: 0.06em;
             margin: 0.75rem 0 0.4rem 0;
@@ -350,54 +415,57 @@ INDEX_HTML = """<!DOCTYPE html>
 
         .prevalence-tag {
             font-size: 0.68rem;
-            padding: 0.15rem 0.4rem;
+            padding: 0.15rem 0.45rem;
             border-radius: 4px;
-            background: rgba(99, 102, 241, 0.1);
-            color: #a5b4fc;
-            font-weight: 600;
+            background: #eff6ff;
+            color: #1e40af;
+            font-weight: 700;
+            border: 1px solid #bfdbfe;
         }
 
         .preset-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-            gap: 0.4rem;
+            grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+            gap: 0.45rem;
         }
 
         .btn-preset-card {
-            background: rgba(255, 255, 255, 0.025);
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            color: var(--text-secondary);
-            padding: 0.45rem 0.65rem;
-            border-radius: 6px;
-            font-size: 0.76rem;
-            font-weight: 500;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            color: var(--text-body);
+            padding: 0.5rem 0.7rem;
+            border-radius: 8px;
+            font-size: 0.78rem;
+            font-weight: 600;
             cursor: pointer;
             transition: all 0.2s ease;
             text-align: left;
         }
 
         .btn-preset-card:hover {
-            color: #fff;
-            border-color: rgba(99, 102, 241, 0.4);
-            background: rgba(99, 102, 241, 0.08);
+            color: var(--accent-blue);
+            border-color: #93c5fd;
+            background: #eff6ff;
         }
 
         .preset-meta {
             font-size: 0.68rem;
-            color: var(--text-tertiary);
-            margin-top: 0.1rem;
+            color: var(--text-muted);
+            font-weight: 400;
+            margin-top: 0.15rem;
         }
 
         /* Results Canvas */
         .error-box {
             display: none;
-            background: rgba(239, 68, 68, 0.1);
-            border: 1px solid rgba(239, 68, 68, 0.3);
+            background: #fef2f2;
+            border: 1px solid #fecaca;
             border-radius: 10px;
             padding: 1rem;
-            color: #fca5a5;
+            color: #991b1b;
             font-size: 0.88rem;
             margin-bottom: 1.25rem;
+            font-weight: 500;
         }
 
         .metrics-grid {
@@ -408,8 +476,8 @@ INDEX_HTML = """<!DOCTYPE html>
         }
 
         .metric-tile {
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid rgba(255, 255, 255, 0.06);
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
             border-radius: 10px;
             padding: 1rem;
             text-align: center;
@@ -418,17 +486,18 @@ INDEX_HTML = """<!DOCTYPE html>
         .metric-number {
             font-size: clamp(1.1rem, 2.2vw, 1.5rem);
             font-weight: 800;
-            color: var(--accent-sky);
+            color: var(--accent-blue);
             font-family: var(--font-mono);
             font-variant-numeric: tabular-nums;
         }
 
         .metric-label {
             font-size: 0.72rem;
-            color: var(--text-secondary);
+            color: var(--text-muted);
             text-transform: uppercase;
             letter-spacing: 0.05em;
             margin-top: 0.2rem;
+            font-weight: 700;
         }
 
         .canonical-bar {
@@ -439,9 +508,9 @@ INDEX_HTML = """<!DOCTYPE html>
         }
 
         .pill-badge {
-            background: rgba(99, 102, 241, 0.1);
-            border: 1px solid rgba(99, 102, 241, 0.25);
-            color: #a5b4fc;
+            background: #f1f5f9;
+            border: 1px solid #cbd5e1;
+            color: var(--text-heading);
             padding: 0.35rem 0.75rem;
             border-radius: 6px;
             font-size: 0.8rem;
@@ -449,6 +518,7 @@ INDEX_HTML = """<!DOCTYPE html>
             display: flex;
             align-items: center;
             gap: 0.4rem;
+            font-weight: 600;
         }
 
         .filter-bar {
@@ -466,35 +536,37 @@ INDEX_HTML = """<!DOCTYPE html>
         }
 
         .btn-phase-tab {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.07);
-            color: var(--text-secondary);
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            color: var(--text-muted);
             padding: 0.35rem 0.65rem;
             border-radius: 6px;
             font-size: 0.78rem;
+            font-weight: 600;
             cursor: pointer;
             transition: all 0.2s ease;
         }
 
         .btn-phase-tab.active {
-            background: rgba(99, 102, 241, 0.15);
-            border-color: rgba(99, 102, 241, 0.4);
-            color: #a5b4fc;
-            font-weight: 600;
+            background: #eff6ff;
+            border-color: #93c5fd;
+            color: #1d4ed8;
         }
 
         /* Combination Therapy Cards */
         .candidate-card {
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid rgba(255, 255, 255, 0.06);
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
             border-radius: 12px;
             padding: 1.25rem;
             margin-bottom: 1rem;
-            transition: border-color 0.2s ease, transform 0.2s ease;
+            box-shadow: var(--shadow-sm);
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
         }
 
         .candidate-card:hover {
-            border-color: rgba(99, 102, 241, 0.3);
+            border-color: #93c5fd;
+            box-shadow: var(--shadow-md);
         }
 
         .candidate-header {
@@ -506,36 +578,36 @@ INDEX_HTML = """<!DOCTYPE html>
 
         .drug-pair-name {
             font-size: 1.05rem;
-            font-weight: 700;
-            color: #fff;
+            font-weight: 800;
+            color: var(--text-heading);
         }
 
         .badge-phase {
-            padding: 0.2rem 0.55rem;
+            padding: 0.25rem 0.6rem;
             border-radius: 4px;
             font-size: 0.72rem;
-            font-weight: 700;
+            font-weight: 800;
             font-family: var(--font-mono);
-            background: rgba(245, 158, 11, 0.15);
-            color: #fbbf24;
-            border: 1px solid rgba(245, 158, 11, 0.3);
+            background: #fffbe6;
+            color: #b45309;
+            border: 1px solid #fde68a;
         }
 
         .badge-phase.approved {
-            background: rgba(16, 185, 129, 0.15);
-            color: #34d399;
-            border-color: rgba(16, 185, 129, 0.3);
+            background: #ecfdf5;
+            color: #047857;
+            border-color: #a7f3d0;
         }
 
         .candidate-metrics {
-            font-size: 0.8rem;
-            color: var(--text-secondary);
+            font-size: 0.82rem;
+            color: var(--text-body);
             margin-bottom: 0.6rem;
         }
 
         .progress-track {
-            height: 6px;
-            background: rgba(255, 255, 255, 0.06);
+            height: 7px;
+            background: #f1f5f9;
             border-radius: 999px;
             overflow: hidden;
             margin: 0.6rem 0;
@@ -543,31 +615,31 @@ INDEX_HTML = """<!DOCTYPE html>
 
         .progress-fill {
             height: 100%;
-            background: linear-gradient(90deg, #6366f1 0%, #38bdf8 100%);
+            background: linear-gradient(90deg, #2563eb 0%, #0d9488 100%);
             border-radius: 999px;
             width: 0%;
             transition: width 0.6s ease;
         }
 
         .candidate-rationale {
-            font-size: 0.84rem;
-            color: var(--text-secondary);
-            line-height: 1.45;
+            font-size: 0.85rem;
+            color: var(--text-body);
+            line-height: 1.5;
         }
 
         .loader-panel {
             display: none;
             text-align: center;
             padding: 4rem 1rem;
-            color: var(--text-secondary);
+            color: var(--text-muted);
         }
 
         .spin-ring {
             width: 44px;
             height: 44px;
-            border: 3px solid rgba(255,255,255,0.08);
+            border: 3px solid #e2e8f0;
             border-radius: 50%;
-            border-top-color: var(--accent-indigo);
+            border-top-color: var(--accent-blue);
             animation: spin 0.8s linear infinite;
             margin: 0 auto 1.25rem auto;
         }
@@ -579,7 +651,7 @@ INDEX_HTML = """<!DOCTYPE html>
         .empty-canvas {
             text-align: center;
             padding: 4.5rem 1rem;
-            color: var(--text-tertiary);
+            color: var(--text-muted);
         }
 
         /* Clinician Guide Modal */
@@ -587,8 +659,8 @@ INDEX_HTML = """<!DOCTYPE html>
             display: none;
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(9, 13, 22, 0.85);
-            backdrop-filter: blur(12px);
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(8px);
             z-index: 1000;
             align-items: center;
             justify-content: center;
@@ -596,7 +668,7 @@ INDEX_HTML = """<!DOCTYPE html>
         }
 
         .modal-box {
-            background: #0f172a;
+            background: #ffffff;
             border: 1px solid var(--panel-border);
             border-radius: 16px;
             max-width: 760px;
@@ -604,8 +676,8 @@ INDEX_HTML = """<!DOCTYPE html>
             max-height: 88vh;
             overflow-y: auto;
             padding: 2rem;
-            color: #e2e8f0;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
+            color: var(--text-body);
+            box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.25);
         }
 
         .modal-top {
@@ -619,14 +691,14 @@ INDEX_HTML = """<!DOCTYPE html>
 
         .modal-heading {
             font-size: 1.25rem;
-            font-weight: 700;
-            color: #fff;
+            font-weight: 800;
+            color: var(--text-heading);
         }
 
         .modal-btn-close {
             background: transparent;
             border: none;
-            color: var(--text-secondary);
+            color: var(--text-muted);
             font-size: 1.5rem;
             cursor: pointer;
         }
@@ -636,15 +708,15 @@ INDEX_HTML = """<!DOCTYPE html>
         }
 
         .guide-term {
-            font-weight: 700;
-            color: #fff;
+            font-weight: 800;
+            color: var(--text-heading);
             font-size: 0.95rem;
             margin-bottom: 0.3rem;
         }
 
         .guide-body {
             font-size: 0.88rem;
-            color: var(--text-secondary);
+            color: var(--text-body);
             line-height: 1.5;
         }
 
@@ -658,8 +730,8 @@ INDEX_HTML = """<!DOCTYPE html>
             align-items: center;
             flex-wrap: wrap;
             gap: 1rem;
-            font-size: 0.8rem;
-            color: var(--text-tertiary);
+            font-size: 0.82rem;
+            color: var(--text-muted);
         }
 
         .dev-links {
@@ -668,40 +740,66 @@ INDEX_HTML = """<!DOCTYPE html>
         }
 
         .dev-link {
-            color: var(--text-secondary);
+            color: var(--text-body);
             text-decoration: none;
             transition: color 0.2s ease;
+            font-weight: 600;
         }
 
         .dev-link:hover {
-            color: #fff;
+            color: var(--accent-blue);
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- Application Header Bar -->
+        <!-- Top Application Bar -->
         <header class="app-header">
             <div class="brand-area">
                 <div class="brand-icon">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 15c6.667-6 13.333 0 20-6"/><path d="M2 9c6.667 6 13.333 0 20 6"/><path d="M7 12v.01M12 12v.01M17 12v.01"/></svg>
                 </div>
                 <div>
-                    <div class="brand-title">Resistance Bypass Engine</div>
-                    <div class="brand-subtitle">Targeted Oncology Microservice v0.1.0</div>
+                    <div class="brand-title">Targeted Oncology Resistance Bypass Engine</div>
+                    <div class="brand-subtitle">Precision Network Biology Microservice v0.1.0</div>
                 </div>
             </div>
 
             <div class="header-actions">
                 <div class="status-pill">
                     <span class="status-dot"></span>
-                    <span>ENGINE ONLINE</span>
+                    <span>ALL APIs ONLINE</span>
                 </div>
                 <button class="btn-header primary" onclick="toggleModal(true)">
-                    <span>📖 Clinician & Methodological Guide</span>
+                    <span>📖 Methodological Guide</span>
                 </button>
             </div>
         </header>
+
+        <!-- Clinical Purpose Hero Card -->
+        <div class="hero-card">
+            <div class="hero-title">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+                <span>What is the purpose of this engine and how does it help?</span>
+            </div>
+            <p class="hero-text">
+                When targeted cancer therapies stop working because cancer cells acquire a secondary mutation or activate a parallel bypass pathway (acquired resistance), this engine resolves official HGNC/UniProt IDs, constructs real-time signaling network graphs (STRING-DB), isolates hub-penalized network bottlenecks, and ranks active clinical dual-drug combination therapies to override resistance.
+            </p>
+            <div class="hero-steps">
+                <div class="hero-step">
+                    <span class="step-num">1</span>
+                    <div><strong>Input Resistance Markers:</strong> Enter frontline target/drug & acquired resistance marker.</div>
+                </div>
+                <div class="hero-step">
+                    <span class="step-num">2</span>
+                    <div><strong>Network Topology:</strong> Builds PPI graph in NetworkX & extracts largest component.</div>
+                </div>
+                <div class="hero-step">
+                    <span class="step-num">3</span>
+                    <div><strong>Rank Combination Therapies:</strong> Offloads math & queries Open Targets / ChEMBL for dual therapies.</div>
+                </div>
+            </div>
+        </div>
 
         <!-- Workstation Grid -->
         <div class="workstation-grid">
@@ -709,7 +807,7 @@ INDEX_HTML = """<!DOCTYPE html>
             <div class="panel">
                 <div class="panel-header">
                     <div class="panel-title-text">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m10 15 5-3-5-3v6z"/></svg>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><path d="m10 15 5-3-5-3v6z"/></svg>
                         <span>Analysis Parameters</span>
                     </div>
                 </div>
@@ -726,7 +824,7 @@ INDEX_HTML = """<!DOCTYPE html>
                         <datalist id="targets_list">
                             <option value="EGFR">Epidermal Growth Factor Receptor</option>
                             <option value="ERBB2">ERBB2 / HER2 Receptor Tyrosine Kinase</option>
-                            <option value="MET">MET Hepatocyte Growth Factor Receptor</option>
+                            <option value="MET">MET Receptor Tyrosine Kinase</option>
                             <option value="ALK">ALK Receptor Tyrosine Kinase</option>
                             <option value="KRAS">KRAS Proto-Oncogene GTPase</option>
                             <option value="BRAF">BRAF Serine/Threonine Kinase</option>
@@ -738,18 +836,6 @@ INDEX_HTML = """<!DOCTYPE html>
                             <option value="CDK4">Cyclin Dependent Kinase 4</option>
                             <option value="CDK6">Cyclin Dependent Kinase 6</option>
                             <option value="AR">Androgen Receptor</option>
-                            <option value="BRCA1">BRCA1 DNA Repair Associated</option>
-                            <option value="BRCA2">BRCA2 DNA Repair Associated</option>
-                            <option value="TP53">Tumor Protein P53</option>
-                            <option value="PTEN">Phosphatase And Tensin Homolog</option>
-                            <option value="AKT1">AKT Serine/Threonine Kinase 1</option>
-                            <option value="MAP2K1">MAP2K1 / MEK1 Kinase</option>
-                            <option value="NRAS">NRAS Proto-Oncogene GTPase</option>
-                            <option value="FGFR1">FGFR1 Receptor Tyrosine Kinase</option>
-                            <option value="FGFR2">FGFR2 Receptor Tyrosine Kinase</option>
-                            <option value="FGFR3">FGFR3 Receptor Tyrosine Kinase</option>
-                            <option value="KIT">KIT Receptor Tyrosine Kinase</option>
-                            <option value="PDGFRA">PDGFRA Tyrosine Kinase</option>
                         </datalist>
                     </div>
 
@@ -765,35 +851,12 @@ INDEX_HTML = """<!DOCTYPE html>
                             <option value="Osimertinib">Osimertinib (EGFR TKI)</option>
                             <option value="Trastuzumab">Trastuzumab (Anti-HER2 mAb)</option>
                             <option value="Gefitinib">Gefitinib (EGFR TKI)</option>
-                            <option value="Erlotinib">Erlotinib (EGFR TKI)</option>
-                            <option value="Afatinib">Afatinib (EGFR TKI)</option>
-                            <option value="Lapatinib">Lapatinib (EGFR/HER2 TKI)</option>
-                            <option value="Tucatinib">Tucatinib (HER2 TKI)</option>
                             <option value="Capmatinib">Capmatinib (MET TKI)</option>
-                            <option value="Tepotinib">Tepotinib (MET TKI)</option>
                             <option value="Alectinib">Alectinib (ALK TKI)</option>
-                            <option value="Brigatinib">Brigatinib (ALK TKI)</option>
-                            <option value="Lorlatinib">Lorlatinib (ALK TKI)</option>
                             <option value="Sotorasib">Sotorasib (KRAS G12C Inhibitor)</option>
-                            <option value="Adagrasib">Adagrasib (KRAS G12C Inhibitor)</option>
                             <option value="Dabrafenib">Dabrafenib (BRAF Inhibitor)</option>
-                            <option value="Vemurafenib">Vemurafenib (BRAF Inhibitor)</option>
-                            <option value="Encorafenib">Encorafenib (BRAF Inhibitor)</option>
-                            <option value="Trametinib">Trametinib (MEK Inhibitor)</option>
                             <option value="Fulvestrant">Fulvestrant (SERD)</option>
-                            <option value="Palbociclib">Palbociclib (CDK4/6 Inhibitor)</option>
-                            <option value="Ribociclib">Ribociclib (CDK4/6 Inhibitor)</option>
-                            <option value="Abemaciclib">Abemaciclib (CDK4/6 Inhibitor)</option>
                             <option value="Imatinib">Imatinib (BCR-ABL TKI)</option>
-                            <option value="Nilotinib">Nilotinib (BCR-ABL TKI)</option>
-                            <option value="Dasatinib">Dasatinib (BCR-ABL TKI)</option>
-                            <option value="Ponatinib">Ponatinib (BCR-ABL TKI)</option>
-                            <option value="Selpercatinib">Selpercatinib (RET Inhibitor)</option>
-                            <option value="Pralsetinib">Pralsetinib (RET Inhibitor)</option>
-                            <option value="Entrectinib">Entrectinib (ROS1/NTRK TKI)</option>
-                            <option value="Enzalutamide">Enzalutamide (AR Inhibitor)</option>
-                            <option value="Alpelisib">Alpelisib (PI3Kalpha Inhibitor)</option>
-                            <option value="Olaparib">Olaparib (PARP Inhibitor)</option>
                         </datalist>
                     </div>
 
@@ -813,17 +876,7 @@ INDEX_HTML = """<!DOCTYPE html>
                             <option value="ERBB2">ERBB2 / HER2 Amplification</option>
                             <option value="PIK3CA">PIK3CA Hyperactivation</option>
                             <option value="CDK4">CDK4 Cyclin Axis</option>
-                            <option value="CDK6">CDK6 Cyclin Axis</option>
                             <option value="ABL1">ABL1 Gatekeeper (T315I)</option>
-                            <option value="MAP2K1">MAP2K1 / MEK1 Reactivation</option>
-                            <option value="RAF1">RAF1 Bypass</option>
-                            <option value="MYC">MYC Amplification</option>
-                            <option value="PTEN">PTEN Loss of Function</option>
-                            <option value="AKT1">AKT1 Activation</option>
-                            <option value="RB1">RB1 Loss of Function</option>
-                            <option value="TP53">TP53 Mutation</option>
-                            <option value="NRAS">NRAS Bypass</option>
-                            <option value="MAPK1">ERK1 / MAPK1 Reactivation</option>
                         </datalist>
                     </div>
 
@@ -832,22 +885,11 @@ INDEX_HTML = """<!DOCTYPE html>
                         <input class="input-field" type="text" id="cancer_type" value="Non-Small Cell Lung Cancer" placeholder="Type indication (e.g. NSCLC, Breast Cancer)..." list="indications_list" autocomplete="off">
                         <datalist id="indications_list">
                             <option value="Non-Small Cell Lung Cancer">Non-Small Cell Lung Cancer (NSCLC)</option>
-                            <option value="Small Cell Lung Cancer">Small Cell Lung Cancer (SCLC)</option>
                             <option value="HER2+ Breast Cancer">HER2+ Breast Cancer</option>
-                            <option value="HR+/HER2- Breast Cancer">HR+/HER2- Breast Cancer</option>
-                            <option value="Triple-Negative Breast Cancer">Triple-Negative Breast Cancer (TNBC)</option>
                             <option value="Colorectal Cancer">Colorectal Cancer (CRC)</option>
                             <option value="Cutaneous Melanoma">Cutaneous Melanoma</option>
                             <option value="Chronic Myeloid Leukemia">Chronic Myeloid Leukemia (CML)</option>
                             <option value="Prostate Cancer">Metastatic Castration-Resistant Prostate Cancer</option>
-                            <option value="Pancreatic Ductal Adenocarcinoma">Pancreatic Ductal Adenocarcinoma (PDAC)</option>
-                            <option value="Ovarian Cancer">High-Grade Serous Ovarian Cancer</option>
-                            <option value="Glioblastoma Multiforme">Glioblastoma Multiforme (GBM)</option>
-                            <option value="Head and Neck Squamous Cell Carcinoma">Head and Neck Cancer (HNSCC)</option>
-                            <option value="Renal Cell Carcinoma">Clear Cell Renal Cell Carcinoma (ccRCC)</option>
-                            <option value="Thyroid Cancer">Thyroid Cancer</option>
-                            <option value="Gastric Cancer">Gastric & Gastroesophageal Junction Cancer</option>
-                            <option value="Bladder Carcinoma">Bladder / Urothelial Carcinoma</option>
                         </datalist>
                     </div>
 
@@ -926,7 +968,7 @@ INDEX_HTML = """<!DOCTYPE html>
             <div class="panel">
                 <div class="panel-header">
                     <div class="panel-title-text">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2.2"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
                         <span>Resistance Topology & Synergy Analysis</span>
                     </div>
                     <button id="copyJsonBtn" class="btn-header" style="display: none;" onclick="copyResultJson()">
@@ -939,13 +981,13 @@ INDEX_HTML = """<!DOCTYPE html>
 
                 <div id="loader" class="loader-panel">
                     <div class="spin-ring"></div>
-                    <p style="font-weight: 600; color: #fff; margin-bottom: 0.3rem;">Querying Biological API Networks...</p>
-                    <p style="font-size: 0.82rem;">Resolving HGNC/UniProt IDs • Fetching STRING-DB PPI & Open Targets GraphQL</p>
+                    <p style="font-weight: 700; color: var(--text-heading); margin-bottom: 0.3rem;">Querying Biological Networks...</p>
+                    <p style="font-size: 0.82rem; color: var(--text-muted);">Resolving HGNC/UniProt IDs • Fetching STRING-DB PPI & Open Targets GraphQL</p>
                 </div>
 
                 <div id="placeholder" class="empty-canvas">
-                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#334155" stroke-width="1.5" style="margin-bottom: 1rem;"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
-                    <p style="font-weight: 600; color: var(--text-secondary); margin-bottom: 0.4rem;">No Active Pipeline Execution</p>
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.5" style="margin-bottom: 1rem;"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+                    <p style="font-weight: 700; color: var(--text-heading); margin-bottom: 0.4rem;">No Active Pipeline Execution</p>
                     <p style="font-size: 0.84rem;">Select a high-prevalence clinical scenario on the left or enter custom target parameters.</p>
                 </div>
 
@@ -971,7 +1013,7 @@ INDEX_HTML = """<!DOCTYPE html>
                     </div>
 
                     <div class="filter-bar">
-                        <h3 style="font-size: 0.95rem; font-weight: 700; color: #fff;">Ranked Dual-Drug Combination Therapies</h3>
+                        <h3 style="font-size: 0.95rem; font-weight: 800; color: var(--text-heading);">Ranked Dual-Drug Combination Therapies</h3>
                         <div class="phase-tabs">
                             <button class="btn-phase-tab active" onclick="filterPhase('ALL')">All Phases</button>
                             <button class="btn-phase-tab" onclick="filterPhase(4)">Phase 4 (Approved)</button>
@@ -1001,27 +1043,27 @@ INDEX_HTML = """<!DOCTYPE html>
     <div id="clinicianModal" class="modal-wrapper" onclick="if(event.target===this) toggleModal(false)">
         <div class="modal-box">
             <div class="modal-top">
-                <div class="modal-heading">📖 Clinician & Methodological Guide</div>
+                <div class="modal-heading">📖 Methodological & Clinical Guide</div>
                 <button class="modal-btn-close" onclick="toggleModal(false)">&times;</button>
             </div>
             
             <div class="guide-section">
                 <div class="guide-term">🎯 Primary Target & Primary Drug</div>
-                <div class="guide-body">The frontline oncogenic driver protein (e.g. EGFR in lung adenocarcinoma) and the primary targeted tyrosine kinase inhibitor or monoclonal antibody administered to the patient (e.g. Osimertinib).</div>
+                <div class="guide-body">The frontline oncogenic driver protein (e.g. EGFR in lung adenocarcinoma) and the primary targeted inhibitor administered to the patient (e.g. Osimertinib).</div>
             </div>
 
             <div class="guide-section">
                 <div class="guide-term">⚡ Secondary Resistance Marker & Mechanism</div>
                 <div class="guide-body">The gene or protein driving acquired therapeutic resistance. Resistance is biological categorized into two main branches:</div>
-                <ul style="margin: 0.5rem 0 0 1.2rem; font-size: 0.85rem; color: var(--text-secondary);">
-                    <li><strong>Off-Target Bypass:</strong> Hyperactivation of a parallel signaling axis (e.g., MET receptor amplification or KRAS activation) that circumvents the primary target blockade to sustain downstream cell proliferation and anti-apoptotic signaling (PI3K-AKT and MAPK-ERK pathways).</li>
-                    <li><strong>On-Target Mutation:</strong> Secondary mutations directly inside the primary target gene (e.g., EGFR C797S or ABL1 T315I) that structurally alter the ATP binding pocket to disrupt drug binding affinity.</li>
+                <ul style="margin: 0.5rem 0 0 1.2rem; font-size: 0.85rem; color: var(--text-body);">
+                    <li><strong>Off-Target Bypass:</strong> Hyperactivation of a parallel signaling axis (e.g., MET receptor amplification or KRAS activation) that circumvents the primary target blockade to sustain downstream cell survival.</li>
+                    <li><strong>On-Target Mutation:</strong> Secondary mutations directly inside the primary target gene (e.g., EGFR C797S or ABL1 T315I) that structurally alter the ATP binding pocket.</li>
                 </ul>
             </div>
 
             <div class="guide-section">
                 <div class="guide-term">🧮 Hub-Penalized Bottleneck Centrality</div>
-                <div class="guide-body">Graph analysis runs via NetworkX using pure Python. Centrality is computed as <code>Betweenness / log2(Degree + 2)</code>. This mathematical formula explicitly penalizes ubiquitous, non-specific hub proteins (such as Ubiquitin or TP53) while isolating true signaling bottleneck nodes driving resistance.</div>
+                <div class="guide-body">Graph analysis runs via NetworkX using pure Python. Centrality is computed as <code>Betweenness / log2(Degree + 2)</code>. This mathematical formula explicitly penalizes ubiquitous hub proteins (such as Ubiquitin or TP53) while isolating true signaling bottleneck nodes driving resistance.</div>
             </div>
 
             <div class="guide-section">
@@ -1131,7 +1173,7 @@ INDEX_HTML = """<!DOCTYPE html>
             }
 
             if (candidates.length === 0) {
-                therapiesList.innerHTML = '<div style="color: var(--text-tertiary); font-size: 0.9rem; text-align: center; padding: 2.5rem;">No clinical combination therapies matching this filter.</div>';
+                therapiesList.innerHTML = '<div style="color: var(--text-muted); font-size: 0.9rem; text-align: center; padding: 2.5rem;">No clinical combination therapies matching this filter.</div>';
                 return;
             }
 
@@ -1147,7 +1189,7 @@ INDEX_HTML = """<!DOCTYPE html>
                         <span class="badge-phase ${isApproved ? 'approved' : ''}">${isApproved ? 'FDA Approved' : 'Phase ' + c.clinical_phase}</span>
                     </div>
                     <div class="candidate-metrics">
-                        Secondary Target: <strong style="color:#fff;">${c.secondary_target}</strong> | Synergy Score: <strong style="color:var(--accent-sky);">${c.synergy_score}</strong> | Hub Penalty Centrality: ${c.hub_penalized_centrality}
+                        Secondary Target: <strong style="color:var(--text-heading);">${c.secondary_target}</strong> | Synergy Score: <strong style="color:var(--accent-blue);">${c.synergy_score}</strong> | Hub Penalty Centrality: ${c.hub_penalized_centrality}
                     </div>
                     <div class="progress-track">
                         <div class="progress-fill" style="width: ${pct}%"></div>
