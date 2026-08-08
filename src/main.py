@@ -2397,6 +2397,24 @@ async def _timed_call(name: str, awaitable: Any, timings: dict[str, float]) -> A
         timings[name] = round((time.perf_counter() - started) * 1000, 1)
 
 
+async def _bounded_timed_call(
+    name: str,
+    awaitable: Any,
+    timings: dict[str, float],
+    timeout_seconds: float,
+) -> Any:
+    """Time a live-source call and bound provider latency per source.
+
+    A single unavailable upstream should produce a clearly marked partial report,
+    not make every independent source wait for its retry budget to expire.
+    """
+    return await _timed_call(
+        name,
+        asyncio.wait_for(awaitable, timeout=timeout_seconds),
+        timings,
+    )
+
+
 @app.post("/api/v1/analyze-resistance", response_model=ResistanceBypassReport)
 async def analyze_resistance(req: ResistanceRequest) -> ResistanceBypassReport:
     """Analyze drug resistance pathways and rank dual-drug combination candidates."""
@@ -2404,6 +2422,9 @@ async def analyze_resistance(req: ResistanceRequest) -> ResistanceBypassReport:
     source_timings: dict[str, float] = {}
     partial_sources: list[str] = []
     id_mapper = IDMapper()
+    live_source_timeout = max(
+        5.0, float(os.getenv("LIVE_SOURCE_TIMEOUT_SECONDS", "15"))
+    )
 
     try:
         mapped_primary, mapped_resistance = await _timed_call(
@@ -2534,14 +2555,15 @@ async def analyze_resistance(req: ResistanceRequest) -> ResistanceBypassReport:
 
         # Fetch independent external APIs concurrently and keep partial results visible.
         results = await asyncio.gather(
-            _timed_call(
+            _bounded_timed_call(
                 "STRING PPI network",
                 string_client.get_network(
                     primary_target_canonical, resistance_marker_canonical
                 ),
                 source_timings,
+                live_source_timeout,
             ),
-            _timed_call(
+            _bounded_timed_call(
                 "Open Targets clinical candidates",
                 ot_client.get_known_drugs(
                     mapped_resistance.ensembl_id,
@@ -2549,8 +2571,14 @@ async def analyze_resistance(req: ResistanceRequest) -> ResistanceBypassReport:
                     primary_drug=req.primary_drug,
                 ),
                 source_timings,
+                live_source_timeout,
             ),
-            _timed_call("ChEMBL activity", _fetch_activities(), source_timings),
+            _bounded_timed_call(
+                "ChEMBL activity",
+                _fetch_activities(),
+                source_timings,
+                live_source_timeout,
+            ),
             return_exceptions=True,
         )
         interactions = results[0] if not isinstance(results[0], Exception) else []

@@ -1,11 +1,27 @@
+import asyncio
 from unittest.mock import AsyncMock, patch
 
+import pytest
 from fastapi.testclient import TestClient
 
-from src.main import _request_windows, app
+from src.main import _bounded_timed_call, _request_windows, app
 from src.schemas.models import AlterationType, IDMappingResult, ResistanceRequest
 
 client = TestClient(app)
+
+
+@pytest.mark.asyncio
+async def test_live_source_call_is_bounded_and_records_timing():
+    timings: dict[str, float] = {}
+
+    async def slow_source() -> None:
+        await asyncio.sleep(0.05)
+
+    with pytest.raises(asyncio.TimeoutError):
+        await _bounded_timed_call("STRING PPI network", slow_source(), timings, 0.01)
+
+    assert "STRING PPI network" in timings
+    assert timings["STRING PPI network"] < 1000
 
 
 def test_vercel_entrypoint_exports_fastapi_app():

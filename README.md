@@ -126,7 +126,7 @@ The implementation uses fixed transforms rather than candidate-pool min–max no
 - **Caching & Persistence:** `diskcache` (7-day TTL, 1GB storage limit)
 - **Frontend Workstation:** Vanilla CSS genomic-atlas UI, Cytoscape.js, 3Dmol.js (Macromolecular PDB viewer)
 
-The analysis report includes a non-identifying trace ID, per-source timing, and any partial-source failures. `GET /api/v1/structure/{symbol}` exposes only curated local PDB mappings; unknown targets return an explicit unavailable state rather than fabricated UniProt, Ensembl, or PDB identifiers. Set `CHEMBL_ACTIVITY_MAX_PAGES` (default `2`) to control the bounded activity scan when latency matters.
+The analysis report includes a non-identifying trace ID, per-source timing, and any partial-source failures. `GET /api/v1/structure/{symbol}` exposes only curated local PDB mappings; unknown targets return an explicit unavailable state rather than fabricated UniProt, Ensembl, or PDB identifiers. Set `CHEMBL_ACTIVITY_MAX_PAGES` (default `2`) to control the bounded activity scan when latency matters. Independent live sources are queried concurrently and each is bounded by `LIVE_SOURCE_TIMEOUT_SECONDS` (default `15`); a timed-out provider is reported as partial evidence instead of blocking the full report.
 
 Set `ALLOWED_ORIGINS` to a comma-separated allowlist in hosted environments. The default wildcard is intended only for local exploration and does not permit credentialed cross-origin requests.
 
