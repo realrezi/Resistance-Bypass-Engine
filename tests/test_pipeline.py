@@ -186,7 +186,7 @@ def test_invalid_gene_symbol_error_handling(mock_id_mapper_cls):
     response = client.post("/api/v1/analyze-resistance", json=payload)
     assert response.status_code == 422
     data = response.json()
-    assert "ID Resolution failed" in data["detail"]
+    assert "could not be confirmed" in data["detail"]
     assert "INVALIDGENEXXX" not in data["detail"]
 
 
@@ -194,10 +194,10 @@ def test_invalid_gene_symbol_error_handling(mock_id_mapper_cls):
 @patch("src.main.StringDBClient")
 @patch("src.main.OpenTargetsClient")
 @patch("src.main.ChEMBLClient")
-def test_no_pathway_found_error_handling(
+def test_no_pathway_returns_an_explicit_partial_report(
     mock_chembl_cls, mock_ot_cls, mock_string_cls, mock_id_mapper_cls
 ):
-    """Verify empty/disconnected graph raises 400 Bad Request NoPathwayFound."""
+    """An unavailable network is reported as missing evidence, not a broken page."""
     mock_id_mapper = mock_id_mapper_cls.return_value
     mock_id_mapper.map_identifier = AsyncMock(
         side_effect=lambda sym: IDMappingResult(
@@ -223,9 +223,14 @@ def test_no_pathway_found_error_handling(
         "resistance_marker": "MET",
     }
     response = client.post("/api/v1/analyze-resistance", json=payload)
-    assert response.status_code == 400
+    assert response.status_code == 200
     data = response.json()
-    assert "NoPathwayFound" in data["detail"]
+    assert data["pathway_nodes_count"] == 0
+    assert data["network_edges"] == []
+    assert "STRING network" in data["metadata"]["partial_sources"]
+    assert any(
+        "No connected protein-interaction network" in item for item in data["warnings"]
+    )
 
 
 @patch("src.main.IDMapper")

@@ -12,6 +12,9 @@ build/
 .venv/
 venv/
 ENV/
+.env
+.env.*
+!.env.example
 
 # Testing
 .pytest_cache/

@@ -6,7 +6,23 @@ from src.clients.base import USER_AGENT, BaseHTTPClient, _stable_cache_key
 from src.clients.chembl import ChEMBLClient
 from src.clients.open_targets import OpenTargetsClient
 from src.clients.string_db import StringDBClient
-from src.services.id_mapper import IDMapper
+from src.services.id_mapper import CURATED_GENE_IDENTIFIERS, IDMapper
+
+
+@pytest.mark.asyncio
+async def test_scenario_gene_identifiers_resolve_without_live_api_calls():
+    """Built-in scenarios must still open when identifier services are unavailable."""
+    mapper = IDMapper()
+    with patch.object(mapper, "get_json", new_callable=AsyncMock) as mock_get:
+        for symbol, expected in CURATED_GENE_IDENTIFIERS.items():
+            result = await mapper.map_identifier(symbol)
+            assert result.canonical_symbol == symbol
+            assert result.ensembl_id == expected["ensembl_id"]
+            assert result.uniprot_id == expected["uniprot_id"]
+
+        her2 = await mapper.map_identifier("HER2")
+        assert her2.canonical_symbol == "ERBB2"
+        mock_get.assert_not_awaited()
 
 
 @pytest.mark.asyncio

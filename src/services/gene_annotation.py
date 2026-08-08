@@ -9,7 +9,7 @@ GENE_ANNOTATIONS: dict[str, dict[str, Any]] = {
         "uniprot_id": "P00533",
         "pdb_id": "1M17",
         "druggability": "Clinically targeted RTK; regulatory status is indication-specific",
-        "role": "Receptor Tyrosine Kinase (RTK) Initiator",
+        "role": "Receptor tyrosine kinase involved in growth signaling",
         "hotspots": [
             "C797S (Exon 20 3rd-Gen TKI Resistance)",
             "T790M (1st/2nd-Gen Gatekeeper Mutation)",
@@ -18,8 +18,8 @@ GENE_ANNOTATIONS: dict[str, dict[str, Any]] = {
             "G719X (Exon 18 Atypical Activation)",
         ],
         "pathways": [
-            "RAS/RAF/MEK/ERK Cascade",
-            "PI3K/AKT/mTOR Survival Axis",
+            "RAS–RAF–MEK–ERK signaling",
+            "PI3K–AKT–mTOR signaling",
             "STAT3 Signaling",
         ],
     },
@@ -31,17 +31,17 @@ GENE_ANNOTATIONS: dict[str, dict[str, Any]] = {
         "uniprot_id": "P08581",
         "pdb_id": "3R7O",
         "druggability": "Clinically targeted RTK; regulatory status is indication-specific",
-        "role": "RTK Bypass Hyperactivation & HGF Receptor",
+        "role": "HGF receptor; MET activation can support alternative signaling",
         "hotspots": [
-            "MET Gene Amplification (Off-Target RTK Bypass)",
+            "MET amplification (alternative signaling during treatment)",
             "Exon 14 Splice Site Skipping (METex14)",
             "D1228N / Y1230C (Type I TKI Solvent Front Resistance)",
             "L1195V (Kinase Activation Loop Mutation)",
         ],
         "pathways": [
             "ERBB3 Trans-Phosphorylation",
-            "FAK Cell Motility Axis",
-            "PI3K Parallel Survival",
+            "FAK signaling and cell motility",
+            "PI3K–AKT signaling",
         ],
     },
     "ERBB2": {
@@ -52,7 +52,7 @@ GENE_ANNOTATIONS: dict[str, dict[str, Any]] = {
         "uniprot_id": "P04626",
         "pdb_id": "1N8Z",
         "druggability": "Clinically targeted receptor; regulatory status is indication-specific",
-        "role": "RTK Heterodimerization Partner",
+        "role": "Receptor tyrosine kinase that pairs with other ERBB receptors",
         "hotspots": [
             "HER2 Gene Amplification / Overexpression",
             "Exon 20 YVMA Insertion",
@@ -62,7 +62,7 @@ GENE_ANNOTATIONS: dict[str, dict[str, Any]] = {
         "pathways": [
             "HER2/HER3 Heterodimer Signaling",
             "PI3K/AKT Pathway",
-            "MAPK Cascade",
+            "MAPK signaling",
         ],
     },
     "ALK": {
@@ -73,14 +73,14 @@ GENE_ANNOTATIONS: dict[str, dict[str, Any]] = {
         "uniprot_id": "Q9UM73",
         "pdb_id": "3L9P",
         "druggability": "Clinically targeted kinase; regulatory status is indication-specific",
-        "role": "Oncogenic Fusion Kinase (EML4-ALK)",
+        "role": "Kinase activated by oncogenic fusions such as EML4–ALK",
         "hotspots": [
             "EML4-ALK Translocation / Fusion Variant 1/3",
-            "G1202R (Solvent Front Master Resistance)",
+            "G1202R (solvent-front substitution associated with inhibitor resistance)",
             "L1196M (Gatekeeper Mutation)",
             "I1171N/T (Alectinib Resistance Variant)",
         ],
-        "pathways": ["STAT3 Survival Pathway", "RAS/MAPK Axis", "PLCgamma Signaling"],
+        "pathways": ["STAT3 signaling", "RAS–MAPK signaling", "PLCγ signaling"],
     },
     "KRAS": {
         "symbol": "KRAS",
@@ -90,7 +90,7 @@ GENE_ANNOTATIONS: dict[str, dict[str, Any]] = {
         "uniprot_id": "P01116",
         "pdb_id": "6OIM",
         "druggability": "Clinically targeted protein; regulatory status is indication-specific",
-        "role": "Small GTPase Molecular Switch",
+        "role": "Small GTPase that regulates downstream signaling",
         "hotspots": [
             "G12C (Switch-II Covalent Target)",
             "G12D / G12V (Constitutive Active GTP-bound)",
@@ -99,8 +99,8 @@ GENE_ANNOTATIONS: dict[str, dict[str, Any]] = {
         ],
         "pathways": [
             "RAF/MEK/ERK Signaling",
-            "PI3K/PDK1/AKT Axis",
-            "RAL-GEF Effector Cascade",
+            "PI3K–PDK1–AKT signaling",
+            "RAL-GEF signaling",
         ],
     },
     "BRAF": {
@@ -111,9 +111,9 @@ GENE_ANNOTATIONS: dict[str, dict[str, Any]] = {
         "uniprot_id": "P15056",
         "pdb_id": "4EB9",
         "druggability": "Clinically targeted kinase; regulatory status is indication-specific",
-        "role": "MAPK Pathway Central Signal Node",
+        "role": "Kinase in the MAPK pathway",
         "hotspots": [
-            "V600E (Class 1 Monomeric Hyperactivation)",
+            "V600E (Class 1 activating mutation)",
             "V600K / V600R (Exon 15 Hotspots)",
             "BRAF Splice Variants / Homodimer Paradox",
             "L597V / K601E (Class 2 Dimer Activation)",
@@ -132,7 +132,7 @@ GENE_ANNOTATIONS: dict[str, dict[str, Any]] = {
         "uniprot_id": "P42336",
         "pdb_id": "4L23",
         "druggability": "Clinically targeted enzyme; regulatory status is indication-specific",
-        "role": "Lipid Kinase PIP3 Generator",
+        "role": "Lipid kinase that generates PIP3",
         "hotspots": [
             "H1047R (Exon 20 Kinase Domain Hotspot)",
             "E542K / E545K (Exon 9 Helical Domain)",
@@ -174,7 +174,7 @@ GENE_ANNOTATIONS: dict[str, dict[str, Any]] = {
         "druggability": "Clinically targeted kinase; regulatory status is indication-specific",
         "role": "Oncogenic Fusion Protein (BCR-ABL1)",
         "hotspots": [
-            "T315I (Gatekeeper Master Steric Clash)",
+            "T315I (gatekeeper substitution associated with reduced inhibitor binding)",
             "E255K / Y253F (P-Loop ATP Binding Hotspot)",
             "F317L (Dasatinib Resistance Mutation)",
             "H396P (Activation Loop Mutation)",
@@ -182,7 +182,7 @@ GENE_ANNOTATIONS: dict[str, dict[str, Any]] = {
         "pathways": [
             "STAT5 Leukemogenic Signaling",
             "CRKL Adaptor Phosphorylation",
-            "PI3K/AKT Survival Axis",
+            "PI3K–AKT signaling",
         ],
     },
     "CDK4": {
@@ -233,11 +233,11 @@ GENE_ANNOTATIONS: dict[str, dict[str, Any]] = {
         "uniprot_id": "P31749",
         "pdb_id": "3QKM",
         "druggability": "Clinically targeted kinase; regulatory status is indication-specific",
-        "role": "Central Survival & Metabolism Kinase",
+        "role": "Kinase involved in cell survival and metabolism",
         "hotspots": [
-            "E17K (PH Domain Membrane Hyper-recruitment)",
+            "E17K (increased membrane recruitment through the PH domain)",
             "L52R (Allosteric Binding Pocket Mutation)",
-            "p-Ser473 / p-Thr308 Hyper-phosphorylation",
+            "Increased phosphorylation at Ser473 or Thr308",
         ],
         "pathways": [
             "mTORC1 / S6K Protein Synthesis",
@@ -255,14 +255,14 @@ GENE_ANNOTATIONS: dict[str, dict[str, Any]] = {
         "druggability": "Clinically targeted kinase; regulatory status is indication-specific",
         "role": "Oncogenic Rearrangement Kinase (CD74-ROS1)",
         "hotspots": [
-            "G2032R (Solvent Front Master Resistance)",
+            "G2032R (solvent-front substitution associated with inhibitor resistance)",
             "D2033N (Kinase Binding Pocket Resistance)",
             "S1986Y/F (Gatekeeper Region Mutation)",
         ],
         "pathways": [
             "SHP2 / RAS Activation",
             "PI3K/AKT Pathway",
-            "STAT3 Survival Cascade",
+            "STAT3 signaling",
         ],
     },
     "RET": {
@@ -273,14 +273,14 @@ GENE_ANNOTATIONS: dict[str, dict[str, Any]] = {
         "uniprot_id": "P07949",
         "pdb_id": "2IVT",
         "druggability": "Clinically targeted kinase; regulatory status is indication-specific",
-        "role": "RTK Fusion & Activating Mutation Target",
+        "role": "Receptor tyrosine kinase activated by fusions or mutations",
         "hotspots": [
             "G810R/S (Solvent Front Resistance Variant)",
             "V804M / V804L (Gatekeeper Mutation)",
             "K703E (ATP Binding Pocket Mutation)",
             "KCC6-RET / CCDC6-RET Translocations",
         ],
-        "pathways": ["RAS/MAPK Axis", "PI3K/AKT Axis", "PLCgamma Pathway"],
+        "pathways": ["RAS–MAPK signaling", "PI3K–AKT signaling", "PLCγ signaling"],
     },
     "NTRK1": {
         "symbol": "NTRK1",
@@ -290,7 +290,7 @@ GENE_ANNOTATIONS: dict[str, dict[str, Any]] = {
         "uniprot_id": "P04629",
         "pdb_id": "4AOJ",
         "druggability": "Clinically targeted kinase; regulatory status is indication-specific",
-        "role": "Agnostic Oncogenic Fusion Kinase",
+        "role": "Receptor tyrosine kinase activated by oncogenic fusions",
         "hotspots": [
             "G595R (Solvent Front Larotrectinib Resistance)",
             "G667C (xDFG Motif Resistance)",
@@ -299,7 +299,7 @@ GENE_ANNOTATIONS: dict[str, dict[str, Any]] = {
         "pathways": [
             "TRK Kinase Fusion Signaling",
             "PLCgamma Pathway",
-            "PI3K Survival Cascade",
+            "PI3K–AKT signaling",
         ],
     },
     "TP53": {
@@ -310,7 +310,7 @@ GENE_ANNOTATIONS: dict[str, dict[str, Any]] = {
         "uniprot_id": "P04637",
         "pdb_id": "1TUP",
         "druggability": "Tumor suppressor; no blanket druggability claim",
-        "role": "Guardian of the Genome & Apoptosis Regulator",
+        "role": "Tumor suppressor involved in DNA-damage responses and apoptosis",
         "hotspots": [
             "R273H / R273C (DNA Binding Hotspot)",
             "R175H (Conformational Structural Loss)",
@@ -319,7 +319,7 @@ GENE_ANNOTATIONS: dict[str, dict[str, Any]] = {
         ],
         "pathways": [
             "Cell Cycle Arrest (p21/CDKN1A)",
-            "BAX/PUMA Pro-Apoptotic Axis",
+            "BAX and PUMA regulation of apoptosis",
             "DNA Repair Surveillance",
         ],
     },
@@ -331,7 +331,7 @@ GENE_ANNOTATIONS: dict[str, dict[str, Any]] = {
         "uniprot_id": "P60484",
         "pdb_id": "1D5R",
         "druggability": "Tumor suppressor; pathway relevance does not imply direct druggability",
-        "role": "PI3K/AKT De-phosphorylation Brake",
+        "role": "Tumor suppressor that limits PI3K–AKT signaling",
         "hotspots": [
             "Homozygous Genomic Deletion",
             "R130G / R130Q (Phosphatase Catalytic Domain)",
@@ -351,7 +351,7 @@ GENE_ANNOTATIONS: dict[str, dict[str, Any]] = {
         "uniprot_id": "P62993",
         "pdb_id": "1TZE",
         "druggability": "Adaptor protein; direct druggability is context-specific",
-        "role": "SH2/SH3 Adaptor Bridge Protein",
+        "role": "Adaptor protein linking activated receptors to downstream signaling",
         "hotspots": [
             "SH2 Domain Phosphotyrosine Binding Loop",
             "N-terminal SH3 Domain SOS1 Interaction",
@@ -370,7 +370,7 @@ GENE_ANNOTATIONS: dict[str, dict[str, Any]] = {
         "ensembl_id": "ENSG00000115904",
         "uniprot_id": "Q07889",
         "pdb_id": "6D55",
-        "druggability": "Tier 2: Clinical Trial Candidate (SOS1 Inhibitors)",
+        "druggability": "SOS1 inhibitors are under clinical investigation; status depends on the specific drug and cancer type",
         "role": "Guanine Nucleotide Exchange Factor (GEF)",
         "hotspots": [
             "GDP-to-GTP Nucleotide Exchange Pocket",
@@ -379,7 +379,7 @@ GENE_ANNOTATIONS: dict[str, dict[str, Any]] = {
         ],
         "pathways": [
             "KRAS GDP-to-GTP Exchange",
-            "RAC1 Signaling Axis",
+            "RAC1 signaling",
             "RAS-GTP Activation",
         ],
     },
@@ -387,14 +387,14 @@ GENE_ANNOTATIONS: dict[str, dict[str, Any]] = {
 
 
 def get_gene_annotation(symbol: str) -> dict[str, Any]:
-    """Retrieve canonical multi-omics annotation metadata for a gene symbol."""
+    """Retrieve locally reviewed annotation metadata for a gene symbol."""
     sym_clean = (symbol or "").strip().upper()
     if sym_clean in GENE_ANNOTATIONS:
         annotation = dict(GENE_ANNOTATIONS[sym_clean])
         annotation["structure_status"] = "curated_structure_mapping"
         annotation["structure_source"] = "RCSB Protein Data Bank"
         annotation["annotation_source"] = (
-            "Local curated annotation panel; verify against current primary literature"
+            "Local reviewed annotation panel; verify against current primary literature"
         )
         return annotation
 
@@ -408,13 +408,13 @@ def get_gene_annotation(symbol: str) -> dict[str, Any]:
         "pdb_id": None,
         "structure_status": "unavailable",
         "structure_source": None,
-        "annotation_source": "No local curated annotation available",
-        "druggability": "Not annotated in the curated local target panel",
-        "role": "Signal Transduction Pathway Interactor",
+        "annotation_source": "No local reviewed annotation is available",
+        "druggability": "Not described in the local target panel",
+        "role": "Protein associated with the retrieved interaction network",
         "hotspots": [
-            f"Oncogenic Amplification / Hyperactivation in {sym_clean}",
-            f"Kinase Domain Variants in {sym_clean}",
-            "Acquired Bypass Resistance Locus",
+            f"Amplification or increased activity reported for {sym_clean}",
+            f"Reported variants in {sym_clean}",
+            "Possible acquired-resistance association",
         ],
-        "pathways": ["Signal Transduction Cascade", "Oncogenic Survival Network"],
+        "pathways": ["Reported protein interactions", "Cancer-related signaling"],
     }

@@ -205,22 +205,22 @@ class PathwayScorer:
             if not target_present:
                 candidate_res["evidence_status"] = "abstained"
                 candidate_res["evidence_notes"] = [
-                    "The target was not present in the validated network topology."
+                    "The target was not found in the retrieved protein-interaction network, so it was not ranked."
                 ]
             elif item["candidate"].get("combination_evidence") is True:
                 candidate_res["evidence_status"] = "pair_co_mention"
                 candidate_res["evidence_notes"] = [
-                    "A returned clinical record co-mentioned the primary drug; this does not prove same-arm efficacy."
+                    "A clinical source mentions the primary drug and this candidate. Confirm that they were studied together and review the reported outcomes."
                 ]
             elif item["affinity"] is not None:
                 candidate_res["evidence_status"] = "pharmacology_available"
                 candidate_res["evidence_notes"] = [
-                    "Drug-specific activity was available, but activity is not clinical response."
+                    "Laboratory drug-activity data were available. These measurements do not predict clinical response."
                 ]
             else:
                 candidate_res["evidence_status"] = "computational_hypothesis"
                 candidate_res["evidence_notes"] = [
-                    "The result is supported by network heuristics without drug-specific activity."
+                    "This result is based on protein-network data; no drug-specific activity measurement was available."
                 ]
 
             scored_results.append(candidate_res)
@@ -261,7 +261,7 @@ class PathwayScorer:
                 and candidate.get("score_components", {}).get("pharmacology") is None
             ):
                 candidate["tie_reason"] = (
-                    "Insufficient drug-specific evidence; topology and proximity "
+                    "Insufficient drug-specific evidence; network position and distance "
                     "were not enough to separate this candidate."
                 )
             candidate.pop("_tie_key", None)

@@ -6,6 +6,106 @@ from src.schemas.models import IDMappingResult
 logger = logging.getLogger(__name__)
 
 
+# Reviewed identifiers for the genes used by the built-in scenario library.
+# Keeping this small reference set locally makes presets reproducible and prevents
+# a temporary HGNC, UniProt, or ChEMBL outage from blocking the entire report.
+# Other symbols continue through the live resolution workflow below.
+CURATED_GENE_IDENTIFIERS: dict[str, dict[str, str | None]] = {
+    "ABL1": {
+        "ensembl_id": "ENSG00000097007",
+        "uniprot_id": "P00519",
+        "chembl_target_id": "CHEMBL1862",
+    },
+    "ALK": {
+        "ensembl_id": "ENSG00000171094",
+        "uniprot_id": "Q9UM73",
+        "chembl_target_id": "CHEMBL4247",
+    },
+    "AR": {
+        "ensembl_id": "ENSG00000169083",
+        "uniprot_id": "P10275",
+        "chembl_target_id": "CHEMBL1871",
+    },
+    "BRAF": {
+        "ensembl_id": "ENSG00000157764",
+        "uniprot_id": "P15056",
+        "chembl_target_id": "CHEMBL5145",
+    },
+    "BRCA2": {
+        "ensembl_id": "ENSG00000139618",
+        "uniprot_id": "P51587",
+        "chembl_target_id": None,
+    },
+    "CDK4": {
+        "ensembl_id": "ENSG00000135446",
+        "uniprot_id": "P11802",
+        "chembl_target_id": "CHEMBL331",
+    },
+    "EGFR": {
+        "ensembl_id": "ENSG00000146648",
+        "uniprot_id": "P00533",
+        "chembl_target_id": "CHEMBL203",
+    },
+    "ERBB2": {
+        "ensembl_id": "ENSG00000141736",
+        "uniprot_id": "P04626",
+        "chembl_target_id": "CHEMBL1824",
+    },
+    "ESR1": {
+        "ensembl_id": "ENSG00000091831",
+        "uniprot_id": "P03372",
+        "chembl_target_id": "CHEMBL206",
+    },
+    "FGFR2": {
+        "ensembl_id": "ENSG00000066468",
+        "uniprot_id": "P21802",
+        "chembl_target_id": "CHEMBL4142",
+    },
+    "KIT": {
+        "ensembl_id": "ENSG00000157404",
+        "uniprot_id": "P10721",
+        "chembl_target_id": "CHEMBL1936",
+    },
+    "KRAS": {
+        "ensembl_id": "ENSG00000133703",
+        "uniprot_id": "P01116",
+        "chembl_target_id": "CHEMBL2189121",
+    },
+    "MAP2K1": {
+        "ensembl_id": "ENSG00000169032",
+        "uniprot_id": "Q02750",
+        "chembl_target_id": "CHEMBL2964",
+    },
+    "MET": {
+        "ensembl_id": "ENSG00000105976",
+        "uniprot_id": "P08581",
+        "chembl_target_id": "CHEMBL3717",
+    },
+    "PARP1": {
+        "ensembl_id": "ENSG00000143799",
+        "uniprot_id": "P09874",
+        "chembl_target_id": "CHEMBL3105",
+    },
+    "PIK3CA": {
+        "ensembl_id": "ENSG00000121879",
+        "uniprot_id": "P42336",
+        "chembl_target_id": "CHEMBL4005",
+    },
+    "RET": {
+        "ensembl_id": "ENSG00000165731",
+        "uniprot_id": "P07949",
+        "chembl_target_id": "CHEMBL2041",
+    },
+    "ROS1": {
+        "ensembl_id": "ENSG00000047936",
+        "uniprot_id": "P08922",
+        "chembl_target_id": "CHEMBL2431",
+    },
+}
+
+CURATED_GENE_ALIASES = {"HER2": "ERBB2"}
+
+
 class IDMapper(BaseHTTPClient):
     def __init__(self, timeout: float = 30.0):
         super().__init__(timeout=timeout)
@@ -86,6 +186,17 @@ class IDMapper(BaseHTTPClient):
     async def map_identifier(self, symbol: str) -> IDMappingResult:
         """Complete ID resolution flow returning an IDMappingResult instance."""
         clean_symbol = symbol.strip().upper()
+        curated_symbol = CURATED_GENE_ALIASES.get(clean_symbol, clean_symbol)
+        curated = CURATED_GENE_IDENTIFIERS.get(curated_symbol)
+        if curated:
+            return IDMappingResult(
+                original_input=symbol,
+                canonical_symbol=curated_symbol,
+                ensembl_id=str(curated["ensembl_id"]),
+                uniprot_id=str(curated["uniprot_id"]),
+                chembl_target_id=curated["chembl_target_id"],
+            )
+
         cache_key = _stable_cache_key("ID-MAP", "hgnc-uniprot-chembl", clean_symbol)
         try:
             cached = cache.get(cache_key)

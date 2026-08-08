@@ -1,4 +1,5 @@
 import asyncio
+import re
 from unittest.mock import AsyncMock, patch
 
 import pytest
@@ -44,10 +45,92 @@ def test_health_endpoint():
 def test_homepage_contains_mutation_focused_workspace():
     response = client.get("/")
     assert response.status_code == 200
-    assert "Trace the mutation." in response.text
+    assert "Examine resistance." in response.text
     assert "mutation-plate" in response.text
-    assert "Molecular structure workspace" in response.text
+    assert "Experimental protein structure" in response.text
     assert "structureWorkspaceViewer" in response.text
+    assert 'href="/" class="btn-header"' in response.text
+    assert "Begin with a documented resistance pattern." in response.text
+    assert 'class="featured-scenario" href="/analyze?' in response.text
+    assert "target=EGFR&amp;drug=Osimertinib&amp;marker=MET" in response.text
+    assert "autorun=1" in response.text
+
+
+def test_scenario_explorer_includes_expanded_evidence_based_catalog():
+    response = client.get("/scenarios")
+    assert response.status_code == 200
+    assert "19 reviewed scenarios" in response.text
+    assert "scenarioCancerFilter" in response.text
+    assert "ROS1 + G2032R" in response.text
+    assert "KIT + V654A" in response.text
+    assert "FGFR2 + V565F" in response.text
+    assert "Primary clinical evidence" in response.text
+    assert "searchTokens.every" in response.text
+    assert len(re.findall(r'class="prevalence-card(?: |")', response.text)) == 19
+    assert response.text.count('data-cancer="') == 11
+    assert "across 9 oncology indications" not in response.text
+    assert "scenarioOrganIcons" in response.text
+    assert "scenarioCategoryColors" in response.text
+    assert "scenario-tab-organ" in response.text
+    assert "activeButton?.classList.add('active')" in response.text
+
+
+def test_every_scenario_uses_a_locally_resolvable_gene_pair():
+    from src.services.id_mapper import CURATED_GENE_ALIASES, CURATED_GENE_IDENTIFIERS
+
+    html = client.get("/scenarios").text
+    gene_pairs = re.findall(
+        r"setPreset\('([^']+)', '[^']+', '([^']+)'",
+        html,
+    )
+    assert len(gene_pairs) == 19
+    supported = set(CURATED_GENE_IDENTIFIERS) | set(CURATED_GENE_ALIASES)
+    assert {gene for pair in gene_pairs for gene in pair} <= supported
+
+
+def test_frontend_uses_plain_language_for_core_workflow():
+    response = client.get("/analyze")
+    assert response.status_code == 200
+    assert "Treatment and resistance details" in response.text
+    assert "Analyze resistance evidence" in response.text
+    assert "Gene records confirmed" in response.text
+    assert "Interactions retrieved" in response.text
+    assert "Research priorities calculated" in response.text
+    for jargon in (
+        "Canonical identity",
+        "Canonical IDs",
+        "PPI topology",
+        "Heuristic Priority",
+        "Hub Centrality",
+    ):
+        assert jargon not in response.text
+    assert re.search(r'id="submitBtn".*?</button>\s*</form>', response.text, re.DOTALL)
+
+
+def test_frontend_has_focused_routes():
+    routes = {
+        "/analyze": '<body data-page="analyze">',
+        "/scenarios": '<body data-page="scenarios">',
+        "/method": '<body data-page="method">',
+        "/sources": '<body data-page="sources">',
+    }
+    for route, marker in routes.items():
+        response = client.get(route)
+        assert response.status_code == 200
+        assert marker in response.text
+        assert response.text.count(marker) == 1
+
+
+def test_frontend_inline_actions_reference_defined_functions():
+    html = client.get("/").text
+    onclick_functions = set(
+        re.findall(
+            r'onclick="(?:if\([^\"]+\)\s*)?([A-Za-z_$][\w$]*)\(',
+            html,
+        )
+    )
+    defined_functions = set(re.findall(r"function\s+([A-Za-z_$][\w$]*)\s*\(", html))
+    assert onclick_functions <= defined_functions
 
 
 def test_structure_lookup_does_not_invent_unknown_identifiers():
@@ -189,7 +272,41 @@ def test_on_target_empty_evidence_does_not_fabricate_candidate(
     assert response.status_code == 200
     data = response.json()
     assert data["ranked_combinations"] == []
-    assert any("no candidate was fabricated" in warning for warning in data["warnings"])
+    assert any("no result is shown" in warning.lower() for warning in data["warnings"])
+
+
+@patch("src.main.IDMapper")
+@patch("src.main.ChEMBLClient")
+def test_on_target_source_failure_returns_partial_report(
+    mock_chembl_cls, mock_id_mapper_cls
+):
+    mock_id_mapper_cls.return_value.map_identifier = AsyncMock(
+        return_value=IDMappingResult(
+            original_input="KIT",
+            canonical_symbol="KIT",
+            ensembl_id="ENSG00000157404",
+            uniprot_id="P10721",
+            chembl_target_id="CHEMBL1936",
+        )
+    )
+    mock_chembl_cls.return_value.get_clinical_molecules = AsyncMock(
+        side_effect=TimeoutError
+    )
+
+    response = client.post(
+        "/api/v1/analyze-resistance",
+        json={
+            "primary_drug": "Imatinib",
+            "primary_target": "KIT",
+            "resistance_marker": "KIT",
+        },
+    )
+
+    assert response.status_code == 200
+    data = response.json()
+    assert data["ranked_combinations"] == []
+    assert "ChEMBL" in data["metadata"]["partial_sources"]
+    assert any("without complete chembl" in item.lower() for item in data["warnings"])
 
 
 @patch("src.main.IDMapper")
