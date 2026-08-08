@@ -131,9 +131,7 @@ async def get_network_image():
     possible_paths = [
         os.path.join(os.path.dirname(__file__), "static", "network.png"),
         os.path.join(os.getcwd(), "src", "static", "network.png"),
-        os.path.join(os.getcwd(), "api", "static", "network.png"),
         "src/static/network.png",
-        "api/static/network.png",
     ]
     for p in possible_paths:
         if os.path.exists(p):
@@ -147,9 +145,7 @@ async def get_lab_mutation_image():
     possible_paths = [
         os.path.join(os.path.dirname(__file__), "static", "lab_mutation.png"),
         os.path.join(os.getcwd(), "src", "static", "lab_mutation.png"),
-        os.path.join(os.getcwd(), "api", "static", "lab_mutation.png"),
         "src/static/lab_mutation.png",
-        "api/static/lab_mutation.png",
     ]
     for p in possible_paths:
         if os.path.exists(p):
