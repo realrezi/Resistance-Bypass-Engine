@@ -8,6 +8,12 @@ from src.schemas.models import AlterationType, IDMappingResult, ResistanceReques
 client = TestClient(app)
 
 
+def test_vercel_entrypoint_exports_fastapi_app():
+    from api.index import app as vercel_app
+
+    assert vercel_app is app
+
+
 def test_health_endpoint():
     """Verify GET /health returns status ok and cache metrics."""
     response = client.get("/health")
